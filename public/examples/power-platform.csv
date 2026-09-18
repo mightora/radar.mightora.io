@@ -1,0 +1,18 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Power Platform Radar,Model-driven Apps,UI,Model-driven Apps,Trial,Standard
+Power Platform Radar,Model-driven Apps,UI,Responsive Canvas,Trial,Standard
+Power Platform Radar,Model-driven Apps,UI,Unsupported UI,Sunset,Rejected
+Power Platform Radar,Power Automate,Automation,Cloud Automation,Assess,Standard
+Power Platform Radar,Power Automate,Automation,Power Automate,Deploy,Standard
+Power Platform Radar,Power Pages & Agents,Extensibility,Copilot Agents,Assess,Caveated
+Power Platform Radar,Power Pages & Agents,Extensibility,Power Pages,Deploy,Standard
+Power Platform Radar,UI Extensions,Controls,PCF Controls,Trial,Standard
+Power Platform Radar,UI Extensions,Controls,Low-code Plug-ins,Assess,Standard
+Power Platform Radar,Solutions & Build,Governance,Managed Solutions,Deploy,Standard
+Power Platform Radar,Solutions & Build,Governance,Native Git & Tests,Assess,Standard
+Power Platform Radar,Transaction Processing,Data,Custom Pages,Deploy,Standard
+Power Platform Radar,Transaction Processing,Data,Approvals,Deploy,Standard
+Power Platform Radar,Operational Data,Data,Fabric Links,Assess,Standard
+Power Platform Radar,Operational Data,Data,Elastic Tables,Assess,Standard
+Power Platform Radar,Analytics & Documents,Connectors,Custom APIs,Deploy,Standard
+Power Platform Radar,Connectors & APIs,Connectors,Giant Personal Flows,Decommission,Rejected

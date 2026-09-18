@@ -1,0 +1,18 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Software Development Radar,Languages,Web,TypeScript,Deploy,Standard
+Software Development Radar,Languages,Systems,Rust,Trial,Standard
+Software Development Radar,Languages,Runtime,Bun,Assess,Caveated
+Software Development Radar,Frameworks,Frontend,React,Deploy,Standard
+Software Development Radar,Frameworks,Frontend,Svelte,Assess,Standard
+Software Development Radar,Frameworks,Backend,NestJS,Trial,Standard
+Software Development Radar,Architecture,Services,OpenTelemetry,Trial,Standard
+Software Development Radar,Architecture,Services,Event-driven Design,Deploy,Standard
+Software Development Radar,Delivery,Automation,GitHub Actions,Deploy,Standard
+Software Development Radar,Delivery,Quality,Playwright,Trial,Standard
+Software Development Radar,Delivery,Quality,Contract Testing,Assess,Standard
+Software Development Radar,Data,Storage,PostgreSQL,Deploy,Standard
+Software Development Radar,Data,Caching,Redis,Deploy,Standard
+Software Development Radar,AI Tooling,Assistants,AI Code Review,Assess,Caveated
+Software Development Radar,AI Tooling,Assistants,Autonomous Agents,Assess,Caveated
+Software Development Radar,Legacy,Frontend,AngularJS,Decommission,Rejected
+Software Development Radar,Legacy,Infrastructure,On-prem CI Servers,Sunset,Rejected

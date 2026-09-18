@@ -1,0 +1,11 @@
+{
+  "name": "technology-radar-live-editor",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/app.js",
+    "test": "node scripts/smoke-test.mjs",
+    "build": "node scripts/build.mjs"
+  }
+}

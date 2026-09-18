@@ -1,0 +1,18 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Cybersecurity Radar,Identity,Access,Passwordless Authentication,Deploy,Standard
+Cybersecurity Radar,Identity,Access,Zero Trust Network Access,Deploy,Standard
+Cybersecurity Radar,Identity,Access,Standing Admin Access,Decommission,Rejected
+Cybersecurity Radar,Detection & Response,SOC,Extended Detection & Response,Deploy,Standard
+Cybersecurity Radar,Detection & Response,SOC,AI-assisted Triage,Trial,Caveated
+Cybersecurity Radar,Application Security,AppSec,Software Bill of Materials,Deploy,Standard
+Cybersecurity Radar,Application Security,AppSec,Static Application Security Testing,Deploy,Standard
+Cybersecurity Radar,Application Security,AppSec,Fuzz Testing,Trial,Standard
+Cybersecurity Radar,Cloud Security,Posture,Cloud Security Posture Management,Deploy,Standard
+Cybersecurity Radar,Cloud Security,Posture,Infrastructure Drift Detection,Trial,Standard
+Cybersecurity Radar,Data Protection,Encryption,Confidential Computing,Assess,Standard
+Cybersecurity Radar,Data Protection,Encryption,Customer-managed Keys,Deploy,Standard
+Cybersecurity Radar,Governance,Compliance,Continuous Compliance Monitoring,Trial,Standard
+Cybersecurity Radar,Governance,Compliance,Manual Annual Audits,Sunset,Rejected
+Cybersecurity Radar,Resilience,Recovery,Immutable Backups,Deploy,Standard
+Cybersecurity Radar,Resilience,Recovery,Tabletop Exercises,Assess,Standard
+Cybersecurity Radar,Legacy,Network,Flat Network Architecture,Decommission,Rejected

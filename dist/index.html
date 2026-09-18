@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a43">
+  <title>Technology Radar Live Editor | Mightora</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mightora/shared-ui@main/shared.css">
+  <link rel="stylesheet" href="src/styles.css">
+  <script>
+    // Fix a known indentation syntax error in the shared-ui footer.yaml before js-yaml parses it.
+    if (window.fetch) {
+      const nativeFetch = window.fetch.bind(window);
+      window.fetch = async (input, init) => {
+        const url = typeof input === 'string' ? input : input.url;
+        const response = await nativeFetch(input, init);
+        if (url && url.includes('footer.yaml')) {
+          const text = await response.text();
+          return new Response(text.replace(/\t/g, '  '), { status: response.status, statusText: response.statusText, headers: response.headers });
+        }
+        return response;
+      };
+    }
+  </script>
+</head>
+<body>
+  <mightora-header
+    site-name="Technology Radar Live Editor"
+    site-url="/"
+    logo-light="https://raw.githubusercontent.com/mightora/mightora.io/main/static/images/mightoraIoLogo4-200x900.png"
+    logo-dark="https://raw.githubusercontent.com/mightora/mightora.io/main/static/images/mightoraIoLogo4-200x900.png"
+    nav-links='[
+      {"label":"Examples","url":"#examples"},
+      {"label":"Documentation","url":"https://github.com/mightora/radar.mightora.io","ext":true},
+      {"label":"Mightora.io ↗","url":"https://mightora.io","ext":true}
+    ]'>
+  </mightora-header>
+  <main>
+    <section class="intro"><div><p class="eyebrow">Mightora / browser workspace</p><h1 id="pageTitle">Technology Radar</h1><p class="subtitle">Edit CSV on the left. See a deterministic radar on the right. Your data stays in this browser.</p></div><span class="status-dot">No account required</span></section>
+    <nav class="toolbar" aria-label="Editor tools"><div class="toolbar-actions"><button id="undoButton" class="icon-button" aria-label="Undo" title="Undo">&#8630;</button><button id="redoButton" class="icon-button" aria-label="Redo" title="Redo">&#8631;</button><button id="newButton" class="button">New</button><button id="examplesButton" class="button">Examples</button><button id="uploadButton" class="button">Upload CSV</button><button id="downloadCsv" class="button">Download CSV</button><button id="shareButton" class="button primary">Share</button><button id="shareTopButton" class="hidden">Share</button><button id="docsButton" class="button">Documentation</button></div><div class="toolbar-actions"><button id="toggleLabels" class="button">Toggle labels</button><button id="resetView" class="button">Reset view</button></div></nav>
+    <div class="segmented page-tabs"><button class="tab active" data-tab="data">Editor</button><button class="tab" data-tab="preview">Preview</button><button class="tab" data-tab="validation">Errors <span id="errorCount" class="count">0</span></button><button class="tab" data-tab="exports">Exports</button></div>
+    <section id="dataPanel" class="workspace-panel active-panel"><div class="editor-head"><div><h2>CSV source</h2><p>Required columns: Radar Name, Category, Sub Category, Technology, Status, Dot Status</p></div><button id="formatCsv" class="small-button">Format CSV</button></div><div class="code-editor"><pre id="lineNumbers" aria-hidden="true">1</pre><textarea id="csvInput" aria-label="CSV radar source" spellcheck="false"></textarea></div><div class="source-actions"><span id="sourceStatus" aria-live="polite">Loading source...</span><span>Debounced validation: 300ms</span></div></section>
+    <section id="previewPanel" class="workspace-panel"><div class="preview-head"><div><h2 id="previewTitle">Technology Radar</h2><p>Hover or focus a dot to inspect its complete CSV values.</p></div></div><div id="radarCanvas" class="radar-canvas"></div></section>
+    <section id="validationPanel" class="workspace-panel"><div class="panel-copy"><h2>Validation</h2><p>Invalid source is preserved and the preview remains on the last valid version.</p></div><div id="validationList" class="validation-list"></div></section>
+    <section id="exportsPanel" class="workspace-panel"><div class="panel-copy"><h2>Download and export</h2><p>Generated locally in your browser. Shared links are encoded, not encrypted.</p></div><div class="export-grid"><button class="export-card" data-export="csv"><strong>CSV</strong><span>Editable source</span></button><button class="export-card" data-export="project"><strong>.radar.json</strong><span>Portable project</span></button><button class="export-card" data-export="svg"><strong>SVG</strong><span>Vector radar</span></button><button class="export-card" data-export="png"><strong>PNG</strong><span>Raster radar</span></button><button class="export-card" data-export="print"><strong>Print</strong><span>Clean print view</span></button></div></section>
+  </main>
+  <dialog id="shareDialog"><div class="dialog-head"><div><p class="eyebrow">Share safely</p><h2>Share radar</h2></div><button id="closeShare" class="close-button" aria-label="Close">&times;</button></div><p class="warning">Anyone with this link can read the radar data. It is encoded and compressed, but it is not encrypted. Do not include confidential information.</p><div class="share-options"><label><input type="radio" name="shareMode" value="view" checked> View link</label><label><input type="radio" name="shareMode" value="edit"> Edit link</label></div><div id="shareResult" class="share-result hidden"><label>Generated URL<input id="shareUrl" readonly></label><p id="shareMeta"></p><button id="copyShare" class="button primary">Copy link</button></div><div class="dialog-actions"><button id="generateShare" class="button primary">Generate link</button><button id="cancelShare" class="button">Close</button></div></dialog>
+  <input id="projectFile" type="file" accept=".csv,text/csv" hidden><div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <mightora-author>
+    <div class="author-section-overlay">
+      <div class="author-section-inner">
+        <div class="author-photos">
+          <img src="https://techtweedie.github.io/images/author/ian-tweedie-sq2_hu_a380911c6f4726de.png" alt="Ian Tweedie" class="author-avatar" />
+          <img src="https://raw.githubusercontent.com/TechTweedie/techtweedie.github.io/v2/assets/images/site/main-logo.png" alt="TechTweedie" class="author-blog-logo" />
+        </div>
+        <div class="author-text">
+          <h2 class="author-heading">Built by TechTweedie</h2>
+          <p class="author-bio">
+            Technology Radar Live Editor is a free tool created by <strong>Ian Tweedie</strong> — also known online as <strong>TechTweedie</strong>. Ian is a technology consultant and developer based in North East England with a background in enterprise IT, cloud infrastructure, and developer tooling. He builds free, practical tools and writes about technology on his blog.
+          </p>
+          <div class="author-links">
+            <a href="https://techtweedie.github.io" target="_blank" rel="noopener" class="author-link">
+              <i class="fas fa-blog"></i> Blog
+            </a>
+            <a href="https://github.com/itweedie" target="_blank" rel="noopener" class="author-link">
+              <i class="fab fa-github"></i> GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mightora-author>
+  <mightora-footer>
+    <div class="container">
+      <div class="footer-bottom">
+        <div class="footer-copy">
+          Technology Radar by <a href="https://mightora.io" target="_blank" rel="noopener noreferrer">Mightora</a>.
+          Open source on <a href="https://github.com/mightora/radar.mightora.io" target="_blank" rel="noopener noreferrer">GitHub</a>.
+        </div>
+        <div class="footer-bottom-links">
+          <span class="site-footer__note">Local-first: your radar data never leaves this browser unless you share it.</span>
+        </div>
+      </div>
+    </div>
+  </mightora-footer>
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/mightora/shared-ui@main/components.js"></script>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

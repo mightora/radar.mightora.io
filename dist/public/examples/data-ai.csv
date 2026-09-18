@@ -1,0 +1,18 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Data & AI Radar,Foundation Models,LLMs,GPT-class Models,Deploy,Standard
+Data & AI Radar,Foundation Models,LLMs,Open-weight Models,Trial,Standard
+Data & AI Radar,Foundation Models,Multimodal,Vision-Language Models,Assess,Caveated
+Data & AI Radar,Agentic AI,Orchestration,Agent Frameworks,Trial,Caveated
+Data & AI Radar,Agentic AI,Orchestration,Autonomous Multi-agent Systems,Assess,Caveated
+Data & AI Radar,Retrieval,Search,Vector Databases,Deploy,Standard
+Data & AI Radar,Retrieval,Search,Hybrid Search,Trial,Standard
+Data & AI Radar,MLOps,Lifecycle,Model Registries,Deploy,Standard
+Data & AI Radar,MLOps,Lifecycle,Feature Stores,Trial,Standard
+Data & AI Radar,Data Engineering,Pipelines,Streaming ETL,Deploy,Standard
+Data & AI Radar,Data Engineering,Pipelines,Lakehouse Architecture,Deploy,Standard
+Data & AI Radar,Governance,Responsible AI,Model Evaluation Suites,Trial,Standard
+Data & AI Radar,Governance,Responsible AI,AI Red Teaming,Assess,Standard
+Data & AI Radar,Analytics,BI,Embedded Analytics,Deploy,Standard
+Data & AI Radar,Analytics,BI,Natural Language Query,Assess,Standard
+Data & AI Radar,Legacy,Batch,Overnight Batch Reporting,Sunset,Rejected
+Data & AI Radar,Legacy,Batch,Manual Spreadsheet ETL,Decommission,Rejected

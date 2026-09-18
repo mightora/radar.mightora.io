@@ -1,0 +1,18 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Cloud & DevOps Radar,Infrastructure as Code,Provisioning,Terraform,Deploy,Standard
+Cloud & DevOps Radar,Infrastructure as Code,Provisioning,Bicep,Deploy,Standard
+Cloud & DevOps Radar,Infrastructure as Code,Provisioning,Pulumi,Assess,Standard
+Cloud & DevOps Radar,Containers,Orchestration,Kubernetes,Deploy,Standard
+Cloud & DevOps Radar,Containers,Orchestration,Helm,Trial,Standard
+Cloud & DevOps Radar,CI/CD,Pipelines,GitHub Actions,Deploy,Standard
+Cloud & DevOps Radar,CI/CD,Pipelines,Azure DevOps Pipelines,Deploy,Standard
+Cloud & DevOps Radar,CI/CD,Delivery,Progressive Delivery,Trial,Caveated
+Cloud & DevOps Radar,Observability,Monitoring,OpenTelemetry,Deploy,Standard
+Cloud & DevOps Radar,Observability,Monitoring,Grafana,Deploy,Standard
+Cloud & DevOps Radar,Observability,Cost,FinOps Dashboards,Assess,Standard
+Cloud & DevOps Radar,Platform Engineering,Developer Portals,Backstage,Trial,Standard
+Cloud & DevOps Radar,Platform Engineering,Developer Portals,Internal Dev Platforms,Assess,Standard
+Cloud & DevOps Radar,Security,Supply Chain,SBOM Generation,Trial,Standard
+Cloud & DevOps Radar,Security,Supply Chain,Signed Container Images,Assess,Caveated
+Cloud & DevOps Radar,Legacy,Config Management,Manual Server Config,Decommission,Rejected
+Cloud & DevOps Radar,Legacy,Config Management,Snowflake Servers,Sunset,Rejected

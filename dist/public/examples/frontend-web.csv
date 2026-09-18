@@ -1,0 +1,18 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Frontend Web Radar,Frameworks,Meta-frameworks,Next.js,Deploy,Standard
+Frontend Web Radar,Frameworks,Meta-frameworks,SvelteKit,Trial,Standard
+Frontend Web Radar,Frameworks,Signals,Fine-grained Reactivity,Trial,Caveated
+Frontend Web Radar,Build Tools,Bundling,Vite,Deploy,Standard
+Frontend Web Radar,Build Tools,Bundling,esbuild,Deploy,Standard
+Frontend Web Radar,Build Tools,Package Management,pnpm,Deploy,Standard
+Frontend Web Radar,Styling,CSS,Container Queries,Deploy,Standard
+Frontend Web Radar,Styling,CSS,View Transitions API,Trial,Standard
+Frontend Web Radar,Testing,Automation,Playwright,Deploy,Standard
+Frontend Web Radar,Testing,Automation,Component Testing,Trial,Standard
+Frontend Web Radar,Performance,Loading,Islands Architecture,Trial,Standard
+Frontend Web Radar,Performance,Loading,Edge Rendering,Assess,Caveated
+Frontend Web Radar,Accessibility,Standards,Automated a11y Audits,Deploy,Standard
+Frontend Web Radar,Accessibility,Standards,Manual Screen Reader Testing,Trial,Standard
+Frontend Web Radar,State Management,Data,Server-first State,Trial,Standard
+Frontend Web Radar,Legacy,Frameworks,jQuery Plugins,Decommission,Rejected
+Frontend Web Radar,Legacy,Frameworks,Global CSS Overrides,Sunset,Rejected

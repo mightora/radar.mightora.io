@@ -1,0 +1,18 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Enterprise Architecture Radar,Cloud Platforms,Compute,Azure,Deploy,Standard
+Enterprise Architecture Radar,Cloud Platforms,Compute,Kubernetes,Trial,Caveated
+Enterprise Architecture Radar,Cloud Platforms,Compute,Serverless Containers,Assess,Standard
+Enterprise Architecture Radar,Data Platforms,Governance,Data Contracts,Assess,Standard
+Enterprise Architecture Radar,Data Platforms,Analytics,Microsoft Fabric,Trial,Standard
+Enterprise Architecture Radar,Data Platforms,Analytics,Data Mesh,Assess,Caveated
+Enterprise Architecture Radar,Integration,APIs,REST,Deploy,Standard
+Enterprise Architecture Radar,Integration,Messaging,Event Hubs,Deploy,Standard
+Enterprise Architecture Radar,Integration,Legacy,ESB,Sunset,Rejected
+Enterprise Architecture Radar,Security,Identity,Passkeys,Assess,Standard
+Enterprise Architecture Radar,Security,Identity,Zero Trust Network,Deploy,Standard
+Enterprise Architecture Radar,Governance,Standards,Architecture Decision Records,Deploy,Standard
+Enterprise Architecture Radar,Governance,Standards,Enterprise Service Catalog,Trial,Standard
+Enterprise Architecture Radar,Observability,Monitoring,Distributed Tracing,Deploy,Standard
+Enterprise Architecture Radar,Observability,Monitoring,Centralized Logging,Deploy,Standard
+Enterprise Architecture Radar,Legacy,Hosting,On-prem VM Farm,Decommission,Rejected
+Enterprise Architecture Radar,Legacy,Hosting,Mainframe Batch Jobs,Decommission,Rejected

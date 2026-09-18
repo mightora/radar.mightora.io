@@ -1,0 +1,47 @@
+version: 1
+radar:
+  ringDirection: outer-to-inner
+statuses:
+  - id: assess
+    label: Assess
+    order: 1
+    description: Explore and understand its potential.
+    backgroundColor: '#A9C9E8'
+    borderColor: '#6E9BC7'
+  - id: trial
+    label: Trial
+    order: 2
+    description: Test through a controlled pilot.
+    backgroundColor: '#DCEAF6'
+    borderColor: '#A9C9E8'
+  - id: deploy
+    label: Deploy
+    order: 3
+    description: Approved for active adoption.
+    backgroundColor: '#C7C68B'
+    borderColor: '#ADA96A'
+  - id: sunset
+    label: Sunset
+    order: 4
+    description: Avoid for new work and plan replacement.
+    backgroundColor: '#EFD469'
+    borderColor: '#D9B93F'
+  - id: decommission
+    label: Decommission
+    order: 5
+    description: Remove from service.
+    backgroundColor: '#D9705B'
+    borderColor: '#C24E37'
+dotStatuses:
+  - id: standard
+    label: Standard
+    color: '#111827'
+    shape: circle
+  - id: caveated
+    label: Caveated
+    color: '#2563EB'
+    shape: circle
+  - id: rejected
+    label: Rejected
+    color: '#DC2626'
+    shape: ring
