@@ -1,8 +1,8 @@
 # Feature build plan and delivery tracker
 
 Last updated: 2026-10-07.
-Overall state: F00, X01, V01 and V02 verified; product features unreleased.
-Next task: **M01 - Small-screen responsive layout.**
+Overall state: F00, X01, V01, V02 and M01 verified; product features unreleased.
+Next task: **Z01 - Radar preview zoom controls.**
 
 Use this as the execution and progress record for the Technology Radar Live Editor improvements. Use the [implementation prompt](build-prompt.md) to start or resume work. Architecture profile: **static-web-delivery** (browser-only, GitHub Pages; no backend, sign-in or database).
 
@@ -26,6 +26,7 @@ Task states: `Not started`, `In progress`, `Blocked`, `Verified`. Feature releas
 | 3 | Good layout on small screens | M01 |
 | 4 | Documentation on how to use the tool | D01 |
 | 5 | SEO and AEO (answer-engine) enrichment | S01 |
+| 6 | Zoom in and out on the radar preview | Z01 |
 
 ## Scope and dependencies
 
@@ -36,9 +37,11 @@ flowchart TD
     V01 --> V02[V02 Visual editor row tools]
     X01 --> M01[M01 Small-screen layout]
     V02 --> M01
+    M01 --> Z01[Z01 Radar preview zoom]
     M01 --> D01[D01 User guide]
     D01 --> S01[S01 SEO and AEO]
-    S01 --> R01[R01 Regression and release]
+    Z01 --> R01[R01 Regression and release]
+    S01 --> R01
 ```
 
 Default work order is the table order. X01 and V01 are independent once F00 is verified. S01 metadata that does not depend on guide content (meta tags, robots, canonical) is a safe independent substep after D-01 is decided. This describes technical order, not a requirement for parallel agents.
@@ -49,7 +52,8 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 | --- | --- | --- | --- |
 | Example picker | X01 | Not released | X01 verified locally; see task evidence below. |
 | Visual (WYSIWYG) editor | V01, V02 | Not released | V01 and V02 verified locally; release gate remains R01. |
-| Small-screen layout | M01 | Not released | Not started |
+| Small-screen layout | M01 | Not released | M01 verified locally; see task evidence below. |
+| Radar preview zoom | Z01 | Not released | Planned; not started. |
 | User documentation | D01 | Not released | Not started |
 | SEO / AEO enrichment | S01 | Not released | Not started |
 
@@ -61,10 +65,11 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 | X01 | Example picker drop-down | F00 | Verified | Accessible picker and D-05 shared-link loading verified. `npm run check`, `npm test`, `npm run build` passed; `npm run test:e2e` passed (4/4), including seven examples and v1 view/edit links overriding stored source. Integrated browser loaded a generated view link, showed Preview, and hid Editor. |
 | V01 | Visual table editor with two-way CSV sync | F00, D-02 | Verified | Dependency-free Visual/CSV editor with round-trip, validation, invalid-source, undo/redo, persistence, and keyboard checks; see V01 delivery log. |
 | V02 | Visual editor row tools (add, delete, duplicate, move, filter) | V01 | Verified | `npm run check`, `npm test`, `npm run build` passed; final `npm run test:e2e` passed 14/14 (6 V02 tests). Single-step undo, header-only deletion, configured defaults, hidden-row preservation, duplicate validation, accessible buttons and keyboard journeys at five widths passed. See [implementation record](v02-visual-row-tools.md) and [baseline](baseline.md). |
-| M01 | Small-screen responsive layout | X01, V02, D-04 | In progress | Responsive audit and implementation against 360, 390, 768, 1024, and 1280 px; preserve desktop layout. |
+| M01 | Small-screen responsive layout | X01, V02, D-04 | Verified | Preview-first startup and cohesive workspace tabs; responsive checks at 360, 390, 768, 1024 and 1280 px. `npm run check`, `npm test`, `npm run build`, and `npm run test:e2e` passed; 15/15 browser tests, no viewport overflow. Real-device checks remain pending. |
+| Z01 | Radar preview zoom controls | M01, D-04 | Not started | Add accessible zoom in/out and reset controls for the radar itself; preserve ring/sector meaning, responsive fit, and export behavior. |
 | D01 | User guide and in-app documentation link | M01, D-03 | Not started | — |
 | S01 | SEO and AEO enrichment | D01, D-01 | Not started | — |
-| R01 | Cross-feature regression and release readiness | X01, V01, V02, M01, D01, S01 | Not started | — |
+| R01 | Cross-feature regression and release readiness | X01, V01, V02, M01, Z01, D01, S01 | Not started | — |
 
 ## Task details and exit checks
 
@@ -118,6 +123,14 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 - Respect `<mightora-header>` built-in mobile menu; do not duplicate it. Follow [design-system.instructions.md](../../design-system.instructions.md) focus styles.
 - Exit: screenshots or recorded browser checks at each width for Editor (both modes), Preview, Errors, Exports and Share dialog; no horizontal overflow (`document.documentElement.scrollWidth <= innerWidth`); desktop layout unchanged at 1280 px; print view unaffected. Real-device checks (iOS Safari, Android Chrome) are release checks if not available locally.
 
+### Z01 — radar preview zoom controls
+
+- Add keyboard-accessible Zoom in, Zoom out and Reset zoom controls to Preview; zoom only the radar graphic, not the page or legend.
+- Keep the radar centered and usable at 360, 390, 768, 1024 and 1280 px; prevent category labels from clipping at supported zoom levels.
+- Keep zoom as transient view state: do not modify CSV, localStorage, undo history or share payload v1. Reset zoom returns to the default fit.
+- SVG, PNG and print output use the default fitted radar, independent of the current on-screen zoom.
+- Exit: controls work by mouse and keyboard, have accessible names and stable hit areas, cannot zoom beyond documented bounds, reset returns to fit, no viewport overflow occurs, exports are unscaled, and existing radar/share behavior still passes focused browser tests.
+
 ### D01 — user guide and in-app documentation
 
 - Create a static, crawlable guide page (D-03, proposed `guide/index.html`) using the same header, author and footer components. Sections: What is a technology radar; Quick start; Loading an example; Visual editor; CSV editor and required columns; Statuses and dot statuses (generated from or kept in sync with `radar-definition.yaml`); Validation errors; Sharing (link to privacy warning, encoded not encrypted); Exports; Using on mobile; Privacy and data; FAQ.
@@ -170,14 +183,15 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 - **2026-10-07** — V02 verification follow-up: initial browser run passed 10/14; four new tests used an exact label-text locator that included option text. Changed those tests to the select's accessible role/name. Next run passed all six V02 tests and 13/14 overall; the existing share-link test timed out in `page.goto()` waiting for full page load after the app rendered. Its receiving pages now wait for `domcontentloaded` and retain the existing source/preview assertions. Full regression rerun pending.
 - **2026-10-07** — V02 verified locally. Added add/delete/duplicate/move and combined text/radar filters, preserving hidden source rows, configured defaults, single-step row history and last-valid validation behavior. `npm run check` -> passed; `npm test` -> passed; `npm run build` (invoked by the browser command) -> passed; final `npm run test:e2e` -> 14/14 passed, including six V02 tests; `git diff --check` -> passed. Playwright Chromium exercised the generated artifact using the configured local Python server and saved screenshots at 360/390/768/1024/1280 px. Filter controls fit their containers; overall page widths remain 468/468/810/1024/1280 px, so the prior narrow-screen overflow remains for M01. README and [V02 implementation record](v02-visual-row-tools.md) document the behavior. No commit, push, deployment or backlog release-state change.
 - **2026-10-07** — Added workspace `agent-optimization` and `search-engine-optimization` skills for future S01 work. Validated skill headers, names and repository references; VS Code reported no diagnostics. No site files, feature status, or release state changed; S01 still depends on D01.
+- **2026-10-07** — M01 verified locally. Preview is now the default landing panel; edit-share links still open Editor. Restyled the workspace tabs to use a quiet underline treatment consistent with the page. Updated browser journeys to explicitly open Editor when editing. `npm run check`, `npm test`, `npm run build` passed; `npm run test:e2e` passed 15/15, including five responsive widths with no horizontal page overflow, share-dialog fit, and print behavior. Real iOS/Android and deployed-host checks remain pending; no deployment performed.
 
 ## Current handoff
 
-- Starting point: `main` at `426cd4a00647056cdddd9c3b72d202d6128bbe8c`; existing uncommitted X01/V01 changes in baseline, tracker, shared contracts, app, HTML, CSS, tests and generated `dist` were preserved. V02 extends that worktree; nothing was committed.
-- Completed this session: V02 only, verified locally. The Visual editor can add, delete, duplicate and move rows, filter across all columns and share its radar selection with Preview. All writes preserve hidden rows; each row operation is one undo step. The CSV schema, localStorage keys, share v1 format, privacy warning and Mightora components remain intact.
-- Checks: `npm run check` -> passed; `npm test` -> passed; `npm run build` (via e2e) -> passed; final `npm run test:e2e` -> 14/14 passed against built `dist` using the configured `python -m http.server 8080 -d dist` server. Browser evidence includes full existing regression, six new V02 tests, keyboard journeys and screenshots at 360/390/768/1024/1280 px. `git diff --check` passed. Initial sandbox/build denial, corrected test locators and a share-test load timeout are recorded in the log; the final run passed.
-- Blockers: none for V02. Pending release checks: real iOS Safari and Android Chrome, other unrun browser/device checks, deployed journey at `https://radar.mightora.io/`, successful Pages workflow and live shared-ui behavior. No interactive/manual browser or screen-reader session was run; browser evidence is automated Chromium plus screenshot inspection. The table still uses its horizontal scroller; whole-page overflow at 360/390/768 px and the complete responsive audit remain for M01.
+- Starting point: V02 and M01 are verified locally. Current worktree contains the Z01 roadmap entry and test navigation updates; no deployment was performed.
+- Completed this session: M01. Preview opens first, edit-share URLs retain Editor as their destination, and the workspace tabs use a restrained underline style. Responsive coverage includes both editor modes, Preview, Errors, Exports and Share at 360/390/768/1024/1280 px.
+- Checks: `npm run check`, `npm test`, and `npm run build` passed; `npm run test:e2e` passed 15/15. The responsive test recorded no page overflow at any target width and checked touch targets, share-dialog bounds and print behavior. Browser checks ran in Playwright Chromium against built `dist`.
+- Blockers: release checks remain real iOS Safari and Android Chrome, deployed journey at `https://radar.mightora.io/`, successful Pages workflow and live shared-ui behavior. No interactive/manual screen-reader session was run. Zoom is planned as Z01 and has not been implemented.
 - Pages deployment additionally requires a maintainer to select Settings → Pages → Source → GitHub Actions and verify Pages availability, then rerun the workflow; the CI repair is locally verified only.
 - PR integration update: `main` at `3fbad1a` merged in `b70ed15`, preserving feature records and CI repair evidence. Syntax, smoke, build, and diff checks passed; browser regression passed 14/15 with the unchanged M01 CSS-label text assertion failing at `tests/e2e/visual-row-tools.spec.js:292`. See [baseline](baseline.md); no feature or release status changed.
 - Release: Visual editor remains Not released; `BACKLOG.md` is unchanged because the R01 release gate has not passed. No commit, push or deployment performed.
-- **Next task: M01 - Small-screen responsive layout. First mark M01 In progress, then audit both editor modes, Preview, Errors, Exports and Share at the required widths; address the recorded page overflow and mobile table layout while preserving the shared header's built-in menu.**
+- **Next task: Z01 - Radar preview zoom controls.**

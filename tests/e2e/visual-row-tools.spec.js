@@ -14,6 +14,7 @@ async function openVisual(page, source = csv(alpha, beta, last)) {
     localStorage.setItem('radar-builder-editor-mode', 'visual');
   }, source);
   await page.goto('/');
+    await page.locator('.tab[data-tab="data"]').click();
   await expect(page.locator('#sourceStatus')).toHaveText(/valid technologies$/);
   await expect(page.locator('#visualTable')).toBeVisible();
 }

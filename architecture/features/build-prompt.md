@@ -63,6 +63,7 @@ Append exactly one to the main prompt.
 | V01 | `For this session, complete V01 only: add the Visual/CSV mode switch and a dependency-free table editor with two-way sync. Do not add row tools yet.` |
 | V02 | `For this session, complete V02 only: add row add/delete/duplicate/move and filtering to the visual editor.` |
 | M01 | `For this session, complete M01 only: make every panel, the toolbar, the visual editor and the share dialog work on small screens without changing the desktop layout.` |
+| Z01 | `For this session, complete Z01 only: add bounded, accessible zoom controls to the radar preview with reset-to-fit and unscaled exports.` |
 | D01 | `For this session, complete D01 only: write the user guide as a static crawlable page, wire the Documentation links to it, and update README and the build script.` |
 | S01 | `For this session, complete S01 only: add SEO metadata, JSON-LD, robots.txt, sitemap.xml and llms.txt, and keep the h1 static. No analytics.` |
 | R01 | `For this session, complete R01 only: run the full regression and prepare release evidence. Do not push.` |

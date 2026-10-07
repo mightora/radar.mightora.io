@@ -126,6 +126,7 @@ test('visual and CSV modes round-trip every example and remember the mode', asyn
   const app = await readFile(new URL('../../src/app.js', import.meta.url), 'utf8');
   const entries = [...app.matchAll(/'([^']+)': '(public\/examples\/[^']+\.csv)'/g)].map(([, name, path]) => ({ name, path }));
   await page.goto('/');
+  await page.locator('.tab[data-tab="data"]').click();
   page.on('dialog', dialog => dialog.accept());
   const picker = page.getByLabel('Load example');
 
@@ -143,12 +144,14 @@ test('visual and CSV modes round-trip every example and remember the mode', asyn
   await page.locator('#visualMode').click();
   expect(await page.evaluate(() => localStorage.getItem('radar-builder-editor-mode'))).toBe('visual');
   await page.reload();
+  await page.locator('.tab[data-tab="data"]').click();
   await expect(page.locator('#visualEditor')).toBeVisible();
   await expect(page.locator('#csvMode')).toHaveAttribute('aria-pressed', 'false');
 });
 
 test('visual editor preserves special CSV values, validation, undo, and redo', async ({ page }) => {
   await page.goto('/');
+  await page.locator('.tab[data-tab="data"]').click();
   const source = 'Radar Name,Category,Sub Category,Technology,Status,Dot Status\n"Radar, ""One""",Platform,"Sub\nCategory","<img src=x onerror=alert(1)>, ""quoted""\nname",Assess,Standard';
   await page.locator('#csvInput').fill(source);
   await expect(page.locator('#sourceStatus')).toHaveText('1 valid technologies');
@@ -187,6 +190,7 @@ test('visual editor preserves special CSV values, validation, undo, and redo', a
 
 test('malformed CSV stays unchanged in the read-only visual state', async ({ page }) => {
   await page.goto('/');
+  await page.locator('.tab[data-tab="data"]').click();
   for (const source of [
     'Radar Name,Category,Sub Category,Technology,Status,Dot Status\n"Unclosed,Platform,Runtime,Thing,Assess,Standard',
     'Name,Category,Sub Category,Technology,Status,Dot Status\nRadar,Platform,Runtime,Thing,Assess,Standard'
@@ -203,6 +207,7 @@ test('malformed CSV stays unchanged in the read-only visual state', async ({ pag
 
 test('visual controls remain reachable by keyboard at target widths', async ({ page }) => {
   await page.goto('/');
+  await page.locator('.tab[data-tab="data"]').click();
   const viewportChecks = [];
   for (const width of [360, 390, 768, 1024, 1280]) {
     await page.setViewportSize({ width, height: 900 });
