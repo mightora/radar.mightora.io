@@ -6,6 +6,10 @@
   "scripts": {
     "check": "node --check src/app.js",
     "test": "node scripts/smoke-test.mjs",
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "test:e2e": "npm run build && playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
   }
 }

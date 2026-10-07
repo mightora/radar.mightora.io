@@ -6,13 +6,15 @@ A static, local-first CSV technology radar editor for GitHub Pages. Edit the sou
 
 ```sh
 npm install
+npx playwright install chromium
 npm run check
 npm test
 npm run build
-python3 -m http.server 8080 -d dist
+npm run test:e2e
+python -m http.server 8080 -d dist
 ```
 
-Open `http://localhost:8080/`. Hash routes such as `#/view/<payload>` and `#/edit/<payload>` work beneath a repository subpath on GitHub Pages.
+Open `http://localhost:8080/`. `npm run test:e2e` rebuilds `dist`, starts the same Python static server, and runs the Chromium smoke test. The separate Python command is available for manual browser checks. Hash routes such as `#/view/<payload>` and `#/edit/<payload>` work beneath a repository subpath on GitHub Pages.
 
 ## Privacy
 
