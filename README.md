@@ -29,3 +29,11 @@ Choose **Visual** in the Editor to edit cells or add, duplicate, delete and move
 Uploaded and edited CSV is processed locally. Share links contain compressed radar data in the URL fragment; they are encoded, not encrypted, and can be read by anyone with the link. No account, backend, database, analytics, or server-side upload is required.
 
 See [docs/sharing.md](docs/sharing.md) for the payload format.
+
+## GitHub Pages deployment
+
+Before the first deployment, a repository maintainer must select **Settings → Pages → Build and deployment → Source → GitHub Actions**. If `actions/configure-pages` reports `Get Pages site failed` / `Not Found`, verify this setting and the repository's Pages availability, then rerun the workflow.
+
+The workflow validates and builds `dist` and uploads the Pages artifact in `build`. A separate `deploy` job depends on that build and configures and deploys the artifact through the `github-pages` environment. Only deployment receives Pages and OIDC write permissions. A successful build does not mean the site was deployed.
+
+Automatic Pages enablement is intentionally disabled: `actions/configure-pages@v5` requires a separate privileged token for that operation, not the standard `GITHUB_TOKEN`. No additional credential is needed when Pages is configured in repository settings. Pushes to `main` and manual workflow dispatch trigger deployment; only do so with explicit user authorisation.
