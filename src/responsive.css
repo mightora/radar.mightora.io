@@ -1,14 +1,22 @@
-@media(max-width:900px){
+@media screen and (max-width:900px){
+  .toolbar{display:block}
+  .toolbar-actions{width:100%;overflow:visible;flex-wrap:wrap;align-items:stretch}
+  .toolbar .button,.toolbar .icon-button{min-height:44px}
+  .toolbar .icon-button{width:44px}
   .radar-canvas{min-width:0;flex-direction:column;align-items:stretch;gap:12px}
   .radar-svg{width:100%;max-width:720px;min-width:0;flex:0 1 auto;align-self:center}
   .legend{width:100%;min-width:0}
 }
 
-@media(max-width:760px){
-  .toolbar{display:block}
-  .toolbar-actions{width:100%;overflow:visible;flex-wrap:wrap;align-items:stretch}
-  .toolbar .button,.toolbar .icon-button,.page-tabs .tab,.editor-head-actions .small-button{min-height:44px}
-  .toolbar .icon-button{width:44px}
+@media screen and (max-width:760px){
+  mightora-header .container.header-inner{width:100%;min-width:0;padding-right:12px;padding-left:12px;gap:8px}
+  mightora-header .site-logo{flex:1 1 auto;min-width:0;gap:8px}
+  mightora-header .site-logo-brand-img{width:76px;max-width:76px;height:auto}
+  mightora-header .site-logo-text{min-width:0;max-width:130px;font-size:14px;line-height:1.15;overflow-wrap:anywhere}
+  mightora-header .site-logo-divider{margin:0}
+  mightora-header .flex-gap{flex:0 0 auto;gap:8px}
+  mightora-header .theme-toggle,mightora-header .mobile-menu-btn{width:44px;min-width:44px;height:44px;flex:none;justify-content:center;align-items:center}
+  .page-tabs .tab,.editor-head-actions .small-button{min-height:44px}
   .example-picker{flex:1 1 100%;min-width:0;font-weight:700}
   .example-picker select{width:100%;min-height:44px}
   .page-tabs{max-width:calc(100% - 36px);margin:0 auto 16px;overflow-x:auto;white-space:nowrap}

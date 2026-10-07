@@ -275,21 +275,34 @@ test('M01 responsive layouts keep every panel and share dialog within the viewpo
   await openVisual(page);
   const widths = [360, 390, 768, 1024, 1280];
   const validSource = csv(alpha, beta, last);
+  const recordedChecks = [];
 
   for (const width of widths) {
     await page.setViewportSize({ width, height: 800 });
+    const surfaces = [];
     const expectNoPageOverflow = async surface => {
       const dimensions = await page.evaluate(() => ({ width: innerWidth, pageWidth: document.documentElement.scrollWidth }));
       expect(dimensions.pageWidth, `${surface} at ${width}px`).toBeLessThanOrEqual(dimensions.width);
+      surfaces.push({ surface, ...dimensions });
     };
 
     await page.locator('.tab[data-tab="data"]').click();
+    await page.locator('#visualMode').click();
     await expect(page.locator('#visualTable')).toBeVisible();
     await expect(page.locator('#shareButton')).toBeVisible();
+    if (width <= 760) {
+      await expect(page.getByRole('button', { name: 'Open navigation menu' })).toBeVisible();
+      for (const selector of ['#examples', '#shareButton', '#toggleLabels']) {
+        const height = await page.locator(selector).evaluate(element => element.getBoundingClientRect().height);
+        expect(height, `${selector} touch target at ${width}px`).toBeGreaterThanOrEqual(44);
+      }
+    }
     await expectNoPageOverflow('visual editor');
     if (width <= 760) {
       await expect(page.locator('#visualTable tbody tr').first()).toHaveCSS('display', 'grid');
-      await expect(page.locator('#visualTable tbody tr').first().locator('td').first()).toContainText('Radar Name');
+      const firstField = page.locator('#visualTable tbody tr').first().locator('td').first();
+      await expect(firstField).toHaveAttribute('data-label', 'Radar Name');
+      await expect.poll(() => firstField.evaluate(cell => getComputedStyle(cell, '::before').content)).toBe('"Radar Name"');
       const touchHeight = await page.getByRole('button', { name: 'Add row', exact: true }).evaluate(button => button.getBoundingClientRect().height);
       expect(touchHeight).toBeGreaterThanOrEqual(44);
     } else {
@@ -299,31 +312,73 @@ test('M01 responsive layouts keep every panel and share dialog within the viewpo
     await page.locator('#csvMode').click();
     await expect(page.locator('#csvInput')).toBeVisible();
     await expectNoPageOverflow('CSV editor');
-    if (width <= 760) await expect(page.locator('#csvInput')).toHaveCSS('font-size', '16px');
+    if (width <= 760) {
+      await expect(page.locator('#csvInput')).toHaveCSS('font-size', '16px');
+      const lineHeights = await page.evaluate(() => [getComputedStyle(document.querySelector('#lineNumbers')).lineHeight, getComputedStyle(document.querySelector('#csvInput')).lineHeight]);
+      expect(lineHeights[0]).toBe(lineHeights[1]);
+    }
+    await page.locator('#visualMode').focus();
+    await page.keyboard.press('Tab');
+    await expect(page.locator('#csvMode')).toBeFocused();
 
     await page.locator('.tab[data-tab="preview"]').click();
     await expect(page.locator('#radarCanvas svg')).toBeVisible();
+    await expect(page.locator('#toggleLabels')).toBeVisible();
+    if (width <= 900) {
+      await expect(page.locator('#radarCanvas')).toHaveCSS('flex-direction', 'column');
+      const previewBounds = await page.evaluate(() => {
+        const svg = document.querySelector('#radarCanvas svg').getBoundingClientRect();
+        const labels = [...document.querySelectorAll('#radarCanvas .category-label')].map(label => {
+          const rect = label.getBoundingClientRect();
+          return rect.left >= svg.left && rect.right <= svg.right && rect.top >= svg.top && rect.bottom <= svg.bottom;
+        });
+        return { svgWidth: svg.width, canvasWidth: document.querySelector('#radarCanvas').clientWidth, labels };
+      });
+      expect(previewBounds.svgWidth).toBeLessThanOrEqual(previewBounds.canvasWidth);
+      expect(previewBounds.labels.every(Boolean)).toBe(true);
+    }
     await expectNoPageOverflow('preview');
 
+    await page.locator('.tab[data-tab="data"]').click();
     await page.locator('#csvInput').fill(validSource + '\n"unclosed');
     await page.waitForTimeout(400);
     await page.locator('.tab[data-tab="validation"]').click();
     await expect(page.locator('#validationList .error')).toBeVisible();
     await expectNoPageOverflow('errors');
 
+    await page.locator('.tab[data-tab="data"]').click();
     await page.locator('#csvInput').fill(validSource);
     await page.waitForTimeout(400);
     await page.locator('.tab[data-tab="exports"]').click();
     await expect(page.locator('.export-card')).toHaveCount(5);
     await expectNoPageOverflow('exports');
+    if (width === 360) {
+      await page.evaluate(() => { window.printCalls = 0; window.print = () => { window.printCalls += 1; }; });
+      await page.locator('.export-card[data-export="print"]').click();
+      await expect.poll(() => page.evaluate(() => window.printCalls)).toBe(1);
+    }
 
-    await page.getByRole('button', { name: 'Share', exact: true }).first().click();
+    await page.locator('#shareButton').focus();
+    await page.keyboard.press('Enter');
     await expect(page.locator('#shareDialog')).toBeVisible();
     await expect(page.locator('#shareDialog .warning')).toContainText('not encrypted');
     await expectNoPageOverflow('share dialog');
     const dialog = await page.locator('#shareDialog').boundingBox();
     expect(dialog.x, `share dialog left edge at ${width}px`).toBeGreaterThanOrEqual(0);
     expect(dialog.x + dialog.width, `share dialog right edge at ${width}px`).toBeLessThanOrEqual(width);
-    await page.locator('#cancelShare').click();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#shareDialog')).not.toBeVisible();
+    if (width === 1280) {
+      await expect(page.locator('.toolbar')).toHaveCSS('display', 'flex');
+      await expect(page.locator('#visualTable')).toHaveCSS('min-width', '1250px');
+      await expect(page.locator('#radarCanvas')).toHaveCSS('flex-direction', 'row');
+    }
+    recordedChecks.push({ width, surfaces });
   }
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.locator('.toolbar')).toHaveCSS('display', 'flex');
+  await expect(page.locator('#visualTable')).toHaveCSS('display', 'table');
+  await expect(page.locator('#radarCanvas')).toHaveCSS('flex-direction', 'row');
+  console.log('M01 responsive checks:', JSON.stringify(recordedChecks));
 });

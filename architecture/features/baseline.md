@@ -95,3 +95,8 @@ No destructive stateful tests exist. There is no service-backed integration envi
 
 - Pending M01 checks/work: whole-page horizontal overflow at 360/390/768 px remains the same as V01; mobile row cards and the complete Editor/Preview/Errors/Exports/Share responsive audit are not part of V02. The wider action column means the visual table also scrolls within its container at 1280 px.
 - Pending release checks: real iOS Safari and Android Chrome; other unrun browser/device checks; deployed URL/routing journey and successful Pages workflow; live shared-ui behavior. No interactive/manual browser or assistive-screen-reader session was run in V02. Local screenshots and automated Chromium do not establish those results. The earlier `/data/config.json` observation was not re-investigated in this task. `BACKLOG.md` remains unchanged until the existing release gate passes.
+
+## 2026-10-07 — optimization skill setup
+
+- Added workspace skills for agent discoverability and search-engine optimization under `.github/skills/`. Their frontmatter names and referenced repository paths passed a focused PowerShell check; VS Code reported no diagnostics in either skill.
+- No app metadata, public guide, generated output or deployment changed. S01 remains not started; indexing and live-agent discovery were not tested.
