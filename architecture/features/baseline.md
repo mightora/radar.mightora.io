@@ -52,6 +52,14 @@ No destructive stateful tests exist. There is no service-backed integration envi
 - Findings confirmed: free-text prompt for examples; uncalled `loadShared()` leaves a valid shared view URL unapplied; missing `#examples` target; Documentation points to GitHub; no guide, description, or canonical metadata; runtime H1 changes to radar name; smoke test checks source text only; build copies only `index.html`, `src/`, and `public/`.
 - D-01 is decided as `https://radar.mightora.io/` at root. D-04 is decided: Playwright is an approved devDependency; local Chromium setup and smoke test passed. It is not in the Pages workflow because CI browser-install/reliability has not been validated. D-05 remains pending user confirmation; proposed fix remains scoped to X01.
 
+## 2026-10-07 — Pages build job investigation
+
+- Actions run `37627582404`, job `112813239244`: dependency installation, syntax check, smoke tests, and build passed. `actions/configure-pages@v5` failed afterward with `Get Pages site failed` / `Not Found`; the action's `enablement` input was false.
+- Separated build/check/artifact upload from a dependent deployment job using the `github-pages` environment. Pages and OIDC write permissions are confined to deployment. No app sources, dependencies, or generated artifacts changed.
+- Added source-based workflow regression checks to the existing smoke test. `npm test` failed before the workflow change and passed afterward. `npm run check`, `npm test`, `npm run build`, and `git diff --check` passed. `npm ci` reported zero vulnerabilities; `npx playwright install chromium` succeeded; `npm run test:e2e` passed (1/1) against locally served `dist`.
+- Live deployment remains unverified and blocked on repository Pages setup: a maintainer must select Settings → Pages → Source → GitHub Actions and verify Pages availability. Automatic enablement requires a separate privileged token per the v5 action metadata; enabling it with the existing workflow token is not a fix. No production deployment or workflow rerun was requested.
+- Final review: secret scan found no secrets; CodeQL Actions analysis found zero alerts. The automated code-review binary was unavailable; a separate read-only code-review agent found no significant issues. Committed scope was limited to the workflow, smoke test, README, baseline, and build plan.
+
 ## 2026-10-07 — X01 execution update
 
 - `npm run check` -> passed; `npm test` -> passed; `npm run build` -> passed; `npm run test:e2e` -> 3/3 passed against built `dist`.
@@ -95,3 +103,9 @@ No destructive stateful tests exist. There is no service-backed integration envi
 
 - Pending M01 checks/work: whole-page horizontal overflow at 360/390/768 px remains the same as V01; mobile row cards and the complete Editor/Preview/Errors/Exports/Share responsive audit are not part of V02. The wider action column means the visual table also scrolls within its container at 1280 px.
 - Pending release checks: real iOS Safari and Android Chrome; other unrun browser/device checks; deployed URL/routing journey and successful Pages workflow; live shared-ui behavior. No interactive/manual browser or assistive-screen-reader session was run in V02. Local screenshots and automated Chromium do not establish those results. The earlier `/data/config.json` observation was not re-investigated in this task. `BACKLOG.md` remains unchanged until the existing release gate passes.
+
+## 2026-10-07 — PR merge conflict resolution
+
+- Merged `main` at `3fbad1a` into the CI repair branch in two-parent merge `b70ed15`. Combined baseline execution records and build-plan delivery entries; retained the latest feature handoff and the Pages setup prerequisite. Application sources and browser tests match `main` exactly.
+- `npm run check`, `npm test`, `npm run build`, and `git diff --check` passed. `npm ci` reported zero vulnerabilities. Chromium setup succeeded; `npm run test:e2e` passed 14/15 tests. The inherited M01 test at `tests/e2e/visual-row-tools.spec.js:292` expects cell text `Radar Name`, but the label is CSS-generated through `td[data-label]::before`; the test and CSS were unchanged by conflict resolution. This unrelated failure remains unresolved.
+- Secret scanning found no secrets; CodeQL JavaScript analysis found zero alerts. The automated review binary was unavailable; a read-only code-review agent found no significant issues. No production deployment or workflow rerun was performed.
