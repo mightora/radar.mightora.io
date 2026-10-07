@@ -114,3 +114,13 @@ No destructive stateful tests exist. There is no service-backed integration envi
 - Merged `main` at `3fbad1a` into the CI repair branch in two-parent merge `b70ed15`. Combined baseline execution records and build-plan delivery entries; retained the latest feature handoff and the Pages setup prerequisite. Application sources and browser tests match `main` exactly.
 - `npm run check`, `npm test`, `npm run build`, and `git diff --check` passed. `npm ci` reported zero vulnerabilities. Chromium setup succeeded; `npm run test:e2e` passed 14/15 tests. The inherited M01 test at `tests/e2e/visual-row-tools.spec.js:292` expects cell text `Radar Name`, but the label is CSS-generated through `td[data-label]::before`; the test and CSS were unchanged by conflict resolution. This unrelated failure remains unresolved.
 - Secret scanning found no secrets; CodeQL JavaScript analysis found zero alerts. The automated review binary was unavailable; a read-only code-review agent found no significant issues. No production deployment or workflow rerun was performed.
+
+## 2026-10-07 - Delivery skill verification policy
+
+- Starting revision: `599c28cfd37756b0b639a6a44b51b8f6a7ad5cb3`; worktree was clean. Scope is delivery skills, reusable prompts/templates and this evidence record only; no application, build, dependency or test changes.
+- Updated the shared session protocol and static profile to select checks by risk, use focused iteration, reuse evidence for unchanged inputs, avoid duplicate builds and stop once acceptance criteria and required gates have evidence. Existing explicit repository/task/release gates are not weakened.
+- Observed command composition: `npm run test:e2e` already runs `npm run build` before Playwright; a separate preceding build is redundant for unchanged inputs.
+- `python .github/skills/agentic-delivery/scripts/validate.py` passed after protocol and profile edits: 34 Markdown documents, 78 local links. This validates pack structure, frontmatter presence, links and code fences, not future agent compliance or runtime savings.
+- Application syntax, smoke, build and browser suites are out of scope for these non-shipped documentation edits and were not run. The existing M01 failure and pending live/device checks are unchanged; no deployment was performed.
+
+

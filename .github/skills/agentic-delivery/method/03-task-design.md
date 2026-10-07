@@ -52,13 +52,24 @@ describes technical order, not a requirement to run parallel agents.
 
 Every task gets exit checks written **before** the work starts. Good exit checks:
 
-- name the adversarial cases, not the happy path — concurrency, crash recovery,
-  retry exhaustion, removed access, mismatched tenant, missing data, pagination
-  boundaries, rollback leaving no partial state;
+- map each acceptance criterion and meaningful regression risk to the cheapest
+  reliable check, reusing existing coverage before adding tests;
+- cover the happy path and relevant adversarial cases, not a universal checklist:
+  malformed input or lost edits for an editor, concurrency or rollback for a
+  stateful service;
 - state what must be *absent* as well as present — no identity fields in external
   payloads, no secrets in logs, no development auth bypasses on privileged routes;
 - distinguish checks that can pass locally from checks that require a real
   environment, and mark the latter as **release checks** rather than task checks.
+
+Follow [the session protocol's verification policy](04-session-protocol.md#4-verify).
+Name the focused iteration command and any final broad gates separately. Give
+standing checks applicability conditions instead of requiring every suite for
+every task. A wider browser/viewport matrix needs a layout, compatibility or
+explicit acceptance reason; do not multiply every behavior by every viewport.
+Record the stop condition: selected checks and mandatory gates pass, with evidence
+for all acceptance criteria. Do not impose time limits that leave required checks
+unmet, or weaken existing gates without an approved policy change.
 
 Example shape:
 

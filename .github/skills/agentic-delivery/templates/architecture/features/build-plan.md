@@ -47,12 +47,20 @@ Dependencies mean verified prerequisites, unless a task explicitly documents a s
 
 ## Task details and exit checks
 
+For each task, record the changed surface/risk, focused iteration command, final
+required gates and their applicability, and checks intentionally out of scope.
+Reuse current passing evidence only while its relevant inputs are unchanged.
+Stop when acceptance criteria and required gates have evidence; do not rerun broad
+suites after documentation-only evidence updates. Existing explicit requirements
+remain mandatory until an approved policy change.
+
 ### F00 — baseline and decisions
 
 - Inspect current application entry points, data/configuration, build/test and deployment workflows. Compare code to specifications rather than assuming feature titles imply implementation.
 - Apply [the solution pattern](../solution-pattern.md), recording existing behaviour and any required departures.
 - Document and run the actual local install/start/build/test commands. Add wrappers, containers or disposable resources only if the chosen profile needs them.
 - Capture existing build and test results, including pre-existing failures. Check relevant browser/platform behaviour and deployment paths separately.
+- Record which commands include other checks (for example, a browser command that builds first), and when each standing check applies. Do not default documentation-only tasks to application suites.
 - For static apps, verify generated output, asset/base paths, hash/deep routes and the main browser journey as applicable. For stateful systems, verify disposable setup and owned-resource cleanup.
 - Inspect any existing migration mechanism before changing it. Database-specific checks are not applicable when the product has no database.
 - Record required decisions before the affected infrastructure work; list each

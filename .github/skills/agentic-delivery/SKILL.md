@@ -77,6 +77,11 @@ read the tracker and contracts, resume or claim one task, implement a coherent
 slice with tests and docs, run the exit checks, record evidence, update the
 handoff, report.
 
+Use the protocol's risk-based verification: focused checks during iteration,
+required broad gates once the slice is stable, and no duplicate runs for unchanged
+inputs. Stop when acceptance criteria and required gates have evidence. A docs-only
+skill change normally needs document validation, not application/browser tests.
+
 For repository layout, CI/CD, environment, hosting or data lifecycle work, read
 the selected profile and relevant project contract. Use the service skill's ALM
 guide and `architecture/alm.md` only for a project adopting that Azure pattern.

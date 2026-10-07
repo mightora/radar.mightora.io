@@ -34,7 +34,7 @@ a check passed because a script exists or another platform passed.
 Before coding a task, mark it In progress and record the scope. Implement the
 user-visible behaviour, data/configuration, documentation and meaningful tests
 that apply to the selected architecture. Add a backend or migrations only when
-the product requires them. Follow existing UI patterns, and verify mobile,
+the product requires them. Follow existing UI patterns, and verify affected mobile,
 keyboard and routing behaviour for frontend work. For new external protocols,
 providers or packages, check current official documentation and record the chosen
 versions and compatibility. Make routine decisions and record them; ask only for
@@ -51,6 +51,14 @@ deployments must stay within explicit user authorisation; record environment and
 client checks that remain pending instead of claiming them passed. Do not publish
 or deploy merely because code is ready, and inspect workflows before any
 authorised push that may deploy.
+
+Choose verification by changed surface and regression risk. Use focused tests
+during iteration and run required broad gates once the slice is stable. Reuse
+passing evidence only while relevant inputs are unchanged; count builds already
+included in test commands. Docs-only changes outside shipped output normally need
+document checks, not application/browser suites. Preserve explicit exit, standing
+and CI gates. Stop when acceptance criteria and required gates have evidence;
+record out-of-scope checks separately from required checks that remain pending.
 
 Update architecture/features/build-plan.md as work is completed: task state,
 evidence and commands/results, decisions, delivery log, feature release state and

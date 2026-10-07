@@ -29,7 +29,8 @@ Every implementation session follows the same six phases.
   tests and documentation for a static app; add services and migrations only when
   the product actually has them. Do not stop after a scaffold or a plan.
 - Reuse shared services rather than re-implementing policy. Follow existing UI
-  patterns; verify mobile, keyboard and routing behaviour for frontend work.
+  patterns; verify affected mobile, keyboard and routing behaviour for frontend
+  work, preserving all explicitly required coverage.
 - Keep the project's real startup and verification commands current when behaviour
   changes. Add platform-specific wrappers only when the selected profile needs
   them. Record actual browser, operating-system and deployment results separately.
@@ -41,11 +42,41 @@ Every implementation session follows the same six phases.
 
 ## 4. Verify
 
-- Run the task's exit checks and the build plan's standing checks.
+- Before testing, name the changed behavior, its main regression risk and the
+  cheapest check that could expose a defect. Select checks by affected surface:
+
+  | Change | Default verification |
+  | --- | --- |
+  | Docs, prompts or skills only; no shipped output changes | Relevant document/link/frontmatter validator; no application build or browser suite. |
+  | Local behavior fix | Focused regression test and applicable syntax/type checks. |
+  | UI or layout | Affected browser journey and relevant visual/keyboard checks, using the selected profile's guidance. |
+  | Shared contracts, startup, build, dependencies or cross-feature behavior | Affected consumers plus broader regression checks justified by the blast radius. |
+  | Release candidate | All required release checks; deployment still requires authorization. |
+
+- Record the selected checks and why broader checks are unnecessary in the task's
+  evidence. These defaults never waive explicit task exit checks, standing gates,
+  CI requirements or requested browser/viewport coverage. If a mandatory gate is
+  disproportionate, propose a separate policy change rather than silently skip it.
+- During iteration, run the smallest relevant check after an edit. On failure,
+  fix and rerun that check before expanding coverage. Run required broad gates
+  once the slice is stable, not after every edit.
+- Reuse passing evidence only while relevant source, tests, configuration,
+  dependencies and environment remain unchanged. Record the revision or worktree
+  scope and command; invalidate affected results when those inputs change.
+  Documentation-only evidence updates do not invalidate application results.
+- Inspect command composition: if a test command builds first, count that build
+  instead of running it separately. Prefer existing tests and extend them only
+  for an uncovered acceptance criterion or regression risk; do not duplicate the
+  same assertion across unit, browser and manual checks without a distinct reason.
+- Stop when selected checks and required gates pass and acceptance criteria have
+  evidence. Do not add another suite, browser pass or screenshot merely for
+  reassurance. Expand only for a failure, uncovered risk or explicit requirement.
 - Use the disposable environment when tests mutate state. Use controlled local
   receivers and mocks for external integrations where applicable.
 - Record commands verbatim and their outcomes with counts (`78/78 passed`).
-- If something did not run, say so. Never infer a result.
+- Distinguish out-of-scope checks (with rationale) from required checks that could
+  not run (pending or blocked). Never infer a result or mark a task verified while
+  a required local exit check remains unmet.
 
 ## 5. Record
 

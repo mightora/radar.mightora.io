@@ -168,6 +168,7 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 
 ## Delivery log
 
+- **2026-10-07** - Delivery-skill maintenance: added risk-based check selection, explicit stop conditions, focused browser/viewport guidance and duplicate-build avoidance to the skills and reusable planning/implementation templates. `python .github/skills/agentic-delivery/scripts/validate.py` passed (34 documents, 78 local links). No application changes or application test runs; existing release gates and the known M01 test limitation remain unchanged. See [baseline](baseline.md).
 - **2026-10-07** — User confirmed D-01 (`https://radar.mightora.io/`) and D-04 (Playwright approved). D-05 still pending.
 - **2026-10-07** — Plan created from repository inspection. No code changed; no checks run.
 - **2026-10-07** — F00 verified. Bootstrapped `AGENTS.md`, `BACKLOG.md`, `architecture/solution-pattern.md`, `architecture/high-level-design.md`, `architecture/features/README.md`, `shared-contracts.md`, and `baseline.md`; documented local commands in `README.md`; added Playwright Chromium smoke test. `npm install` -> 0 vulnerabilities; `npm run check` -> passed; `npm test` -> passed; `npm run build` -> passed; `npm run test:e2e` -> 1/1 passed. Local browser confirmed the listed behavior gaps and reproduced D-05. Pending viewport, real-device, and deployed-host checks are in `baseline.md`.
@@ -187,6 +188,7 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 
 ## Current handoff
 
+- Delivery-method maintenance (2026-10-07): updated the agentic/static delivery skills and reusable prompts/templates with risk-based verification, focused iteration, unchanged-input evidence reuse and a stop rule. Skill-pack validation passed (34 documents, 78 links); application suites were not run for these non-shipped documentation changes. Existing task/release gates and feature statuses are unchanged; Z01 remains next. See the [baseline](baseline.md).
 - Starting point: V02 and M01 are verified locally. Current worktree contains the Z01 roadmap entry and test navigation updates; no deployment was performed.
 - Completed this session: M01. Preview opens first, edit-share URLs retain Editor as their destination, and the workspace tabs use a restrained underline style. Responsive coverage includes both editor modes, Preview, Errors, Exports and Share at 360/390/768/1024/1280 px.
 - Checks: `npm run check`, `npm test`, and `npm run build` passed; `npm run test:e2e` passed 15/15. The responsive test recorded no page overflow at any target width and checked touch targets, share-dialog bounds and print behavior. Browser checks ran in Playwright Chromium against built `dist`.
