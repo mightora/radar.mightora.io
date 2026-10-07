@@ -1,0 +1,45 @@
+@media(max-width:900px){
+  .radar-canvas{min-width:0;flex-direction:column;align-items:stretch;gap:12px}
+  .radar-svg{width:100%;max-width:720px;min-width:0;flex:0 1 auto;align-self:center}
+  .legend{width:100%;min-width:0}
+}
+
+@media(max-width:760px){
+  .toolbar{display:block}
+  .toolbar-actions{width:100%;overflow:visible;flex-wrap:wrap;align-items:stretch}
+  .toolbar .button,.toolbar .icon-button,.page-tabs .tab,.editor-head-actions .small-button{min-height:44px}
+  .toolbar .icon-button{width:44px}
+  .example-picker{flex:1 1 100%;min-width:0;font-weight:700}
+  .example-picker select{width:100%;min-height:44px}
+  .page-tabs{max-width:calc(100% - 36px);margin:0 auto 16px;overflow-x:auto;white-space:nowrap}
+  .page-tabs .tab{flex:0 0 auto;white-space:nowrap}
+  .workspace-panel{min-width:0}
+  .editor-head{align-items:flex-start}
+  .editor-head-actions{width:100%;flex-wrap:wrap;justify-content:space-between}
+  .code-editor{grid-template-columns:42px minmax(0,1fr);min-width:0}
+  .code-editor pre,.code-editor textarea{font-size:16px;line-height:1.6}
+  .code-editor textarea{width:100%;min-width:0}
+  .source-actions{display:flex;flex-wrap:wrap;gap:8px}
+  .visual-notice{align-items:flex-start;flex-direction:column}
+  .visual-table-wrap{overflow:visible;border:0;background:transparent}
+  .visual-table{display:block;width:100%;min-width:0}
+  .visual-table thead{display:none}
+  .visual-table tbody{display:grid;gap:12px}
+  .visual-table tbody tr{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;padding:8px 12px;border:1px solid var(--line);background:#fff}
+  .visual-table td{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;padding:8px 0;border:0}
+  .visual-table td[data-label]::before{content:attr(data-label);display:block;margin-bottom:6px;font-size:12px;font-weight:800;color:var(--muted)}
+  .visual-input,.visual-textarea,.visual-select,.visual-tools input,.visual-tools select{min-height:44px;font-size:16px}
+  .visual-tools .button,.visual-tools .small-button,.visual-row-actions .icon-button{min-height:44px}
+  .visual-row-actions{display:flex;flex-wrap:wrap;gap:8px;white-space:normal}
+  .visual-row-actions .icon-button{margin:0}
+  .export-card{min-width:0;min-height:105px;overflow-wrap:anywhere}
+  #shareDialog{width:calc(100vw - 24px);max-width:560px;max-height:calc(100dvh - 24px);overflow-y:auto}
+  #shareDialog .dialog-head,#shareDialog .dialog-actions{gap:8px;padding:16px}
+  #shareDialog .dialog-actions{flex-wrap:wrap;justify-content:flex-start}
+  #shareDialog .share-options{flex-wrap:wrap;gap:12px;padding:8px 16px}
+  #shareDialog .warning{margin:16px}
+  #shareDialog .share-result{margin:14px 16px;overflow-wrap:anywhere}
+  #shareDialog .share-result input{width:100%;min-width:0;font-size:16px}
+  #shareDialog button{min-height:44px}
+  .toast{right:12px;bottom:12px;left:12px;text-align:center}
+}

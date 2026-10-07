@@ -9,7 +9,7 @@ const EXAMPLE_FILES = {
   'Cybersecurity Radar': 'public/examples/cybersecurity.csv',
   'Frontend Web Radar': 'public/examples/frontend-web.csv'
 };
-const state = { source: EXAMPLE, validRows: [], errors: [], config: null, history: [], future: [], labels: true, selectedRadar: '', dirty: false, timer: 0 };
+const state = { source: EXAMPLE, validRows: [], errors: [], config: null, history: [], future: [], labels: true, selectedRadar: '', dirty: false, timer: 0, editorMode: localStorage.getItem('radar-builder-editor-mode') || 'csv', visualTableSource: null, visualEditBefore: null, visualFilter: '' };
 const $ = id => document.getElementById(id);
 const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
 const csvCell = value => /[",\r\n]/.test(value) ? `"${String(value).replaceAll('"', '""')}"` : String(value);
@@ -41,7 +41,7 @@ function validate(rows) {
 
 function parseYaml(text) { const config = { statuses: [], dotStatuses: [] }; let section = ''; let item = null; text.split(/\r?\n/).forEach(line => { const sectionMatch = line.match(/^(statuses|dotStatuses):/); if (sectionMatch) { section = sectionMatch[1]; return; } const itemMatch = line.match(/^\s+- id:\s*(.+)$/); if (itemMatch) { item = { id: itemMatch[1].trim() }; config[section].push(item); return; } const value = line.match(/^\s+(label|order|description|backgroundColor|borderColor|color|shape):\s*(.*)$/); if (value && item) item[value[1]] = value[2].replace(/^['"]|['"]$/g, ''); }); return config; }
 async function loadConfig() { try { const response = await fetch('public/config/radar-definition.yaml'); state.config = parseYaml(await response.text()); } catch { state.config = parseYaml(`statuses:\n  - id: assess\n    label: Assess\n    order: 1\n    backgroundColor: #A9C9E8\n    borderColor: #6E9BC7\n  - id: trial\n    label: Trial\n    order: 2\n    backgroundColor: #DCEAF6\n    borderColor: #A9C9E8\n  - id: deploy\n    label: Deploy\n    order: 3\n    backgroundColor: #C7C68B\n    borderColor: #ADA96A\n  - id: sunset\n    label: Sunset\n    order: 4\n    backgroundColor: #EFD469\n    borderColor: #D9B93F\n  - id: decommission\n    label: Decommission\n    order: 5\n    backgroundColor: #D9705B\n    borderColor: #C24E37\ndotStatuses:\n  - id: standard\n    label: Standard\n    color: #111827\n    shape: circle\n  - id: caveated\n    label: Caveated\n    color: #2563EB\n    shape: circle\n  - id: rejected\n    label: Rejected\n    color: #DC2626\n    shape: ring`); } }
-function setSource(source, addHistory = true) { if (addHistory && state.source !== source) { state.history.push(state.source); if (state.history.length > 50) state.history.shift(); state.future = []; } state.source = source; state.dirty = true; $('csvInput').value = source; updateLineNumbers(); clearTimeout(state.timer); state.timer = setTimeout(parseSource, 300); }
+function setSource(source, addHistory = true) { if (addHistory && state.source !== source) { state.history.push(state.source); if (state.history.length > 50) state.history.shift(); state.future = []; } state.source = source; state.dirty = true; $('csvInput').value = source; localStorage.setItem('radar-builder-source', source); updateLineNumbers(); clearTimeout(state.timer); state.timer = setTimeout(parseSource, 300); }
 function parseSource() { try { const rows = parseCsv(state.source); state.errors = validate(rows); if (!state.errors.length) state.validRows = rows; render(); } catch (error) { state.errors = [{ line: 1, message: error.message }]; render(); } }
 function updateLineNumbers() { $('lineNumbers').textContent = state.source.split('\n').map((_, index) => index + 1).join('\n'); }
 function renderErrors() { $('errorCount').textContent = state.errors.length; $('validationList').innerHTML = state.errors.length ? state.errors.map(error => `<div class="validation-item error"><strong>Line ${error.line}${error.column ? ` / ${escapeHtml(error.column)}` : ''}</strong> ${escapeHtml(error.message)}</div>`).join('') : '<div class="validation-item">No validation errors. Preview is current.</div>'; $('sourceStatus').textContent = state.errors.length ? 'Preview is showing the last valid version. Source was not discarded.' : `${state.validRows.length} valid technologies`; }
@@ -87,19 +87,142 @@ function renderPreview() {
   $('previewTitle').textContent = title;
   $('radarCanvas').innerHTML = `<svg class="radar-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(title)} radar"><title>${escapeHtml(title)}</title>${ringSvg}${boundary}${dividers}${categoryLabels}${dots}</svg><div class="legend"><h3>Status</h3>${ringLegend}<h3>Dot status</h3>${dotLegend}</div>`;
 }
-function renderRadarSelector() { const names = [...new Set(state.validRows.map(row => row[0]))]; if (!names.length) return; const existing = $('radarSelector'); if (existing) existing.remove(); const label = document.createElement('label'); label.id = 'radarSelector'; label.innerHTML = `Radar <select>${names.map(name => `<option>${escapeHtml(name)}</option>`).join('')}<option value="">All radars</option></select>`; $('previewTitle').after(label); label.querySelector('select').value = state.selectedRadar; label.querySelector('select').addEventListener('change', event => { state.selectedRadar = event.target.value; renderPreview(); }); }
-function render() { renderErrors(); renderPreview(); renderRadarSelector(); updateLineNumbers(); $('pageTitle').textContent = state.validRows[0]?.[0] || 'Technology Radar'; }
+function renderRadarSelector() {
+  let sourceRows = []; try { sourceRows = parseCsv(state.source); } catch { /* Keep the last valid preview's choices. */ }
+  const names = [...new Set([...sourceRows, ...state.validRows].map(row => row[0]).filter(Boolean))];
+  if (!names.includes(state.selectedRadar)) state.selectedRadar = '';
+  let label = $('radarSelector');
+  if (!label) { label = makeElement('label', '', 'Radar '); label.id = 'radarSelector'; const select = makeElement('select'); select.addEventListener('change', event => selectRadar(event.target.value)); label.append(select); $('previewTitle').after(label); }
+  [label.querySelector('select'), $('visualRadarFilter')].forEach(select => {
+    select.replaceChildren();
+    ['', ...names].forEach(name => { const option = makeElement('option', '', name || 'All radars'); option.value = name; select.append(option); });
+    select.value = state.selectedRadar;
+  });
+}
+function selectRadar(name) { state.selectedRadar = name; renderRadarSelector(); renderPreview(); applyVisualFilters(); }
+function render() { renderErrors(); renderRadarSelector(); renderPreview(); updateLineNumbers(); if (state.editorMode === 'visual') { if (state.visualTableSource !== state.source) renderVisualEditor(); else { updateVisualErrors(); applyVisualFilters(); } } $('pageTitle').textContent = state.validRows[0]?.[0] || 'Technology Radar'; }
+function setEditorMode(mode, refresh = true) { state.editorMode = mode; localStorage.setItem('radar-builder-editor-mode', mode); $('visualMode').classList.toggle('active', mode === 'visual'); $('csvMode').classList.toggle('active', mode === 'csv'); $('visualMode').setAttribute('aria-pressed', String(mode === 'visual')); $('csvMode').setAttribute('aria-pressed', String(mode === 'csv')); $('visualEditor').classList.toggle('hidden', mode !== 'visual'); $('codeEditor').classList.toggle('hidden', mode !== 'csv'); $('sourceActions').classList.toggle('hidden', mode !== 'csv'); $('formatCsv').classList.toggle('hidden', mode !== 'csv'); if (mode === 'visual' && refresh) renderVisualEditor(); }
+function makeElement(tag, className, text) { const element = document.createElement(tag); if (className) element.className = className; if (text !== undefined) element.textContent = text; return element; }
+function renderVisualEditor() {
+  const table = $('visualTable'), notice = $('visualNotice'); let rows;
+  try { rows = parseCsv(state.source); }
+  catch (error) { table.replaceChildren(); table.classList.add('hidden'); $('visualTools').classList.add('hidden'); $('visualFilterStatus').textContent = ''; notice.classList.remove('hidden'); $('visualNoticeText').textContent = `${error.message} The source is unchanged.`; state.visualTableSource = state.source; return; }
+  notice.classList.add('hidden'); $('visualTools').classList.remove('hidden'); table.classList.remove('hidden'); table.replaceChildren();
+  $('visualEditor').querySelectorAll('datalist').forEach(list => list.remove());
+  const datalists = { 0: 'radarNames', 1: 'categories', 2: 'subCategories' };
+  Object.entries(datalists).forEach(([column, id]) => {
+    const list = makeElement('datalist'); list.id = id;
+    [...new Set(rows.map(row => row[Number(column)]).filter(Boolean))].forEach(value => { const option = makeElement('option'); option.value = value; list.append(option); });
+    $('visualEditor').append(list);
+  });
+  const head = makeElement('thead'), headerRow = makeElement('tr');
+  [...REQUIRED, 'Row actions'].forEach(label => { const heading = makeElement('th', '', label); heading.scope = 'col'; headerRow.append(heading); });
+  head.append(headerRow); table.append(head); const body = makeElement('tbody');
+  rows.forEach((row, rowIndex) => {
+    const tableRow = makeElement('tr'); tableRow.dataset.rowIndex = rowIndex;
+    REQUIRED.forEach((label, columnIndex) => {
+      const cell = makeElement('td'), error = makeElement('span', 'visual-cell-error'); cell.dataset.label = label;
+      error.id = `visual-error-${rowIndex}-${columnIndex}`; error.setAttribute('aria-live', 'polite'); let control;
+      if (columnIndex < 4) {
+        if (/[\r\n]/.test(row[columnIndex])) { control = makeElement('textarea', 'visual-textarea'); control.rows = 1; control.value = row[columnIndex]; }
+        else { control = makeElement('input', 'visual-input'); control.type = 'text'; control.value = row[columnIndex]; if (datalists[columnIndex]) control.setAttribute('list', datalists[columnIndex]); }
+      } else {
+        control = makeElement('select', 'visual-select'); const choices = columnIndex === 4 ? state.config?.statuses || [] : state.config?.dotStatuses || [];
+        if (!choices.some(item => item.label === row[columnIndex])) { const invalid = makeElement('option', '', `Invalid: ${row[columnIndex]}`); invalid.value = row[columnIndex]; control.append(invalid); }
+        choices.forEach(item => { const option = makeElement('option', '', item.label); option.value = item.label; control.append(option); }); control.value = row[columnIndex];
+      }
+      control.dataset.columnIndex = columnIndex; control.setAttribute('aria-label', `${label}, row ${rowIndex + 1}`); cell.append(control, error); tableRow.append(cell);
+    });
+    const actions = makeElement('td', 'visual-row-actions'); actions.dataset.label = 'Row actions';
+    [['up', 'Move up', '\u2191'], ['down', 'Move down', '\u2193'], ['duplicate', 'Duplicate', '\u29c9'], ['delete', 'Delete', '\u00d7']].forEach(([action, label, icon]) => {
+      const button = makeElement('button', 'icon-button', icon); button.type = 'button'; button.dataset.rowAction = action;
+      button.setAttribute('aria-label', `${label} row ${rowIndex + 1}`); button.title = `${label} row ${rowIndex + 1}`;
+      button.disabled = (action === 'up' && rowIndex === 0) || (action === 'down' && rowIndex === rows.length - 1); actions.append(button);
+    });
+    tableRow.append(actions); body.append(tableRow);
+  });
+  table.append(body); state.visualTableSource = state.source; updateVisualErrors(); applyVisualFilters();
+}
+function applyVisualFilters() {
+  if ($('visualTable').classList.contains('hidden')) return;
+  const rows = [...$('visualTable').querySelectorAll('tbody tr')], query = state.visualFilter.trim().toLowerCase(); let visible = 0;
+  rows.forEach(row => {
+    const values = [...row.querySelectorAll('[data-column-index]')].map(control => control.value);
+    const matches = (!state.selectedRadar || values[0] === state.selectedRadar) && (!query || values.some(value => value.toLowerCase().includes(query)));
+    // Finish typing before an edited value can hide its own row.
+    const editing = row.contains(document.activeElement) && document.activeElement.matches('[data-column-index]');
+    row.classList.toggle('hidden', !matches && !editing); if (matches || editing) visible += 1;
+  });
+  $('visualFilterStatus').textContent = rows.length ? `${visible} of ${rows.length} rows shown.${visible ? '' : ' No matching rows. Clear filters to see all rows.'}` : 'No rows yet. Add a row to get started.';
+}
+function finishVisualEdit() {
+  if (state.visualEditBefore !== null && state.visualEditBefore !== state.source) { state.history.push(state.visualEditBefore); if (state.history.length > 50) state.history.shift(); state.future = []; }
+  state.visualEditBefore = null;
+}
+function changeVisualRow(action, rowIndex) {
+  let rows; try { rows = parseCsv(state.source); } catch { return; }
+  finishVisualEdit(); let focusIndex = rowIndex, focusColumn = 3;
+  if (action === 'add') {
+    rows.push([state.selectedRadar, '', '', '', state.config?.statuses[0]?.label || '', state.config?.dotStatuses[0]?.label || '']);
+    focusIndex = rows.length - 1; focusColumn = state.selectedRadar ? 1 : 0;
+    state.visualFilter = ''; $('visualTextFilter').value = '';
+  } else {
+    if (!Number.isInteger(rowIndex) || !rows[rowIndex]) return;
+    if (action === 'delete') rows.splice(rowIndex, 1);
+    else if (action === 'duplicate') { rows.splice(rowIndex + 1, 0, [...rows[rowIndex]]); focusIndex += 1; }
+    else if (action === 'up' || action === 'down') {
+      const destination = rowIndex + (action === 'up' ? -1 : 1); if (!rows[destination]) return;
+      [rows[rowIndex], rows[destination]] = [rows[destination], rows[rowIndex]]; focusIndex = destination;
+    } else return;
+  }
+  // Always serialize the full source, including rows hidden by either filter.
+  setSource(csvString(rows)); renderRadarSelector(); renderVisualEditor();
+  const visibleRows = [...$('visualTable').querySelectorAll('tbody tr:not(.hidden)')];
+  const target = visibleRows.find(row => Number(row.dataset.rowIndex) >= focusIndex) || visibleRows.at(-1);
+  const moveButton = (action === 'up' || action === 'down') && target?.querySelector(`[data-row-action="${action}"]:not(:disabled)`);
+  (moveButton || target?.querySelector(`[data-column-index="${focusColumn}"]`) || $('addVisualRow')).focus();
+}
+function updateVisualErrors() {
+  const table = $('visualTable'); if (!table || table.classList.contains('hidden')) return; const errors = new Map();
+  state.errors.forEach(error => {
+    const rowIndex = error.line - 2; if (rowIndex < 0) return;
+    const columns = error.column ? [REQUIRED.indexOf(error.column)] : REQUIRED.map((_, index) => index);
+    columns.filter(index => index >= 0).forEach(columnIndex => { const key = `${rowIndex}-${columnIndex}`; errors.set(key, [...(errors.get(key) || []), error.message]); });
+  });
+  table.querySelectorAll('[data-column-index]').forEach(control => {
+    const key = `${control.closest('tr').dataset.rowIndex}-${control.dataset.columnIndex}`, messages = errors.get(key) || [], error = $(`visual-error-${key}`);
+    error.textContent = messages.join(' '); error.classList.toggle('visible', messages.length > 0); control.closest('td').classList.toggle('has-error', messages.length > 0);
+    if (messages.length) { control.setAttribute('aria-invalid', 'true'); control.setAttribute('aria-describedby', error.id); } else { control.removeAttribute('aria-invalid'); control.removeAttribute('aria-describedby'); }
+  });
+}
 function download(name, content, type) { const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([content], { type })); link.download = name; link.click(); URL.revokeObjectURL(link.href); }
 function showToast(message) { $('toast').textContent = message; $('toast').classList.add('show'); setTimeout(() => $('toast').classList.remove('show'), 2500); }
 async function encodeShare(mode) { const payload = JSON.stringify({ version: 1, csv: state.source, selectedRadarName: state.selectedRadar || undefined, mode }); const stream = new Blob([new TextEncoder().encode(payload)]).stream().pipeThrough(new CompressionStream('deflate-raw')); const bytes = new Uint8Array(await new Response(stream).arrayBuffer()); let binary = ''; bytes.forEach(byte => { binary += String.fromCharCode(byte); }); return `${location.origin}${location.pathname}#/${mode}/${btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '')}`; }
 async function decodeShare(value) { const binary = atob(value.replaceAll('-', '+').replaceAll('_', '/') + '='.repeat((4 - value.length % 4) % 4)); const bytes = Uint8Array.from(binary, char => char.charCodeAt(0)); const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw')); return JSON.parse(new TextDecoder().decode(await new Response(stream).arrayBuffer())); }
 function openTab(name) { document.querySelectorAll('.tab').forEach(tab => tab.classList.toggle('active', tab.dataset.tab === name)); document.querySelectorAll('.workspace-panel').forEach(panel => panel.classList.toggle('active-panel', panel.id === `${name}Panel`)); }
 
-document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => openTab(tab.dataset.tab))); $('csvInput').addEventListener('input', event => { state.source = event.target.value; state.dirty = true; updateLineNumbers(); clearTimeout(state.timer); state.timer = setTimeout(parseSource, 300); }); $('csvInput').addEventListener('scroll', () => { $('lineNumbers').scrollTop = $('csvInput').scrollTop; });
-$('formatCsv').addEventListener('click', () => { try { const rows = parseCsv(state.source); setSource(csvString(rows)); } catch (error) { showToast(error.message); } }); $('downloadCsv').addEventListener('click', () => download('technology-radar.csv', state.source, 'text/csv')); $('toggleLabels').addEventListener('click', () => { state.labels = !state.labels; renderPreview(); }); $('resetView').addEventListener('click', () => { state.selectedRadar = ''; renderRadarSelector(); renderPreview(); }); $('uploadButton').addEventListener('click', () => $('projectFile').click()); $('projectFile').addEventListener('change', async event => { const file = event.target.files[0]; if (file) setSource(await file.text()); event.target.value = ''; });
-$('examplesButton').addEventListener('click', async () => { const name = prompt(`Choose an example:\n${Object.keys(EXAMPLE_FILES).join('\n')}`, Object.keys(EXAMPLE_FILES)[0]); if (!name || !EXAMPLE_FILES[name]) return; if (state.dirty && !confirm('Replace the current source?')) return; try { const response = await fetch(EXAMPLE_FILES[name]); if (!response.ok) throw new Error('Not found'); setSource(await response.text()); } catch { showToast(`Could not load the “${name}” example.`); } }); $('newButton').addEventListener('click', () => { if (!state.dirty || confirm('Replace the current source with a blank radar?')) setSource(REQUIRED.join(',') + '\n'); }); $('docsButton').addEventListener('click', () => window.open('https://github.com/mightora/radar.mightora.io', '_blank', 'noopener,noreferrer'));
-$('undoButton').addEventListener('click', () => { if (state.history.length) { state.future.push(state.source); setSource(state.history.pop(), false); } }); $('redoButton').addEventListener('click', () => { if (state.future.length) { state.history.push(state.source); setSource(state.future.pop(), false); } }); $('shareButton').addEventListener('click', () => $('shareDialog').showModal()); $('shareTopButton').addEventListener('click', () => $('shareDialog').showModal()); $('cancelShare').addEventListener('click', () => $('shareDialog').close()); $('closeShare').addEventListener('click', () => $('shareDialog').close()); $('generateShare').addEventListener('click', async () => { try { const mode = document.querySelector('[name=shareMode]:checked').value; const url = await encodeShare(mode); $('shareUrl').value = url; $('shareMeta').textContent = `${url.length} characters; ${state.validRows.length} technologies; encoded, not encrypted.`; $('shareResult').classList.remove('hidden'); } catch { showToast('Compressed sharing is unavailable in this browser.'); } }); $('copyShare').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('shareUrl').value); showToast('Share link copied'); } catch { $('shareUrl').select(); showToast('Select the link and copy it'); } });
+Object.entries(EXAMPLE_FILES).forEach(([name]) => { const option = document.createElement('option'); option.value = name; option.textContent = name; $('examples').append(option); });
+document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => openTab(tab.dataset.tab))); $('visualMode').addEventListener('click', () => setEditorMode('visual')); $('csvMode').addEventListener('click', () => setEditorMode('csv')); $('switchToCsv').addEventListener('click', () => setEditorMode('csv'));
+$('visualTextFilter').addEventListener('input', event => { state.visualFilter = event.target.value; applyVisualFilters(); });
+$('visualRadarFilter').addEventListener('change', event => selectRadar(event.target.value));
+$('clearVisualFilters').addEventListener('click', () => { state.visualFilter = ''; $('visualTextFilter').value = ''; selectRadar(''); });
+$('addVisualRow').addEventListener('click', () => changeVisualRow('add'));
+$('visualTable').addEventListener('click', event => { const button = event.target.closest('[data-row-action]'); if (button) changeVisualRow(button.dataset.rowAction, Number(button.closest('tr').dataset.rowIndex)); });
+$('visualTable').addEventListener('focusin', event => { if (event.target.matches('[data-column-index]') && state.visualEditBefore === null) state.visualEditBefore = state.source; });
+$('visualTable').addEventListener('input', event => {
+  if (!event.target.matches('[data-column-index]')) return;
+  let rows; try { rows = parseCsv(state.source); } catch { return; }
+  const rowIndex = Number(event.target.closest('tr').dataset.rowIndex); if (!rows[rowIndex]) return;
+  rows[rowIndex][Number(event.target.dataset.columnIndex)] = event.target.value;
+  const source = csvString(rows); setSource(source, false); state.visualTableSource = source;
+});
+$('visualTable').addEventListener('focusout', () => { finishVisualEdit(); applyVisualFilters(); });
+setEditorMode(state.editorMode, false);
+$('csvInput').addEventListener('input', event => { state.source = event.target.value; state.dirty = true; updateLineNumbers(); clearTimeout(state.timer); state.timer = setTimeout(parseSource, 300); }); $('csvInput').addEventListener('scroll', () => { $('lineNumbers').scrollTop = $('csvInput').scrollTop; });
+$('formatCsv').addEventListener('click', () => { try { const rows = parseCsv(state.source); setSource(csvString(rows)); } catch (error) { showToast(error.message); } }); $('downloadCsv').addEventListener('click', () => download('technology-radar.csv', state.source, 'text/csv')); $('toggleLabels').addEventListener('click', () => { state.labels = !state.labels; renderPreview(); }); $('resetView').addEventListener('click', () => selectRadar('')); $('uploadButton').addEventListener('click', () => $('projectFile').click()); $('projectFile').addEventListener('change', async event => { const file = event.target.files[0]; if (file) setSource(await file.text()); event.target.value = ''; });
+$('examples').addEventListener('change', async event => { const select = event.currentTarget, name = select.value; select.value = ''; if (!name || !EXAMPLE_FILES[name]) return; if (state.dirty && !confirm('Replace the current source?')) return; try { const response = await fetch(EXAMPLE_FILES[name]); if (!response.ok) throw new Error('Not found'); setSource(await response.text()); } catch { showToast(`Could not load the “${name}” example.`); } }); $('newButton').addEventListener('click', () => { if (!state.dirty || confirm('Replace the current source with a blank radar?')) setSource(REQUIRED.join(',') + '\n'); }); $('docsButton').addEventListener('click', () => window.open('https://github.com/mightora/radar.mightora.io', '_blank', 'noopener,noreferrer'));
+$('undoButton').addEventListener('click', () => { finishVisualEdit(); if (state.history.length) { state.future.push(state.source); setSource(state.history.pop(), false); if (state.editorMode === 'visual') renderVisualEditor(); } }); $('redoButton').addEventListener('click', () => { finishVisualEdit(); if (state.future.length) { state.history.push(state.source); setSource(state.future.pop(), false); if (state.editorMode === 'visual') renderVisualEditor(); } }); $('shareButton').addEventListener('click', () => $('shareDialog').showModal()); $('shareTopButton').addEventListener('click', () => $('shareDialog').showModal()); $('cancelShare').addEventListener('click', () => $('shareDialog').close()); $('closeShare').addEventListener('click', () => $('shareDialog').close()); $('generateShare').addEventListener('click', async () => { try { const mode = document.querySelector('[name=shareMode]:checked').value; const url = await encodeShare(mode); $('shareUrl').value = url; $('shareMeta').textContent = `${url.length} characters; ${state.validRows.length} technologies; encoded, not encrypted.`; $('shareResult').classList.remove('hidden'); } catch { showToast('Compressed sharing is unavailable in this browser.'); } }); $('copyShare').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('shareUrl').value); showToast('Share link copied'); } catch { $('shareUrl').select(); showToast('Select the link and copy it'); } });
 document.querySelectorAll('[data-export]').forEach(button => button.addEventListener('click', () => { const svg = $('radarCanvas').querySelector('svg'); if (button.dataset.export === 'csv') download('technology-radar.csv', state.source, 'text/csv'); if (button.dataset.export === 'svg') download('technology-radar.svg', svg.outerHTML, 'image/svg+xml'); if (button.dataset.export === 'png') { const image = new Image(); image.onload = () => { const canvas = document.createElement('canvas'); canvas.width = 1640; canvas.height = 1140; canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height); canvas.toBlob(blob => download('technology-radar.png', blob, 'image/png')); }; image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg.outerHTML)}`; } if (button.dataset.export === 'print') window.print(); if (button.dataset.export === 'project') download('technology-radar.radar.json', JSON.stringify({ format: 'mightora-technology-radar', version: 1, createdAt: new Date().toISOString(), radarData: { csv: state.source }, configuration: { strategy: 'embedded' } }, null, 2), 'application/json'); }));
 window.addEventListener('keydown', event => { if (!(event.ctrlKey || event.metaKey)) return; if (event.key.toLowerCase() === 'z') { event.preventDefault(); (event.shiftKey ? $('redoButton') : $('undoButton')).click(); } if (event.key.toLowerCase() === 'y') { event.preventDefault(); $('redoButton').click(); } }); window.addEventListener('beforeunload', event => { if (state.dirty) { event.preventDefault(); event.returnValue = ''; } });
-async function loadShared() { const match = location.hash.match(/^#\/(view|edit)\/(.+)$/); if (!match) return; try { const payload = await decodeShare(match[2]); if (payload.version !== 1 || typeof payload.csv !== 'string') throw new Error('Unsupported share payload.'); state.selectedRadar = payload.selectedRadarName || ''; setSource(payload.csv, false); state.dirty = false; if (match[1] === 'view') { $('dataPanel').classList.remove('active-panel'); $('dataPanel').classList.add('hidden'); openTab('preview'); showToast('View-only radar loaded.'); } } catch (error) { showToast(`Could not open shared radar: ${error.message}`); } }
-loadConfig().then(() => { state.source = localStorage.getItem('radar-builder-source') || EXAMPLE; $('csvInput').value = state.source; parseSource(); }); $('csvInput').addEventListener('input', () => localStorage.setItem('radar-builder-source', state.source));
+async function loadShared() { const match = location.hash.match(/^#\/(view|edit)\/(.+)$/); if (!match) return false; try { const payload = await decodeShare(match[2]); if (payload.version !== 1 || typeof payload.csv !== 'string') throw new Error('Unsupported share payload.'); state.selectedRadar = payload.selectedRadarName || ''; setSource(payload.csv, false); state.dirty = false; if (match[1] === 'view') { $('dataPanel').classList.remove('active-panel'); $('dataPanel').classList.add('hidden'); openTab('preview'); showToast('View-only radar loaded.'); } return true; } catch (error) { showToast(`Could not open shared radar: ${error.message}`); return false; } }
+loadConfig().then(async () => { if (await loadShared()) return; state.source = localStorage.getItem('radar-builder-source') || EXAMPLE; $('csvInput').value = state.source; parseSource(); }); $('csvInput').addEventListener('input', () => localStorage.setItem('radar-builder-source', state.source));

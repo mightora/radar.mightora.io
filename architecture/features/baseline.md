@@ -59,3 +59,47 @@ No destructive stateful tests exist. There is no service-backed integration envi
 - Added source-based workflow regression checks to the existing smoke test. `npm test` failed before the workflow change and passed afterward. `npm run check`, `npm test`, `npm run build`, and `git diff --check` passed. `npm ci` reported zero vulnerabilities; `npx playwright install chromium` succeeded; `npm run test:e2e` passed (1/1) against locally served `dist`.
 - Live deployment remains unverified and blocked on repository Pages setup: a maintainer must select Settings → Pages → Source → GitHub Actions and verify Pages availability. Automatic enablement requires a separate privileged token per the v5 action metadata; enabling it with the existing workflow token is not a fix. No production deployment or workflow rerun was requested.
 - Final review: secret scan found no secrets; CodeQL Actions analysis found zero alerts. The automated code-review binary was unavailable; a separate read-only code-review agent found no significant issues. Committed scope was limited to the workflow, smoke test, README, baseline, and build plan.
+
+## 2026-10-07 — X01 execution update
+
+- `npm run check` -> passed; `npm test` -> passed; `npm run build` -> passed; `npm run test:e2e` -> 3/3 passed against built `dist`.
+- Playwright verified the picker options match all seven files in `public/examples/`, and every example loads with zero validation errors. Keyboard selection, placeholder reset, cancelled confirmation, failed fetch, undo, and `radar-builder-source` persistence passed.
+- Local browser session: integrated browser on Windows, Chrome 150.0.7871.250 / Electron 43.7.3, served with `python -m http.server 8080 -d dist`. The `#examples` header target resolves; keyboard selection loads an example and resets the select.
+- Width checks at 360, 390, 768, 1024, and 1280 px observed `document.documentElement.scrollWidth` values 468, 468, 806, 1018, and 1274 px respectively. Horizontal overflow occurs at 360, 390, and 768 px; this responsive issue is tracked for M01 and was not changed in X01.
+- Pending: real-device checks (iOS Safari and Android Chrome), deployed URL/Pages checks, and the M01 responsive audit. D-05 remains pending user approval; no share-link code changed.
+
+## 2026-10-07 — D-05 approval and verification
+
+- User approved D-05. Startup now awaits `loadShared()` before loading the saved browser source; a valid v1 payload wins over an existing localStorage value. Unrecognized or invalid hashes continue through the normal localStorage/example startup path. The v1 payload fields and privacy warning are unchanged.
+- `npm run check` -> passed; `npm test` -> passed; `npm run build` -> passed; `npm run test:e2e` -> 4/4 passed. Playwright generated view and edit links and confirmed both load the shared CSV despite a conflicting localStorage source; view mode activates Preview and hides Editor, while edit mode keeps Editor active.
+- Integrated browser against `http://localhost:8080` generated a view link and opened it in a second page. The shared CSV loaded, Preview was active, and Editor was hidden. Browser: Chrome 150.0.7871.250 / Electron 43.7.3 on Windows.
+- No deployment or commit performed. Pending release checks remain iOS Safari, Android Chrome, deployed-URL/Pages verification, and the M01 responsive audit. The `/data/config.json` 404 noted in the original baseline remains observed and was not part of D-05.
+
+## 2026-10-07 — V01 visual editor verification
+
+- Added a dependency-free Visual/CSV mode switch. CSV remains canonical; visual controls use DOM properties, configured status labels, datalist suggestions, and the `radar-builder-editor-mode` localStorage preference. Cell validation is associated with its control; malformed CSV displays a read-only notice and is never rewritten from Visual mode.
+- `npm run check` -> passed; `npm test` -> passed; `npm run build` -> passed; `npm run test:e2e` -> 8/8 passed against `dist` served by the configured `python -m http.server 8080 -d dist` web server. VS Code diagnostics reported no errors in edited app, CSS, HTML, and test files.
+- Playwright Chromium confirmed every example round-trips through Visual to parsed-equivalent CSV. Values containing commas, quotes, and embedded newlines round-tripped; CSV updates, preview updates after debounce, validation messaging, undo/redo, mode persistence, read-only parse errors, and keyboard Tab order passed.
+- Keyboard traversal was exercised at 360, 390, 768, 1024, and 1280 px. The table stayed inside its horizontal scroller at each width. Whole-page `scrollWidth` was 468, 468, 810, 1024, and 1280 px respectively; narrow-screen page overflow remains for M01.
+- Browser evidence is automated Playwright Chromium against the generated static artifact. Real-device Safari/Chrome and deployed URL/Pages checks remain pending release checks; no production action was taken.
+
+## 2026-10-07 — V02 row tools verification
+
+- Starting revision observed in this session: `426cd4a00647056cdddd9c3b72d202d6128bbe8c`, branch `main`. Existing uncommitted X01/V01 edits in source, tests, docs and generated output were preserved. No commit, push or deployment was performed.
+- Added add/delete/duplicate/move, text filtering across all six columns and a radar filter synchronized with Preview. Row writes serialize all source rows; filters never remove hidden rows from CSV, downloads or v1 share links. Defaults come from the first configured status/dot labels. See [V02 implementation record](v02-visual-row-tools.md) for decisions and paths; the [build plan](build-plan.md) owns status.
+- Final commands: `npm run check` -> passed; `npm test` -> `Smoke tests passed.`; `npm run build` (run inside `npm run test:e2e`) -> passed and regenerated `dist`; `npm run test:e2e` -> **14/14 passed**, including all eight prior tests and six V02 tests; `git diff --check` -> passed.
+- Execution limitations and corrections: the initial e2e build failed with sandbox `EPERM` removing generated `dist`; approved escalation allowed the normal build and browser command. The first browser run passed 10/14, with four incorrect exact label locators in the new tests; accessible role/name locators resolved them. The next run passed 13/14 and all V02 tests, but an existing shared-link receiving page timed out waiting for `load` after its app rendered. That navigation now waits for `domcontentloaded` and retains its application assertions. The final complete run passed 14/14 in 1.3 minutes.
+- Browser session: automated Playwright 1.63.0 headless Chromium against `http://127.0.0.1:8080/`, with `dist` served through the existing local Python-server configuration (`python -m http.server 8080 -d dist`). Installed Playwright browser metadata identifies Chromium/headless shell 153.0.8010.12. Host tools remain Node v26.7.0, npm 11.19.0 and Python 3.13.1 on Windows.
+- Behavioral evidence: every row operation has one undo step (including unwinding a mixed sequence); keyboard undo captures a cell edit before blur; deleting the final row gives valid headers and zero technologies; custom YAML labels supply new-row defaults; duplicate validation and last-valid preview remain active; combined filters preserve hidden rows through cell edits, movement, duplication, deletion, CSV download and v1 sharing; commas/quotes/newlines survive; CSV-derived HTML does not become elements; malformed CSV blocks row tools without modifying source.
+- Keyboard operation of Add row, both filters, Move up/down, Duplicate and Delete passed at all five widths below. New row-action buttons have action/row accessible names, focus indicators and 44 px targets. Screenshots were captured under `test-results/visual-row-tools-row-tools-041df-t-all-five-requested-widths/v02-<width>.png` and inspected at all five widths (generated, ignored artifacts). The table remains inside its horizontal scroller; new filter controls wrap within their container.
+
+| Viewport width | Whole-page scroll width | Table viewport / content width | Filter tools client / scroll width |
+| --- | --- | --- | --- |
+| 360 | 468 | 320 / 1250 | 322 / 322 |
+| 390 | 468 | 350 / 1250 | 352 / 352 |
+| 768 | 810 | 703 / 1250 | 705 / 705 |
+| 1024 | 1024 | 938 / 1250 | 940 / 940 |
+| 1280 | 1280 | 1174 / 1250 | 1176 / 1176 |
+
+- Pending M01 checks/work: whole-page horizontal overflow at 360/390/768 px remains the same as V01; mobile row cards and the complete Editor/Preview/Errors/Exports/Share responsive audit are not part of V02. The wider action column means the visual table also scrolls within its container at 1280 px.
+- Pending release checks: real iOS Safari and Android Chrome; other unrun browser/device checks; deployed URL/routing journey and successful Pages workflow; live shared-ui behavior. No interactive/manual browser or assistive-screen-reader session was run in V02. Local screenshots and automated Chromium do not establish those results. The earlier `/data/config.json` observation was not re-investigated in this task. `BACKLOG.md` remains unchanged until the existing release gate passes.

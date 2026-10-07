@@ -14,7 +14,15 @@ npm run test:e2e
 python -m http.server 8080 -d dist
 ```
 
-Open `http://localhost:8080/`. `npm run test:e2e` rebuilds `dist`, starts the same Python static server, and runs the Chromium smoke test. The separate Python command is available for manual browser checks. Hash routes such as `#/view/<payload>` and `#/edit/<payload>` work beneath a repository subpath on GitHub Pages.
+Open `http://localhost:8080/`. `npm run test:e2e` rebuilds `dist`, starts the same Python static server, and runs the Chromium browser tests. The separate Python command is available for manual browser checks. Hash routes such as `#/view/<payload>` and `#/edit/<payload>` work beneath a repository subpath on GitHub Pages.
+
+## Visual row tools
+
+Choose **Visual** in the Editor to edit cells or add, duplicate, delete and move rows. Each row action is one undo step. Move up/down swaps with the adjacent row in CSV order, including hidden rows. Duplicates keep all cell values and show the existing duplicate-entry validation error until edited. Deleting the final row leaves the CSV headers intact.
+
+**Filter rows** searches all six columns without case sensitivity; **Filter by radar** shares its selection with Preview. Filters only change which rows are visible: edits, downloads and share links retain hidden rows. **Clear filters** shows all rows again. Filters are temporary and do not add undo steps or storage keys.
+
+**Add row** appends a row, inherits the selected radar (if any), clears the text filter, and focuses the first empty field. Status and Dot Status default to the first values in `public/config/radar-definition.yaml`. Fill the remaining required fields to update the preview; validation keeps the last valid preview while a row is incomplete. Row buttons have keyboard focus and accessible labels; after deletion, focus goes to a remaining visible row or Add row.
 
 ## Privacy
 
