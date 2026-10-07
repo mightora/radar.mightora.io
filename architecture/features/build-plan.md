@@ -1,8 +1,8 @@
 # Feature build plan and delivery tracker
 
 Last updated: 2026-10-07.
-Overall state: F00 verified; product feature implementation not started; all features unreleased.
-Next task: **X01 - Example picker drop-down.**
+Overall state: F00, X01, V01 and V02 verified; product features unreleased.
+Next task: **M01 - Small-screen responsive layout.**
 
 Use this as the execution and progress record for the Technology Radar Live Editor improvements. Use the [implementation prompt](build-prompt.md) to start or resume work. Architecture profile: **static-web-delivery** (browser-only, GitHub Pages; no backend, sign-in or database).
 
@@ -47,8 +47,8 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 
 | Feature | Required tasks | Release state | Evidence |
 | --- | --- | --- | --- |
-| Example picker | X01 | Not released | Not started |
-| Visual (WYSIWYG) editor | V01, V02 | Not released | Not started |
+| Example picker | X01 | Not released | X01 verified locally; see task evidence below. |
+| Visual (WYSIWYG) editor | V01, V02 | Not released | V01 and V02 verified locally; release gate remains R01. |
 | Small-screen layout | M01 | Not released | Not started |
 | User documentation | D01 | Not released | Not started |
 | SEO / AEO enrichment | S01 | Not released | Not started |
@@ -58,10 +58,10 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 | ID | Task | Depends on | State | Evidence / blocker |
 | --- | --- | --- | --- | --- |
 | F00 | Baseline, method bootstrap and decisions | None | Verified | Added method docs and Playwright smoke test. `npm install` passed (0 vulnerabilities); `npm run check`, `npm test`, `npm run build` passed; `npm run test:e2e` passed (1/1); local browser confirmed listed findings. See [baseline](baseline.md). |
-| X01 | Example picker drop-down | F00 | Not started | — |
-| V01 | Visual table editor with two-way CSV sync | F00, D-02 | Not started | — |
-| V02 | Visual editor row tools (add, delete, duplicate, filter) | V01 | Not started | — |
-| M01 | Small-screen responsive layout | X01, V02, D-04 | Not started | — |
+| X01 | Example picker drop-down | F00 | Verified | Accessible picker and D-05 shared-link loading verified. `npm run check`, `npm test`, `npm run build` passed; `npm run test:e2e` passed (4/4), including seven examples and v1 view/edit links overriding stored source. Integrated browser loaded a generated view link, showed Preview, and hid Editor. |
+| V01 | Visual table editor with two-way CSV sync | F00, D-02 | Verified | Dependency-free Visual/CSV editor with round-trip, validation, invalid-source, undo/redo, persistence, and keyboard checks; see V01 delivery log. |
+| V02 | Visual editor row tools (add, delete, duplicate, move, filter) | V01 | Verified | `npm run check`, `npm test`, `npm run build` passed; final `npm run test:e2e` passed 14/14 (6 V02 tests). Single-step undo, header-only deletion, configured defaults, hidden-row preservation, duplicate validation, accessible buttons and keyboard journeys at five widths passed. See [implementation record](v02-visual-row-tools.md) and [baseline](baseline.md). |
+| M01 | Small-screen responsive layout | X01, V02, D-04 | In progress | Responsive audit and implementation against 360, 390, 768, 1024, and 1280 px; preserve desktop layout. |
 | D01 | User guide and in-app documentation link | M01, D-03 | Not started | — |
 | S01 | SEO and AEO enrichment | D01, D-01 | Not started | — |
 | R01 | Cross-feature regression and release readiness | X01, V01, V02, M01, D01, S01 | Not started | — |
@@ -81,7 +81,7 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
   - [scripts/smoke-test.mjs](../../scripts/smoke-test.mjs) asserts source text only; there are no behavioural or browser tests.
   - [scripts/build.mjs](../../scripts/build.mjs) copies only `index.html`, `src/`, `public/`; any new root files (guide, robots, sitemap) need adding.
 - Install Playwright per D-04, add a minimal e2e test that loads the built app and asserts the radar SVG renders, and record its command and outcome.
-- D-01 and D-04 are decided; ask the user for D-05 if still pending.
+- D-01, D-04, and D-05 are decided.
 - Exit: baseline.md lists actual commands with observed outcomes, the findings above confirmed or corrected, browser checks performed (browser + viewport) and checks not performed marked pending.
 
 ### X01 — example picker drop-down
@@ -147,21 +147,34 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 | ID | Date | Question | Decision | Gates |
 | --- | --- | --- | --- | --- |
 | D-01 | 2026-10-07 | Canonical production URL and base path? | Decided (user): `https://radar.mightora.io/` at root. Custom domain is configured outside the repo (no `CNAME` file); verify on the live host in R01. | S01 |
-| D-02 | 2026-10-07 | How should the WYSIWYG editor relate to CSV? | Proposed: dependency-free table/grid editor; CSV text remains canonical; visual edits serialise via `csvString()`. | V01 |
+| D-02 | 2026-10-07 | How should the WYSIWYG editor relate to CSV? | Decided: dependency-free, DOM-built table; CSV text remains canonical and visual edits serialize through `csvString()` and `setSource()` semantics. Use textareas for text cells to preserve embedded newlines; remember mode in `radar-builder-editor-mode`. | V01 |
 | D-03 | 2026-10-07 | Where does user documentation live? | Proposed: static `guide/index.html` deployed with the app (crawlable, shareable), linked from header and toolbar. | D01, S01 |
 | D-04 | 2026-10-07 | Browser test tooling? | Decided (user): add `@playwright/test` as a devDependency for viewport and journey checks. Set up in F00 (`playwright.config.js`, `npm run test:e2e` against built `dist`, Chromium minimum); local test passed. Not added to `pages.yml`: CI browser installation/reliability has not yet been verified. | M01, R01 |
-| D-05 | 2026-10-07 | Fix the uncalled `loadShared()` share-link defect? | Pending user: proposed fix in X01's slice (one-line boot call + test) because R01 verifies sharing. | R01 |
+| D-05 | 2026-10-07 | Fix the uncalled `loadShared()` share-link defect? | Decided (user, 2026-10-07): fix in X01 by loading a valid v1 share payload during startup before falling back to localStorage; test view and edit links. Preserve payload format and privacy warning. | X01, R01 |
+| D-06 | 2026-10-07 | Row ordering, filter scope and new-row defaults? | Decided (V02): move against adjacent source rows, including hidden rows; case-insensitive text search across all six cells; radar filter shares the preview selection. Filters are temporary view state, do not write CSV or add history/storage keys. Add appends, clears text search, inherits the selected radar, uses the first configured status/dot labels and focuses the first empty field. Duplicate preserves every value; existing validation reports duplicates. | V02 |
 
 ## Delivery log
+
 
 - **2026-10-07** — User confirmed D-01 (`https://radar.mightora.io/`) and D-04 (Playwright approved). D-05 still pending.
 - **2026-10-07** — Plan created from repository inspection. No code changed; no checks run.
 - **2026-10-07** — F00 verified. Bootstrapped `AGENTS.md`, `BACKLOG.md`, `architecture/solution-pattern.md`, `architecture/high-level-design.md`, `architecture/features/README.md`, `shared-contracts.md`, and `baseline.md`; documented local commands in `README.md`; added Playwright Chromium smoke test. `npm install` -> 0 vulnerabilities; `npm run check` -> passed; `npm test` -> passed; `npm run build` -> passed; `npm run test:e2e` -> 1/1 passed. Local browser confirmed the listed behavior gaps and reproduced D-05. Pending viewport, real-device, and deployed-host checks are in `baseline.md`.
+- **2026-10-07** — X01 started. D-05 remains pending; this session implements the example picker only.
+- **2026-10-07** — X01 verified locally. Added the accessible toolbar example select and ensured `setSource()` persists programmatic source changes. All seven example files matched the picker map and loaded with zero validation errors; keyboard selection, cancel, failed fetch, undo, and storage behavior passed. `npm run check`, `npm test`, `npm run build`, and `npm run test:e2e` (3/3) passed. Local browser width checks found overflow at 360, 390, and 768 px; responsive follow-up remains in M01. No deployment or commit performed; D-05 remains pending user approval.
+- **2026-10-07** — User approved D-05. X01 reopened to wire the existing v1 `loadShared()` path into startup and verify view/edit shared URLs; no payload format change.
+- **2026-10-07** — D-05 implemented and X01 re-verified. Startup now loads a valid v1 view/edit link before falling back to localStorage. `npm run check`, `npm test`, `npm run build`, and `npm run test:e2e` passed (4/4); test proves incoming shared CSV wins over a different stored source. Integrated browser confirmed a generated view URL loads its CSV and preview. Payload format and privacy warning unchanged.
+- **2026-10-07** — V01 started. D-02 resolved in line with the shared contract: CSV remains canonical; use DOM-created controls, preserve multiline cell values, and store the selected editor mode under `radar-builder-editor-mode`.
+- **2026-10-07** — V01 verified. Added the Visual/CSV switch, DOM-rendered table with configured status choices and suggestions, per-cell accessible validation, malformed-source read-only state, mode persistence, and visual-edit undo/redo. `npm run check`, `npm test`, `npm run build`, and `npm run test:e2e` passed; browser suite passed 8/8. Every example round-tripped to identical parsed rows; quoted, comma-containing and multiline values survived; invalid CSV stayed unchanged. Keyboard Tab traversal passed at 360, 390, 768, 1024, and 1280 px. The editor's table stayed within its own horizontal scroller; overall page overflow remains at 360 (468 px), 390 (468 px), and 768 (810 px), tracked for M01. No commit, push, or deployment performed.
+- **2026-10-07** — V02 started at `426cd4a00647056cdddd9c3b72d202d6128bbe8c`. Inspected the dirty worktree and preserved existing X01/V01 edits in source, tests, contracts, baseline, tracker and generated output. Scope is V02 only: add/delete/duplicate/move, text/radar filters, and their verification. M01 responsive redesign and all deployment actions remain outside this session.
+- **2026-10-07** — V02 implementation and browser tests added. `npm run check` and `npm test` passed. The first `npm run test:e2e` attempt stopped in the build with sandbox `EPERM` removing generated `dist`; retried with approved escalation. Browser verification remains in progress.
+- **2026-10-07** — V02 verification follow-up: initial browser run passed 10/14; four new tests used an exact label-text locator that included option text. Changed those tests to the select's accessible role/name. Next run passed all six V02 tests and 13/14 overall; the existing share-link test timed out in `page.goto()` waiting for full page load after the app rendered. Its receiving pages now wait for `domcontentloaded` and retain the existing source/preview assertions. Full regression rerun pending.
+- **2026-10-07** — V02 verified locally. Added add/delete/duplicate/move and combined text/radar filters, preserving hidden source rows, configured defaults, single-step row history and last-valid validation behavior. `npm run check` -> passed; `npm test` -> passed; `npm run build` (invoked by the browser command) -> passed; final `npm run test:e2e` -> 14/14 passed, including six V02 tests; `git diff --check` -> passed. Playwright Chromium exercised the generated artifact using the configured local Python server and saved screenshots at 360/390/768/1024/1280 px. Filter controls fit their containers; overall page widths remain 468/468/810/1024/1280 px, so the prior narrow-screen overflow remains for M01. README and [V02 implementation record](v02-visual-row-tools.md) document the behavior. No commit, push, deployment or backlog release-state change.
 
 ## Current handoff
 
-- Starting point: `main` at `afdd89bbeacb70b7ca2f3892208426f1baae247e`; the untracked `architecture/` plan and prompt were preserved.
-- Completed this session: F00 verified. Added delivery guidance/contracts/baseline docs and an e2e Playwright smoke test; no application behavior was changed.
-- Checks run: `npm install` -> success, zero vulnerabilities; `npm run check` -> passed; `npm test` -> passed; `npm run build` -> passed; `npm run test:e2e` -> 1/1 passed using locally served `dist`. Local browser findings and the `/data/config.json` 404 are recorded in `baseline.md`.
-- Blockers and pending release checks: D-05 needs user confirmation; it gates only the proposed X01 share-link fix, not X01's example picker or other feature tasks. Real-device and deployed-URL checks remain pending.
-- **Next task: X01 - Example picker drop-down. First step: confirm whether to include the proposed D-05 share-link fix in X01; then mark X01 In progress and implement the accessible example selector.**
+- Starting point: `main` at `426cd4a00647056cdddd9c3b72d202d6128bbe8c`; existing uncommitted X01/V01 changes in baseline, tracker, shared contracts, app, HTML, CSS, tests and generated `dist` were preserved. V02 extends that worktree; nothing was committed.
+- Completed this session: V02 only, verified locally. The Visual editor can add, delete, duplicate and move rows, filter across all columns and share its radar selection with Preview. All writes preserve hidden rows; each row operation is one undo step. The CSV schema, localStorage keys, share v1 format, privacy warning and Mightora components remain intact.
+- Checks: `npm run check` -> passed; `npm test` -> passed; `npm run build` (via e2e) -> passed; final `npm run test:e2e` -> 14/14 passed against built `dist` using the configured `python -m http.server 8080 -d dist` server. Browser evidence includes full existing regression, six new V02 tests, keyboard journeys and screenshots at 360/390/768/1024/1280 px. `git diff --check` passed. Initial sandbox/build denial, corrected test locators and a share-test load timeout are recorded in the log; the final run passed.
+- Blockers: none for V02. Pending release checks: real iOS Safari and Android Chrome, other unrun browser/device checks, deployed journey at `https://radar.mightora.io/`, successful Pages workflow and live shared-ui behavior. No interactive/manual browser or screen-reader session was run; browser evidence is automated Chromium plus screenshot inspection. The table still uses its horizontal scroller; whole-page overflow at 360/390/768 px and the complete responsive audit remain for M01.
+- Release: Visual editor remains Not released; `BACKLOG.md` is unchanged because the R01 release gate has not passed. No commit, push or deployment performed.
+- **Next task: M01 - Small-screen responsive layout. First mark M01 In progress, then audit both editor modes, Preview, Errors, Exports and Share at the required widths; address the recorded page overflow and mobile table layout while preserving the shared header's built-in menu.**

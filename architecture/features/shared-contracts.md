@@ -23,7 +23,7 @@ There are no accounts, authentication, roles, server-side sessions, or server au
 
 | Surface | Permitted data |
 | --- | --- |
-| In-memory editor and `localStorage` | The user's source CSV; persistent source key is `radar-builder-source`. |
+| In-memory editor and `localStorage` | The user's source CSV; persistent source key is `radar-builder-source`. The Visual/CSV editor preference uses `radar-builder-editor-mode` (`visual` or `csv`). |
 | Share URL fragment | Version 1 payload containing `version`, `csv`, `mode`, and optional `selectedRadarName`; compressed and Base64URL-encoded. Anyone receiving a link can decode its CSV. |
 | Static host requests | Static application files, configuration, and selected example CSV; user CSV is not included in ordinary requests. |
 | Downloads | User-requested CSV, SVG, PNG, print output, or portable project JSON. |
