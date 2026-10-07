@@ -18,10 +18,12 @@ function parseCsv(source) {
   return rows;
 }
 
-test('built app renders the radar preview', async ({ page }) => {
+test('built app opens on the radar preview', async ({ page }) => {
   await page.goto('/');
-  await page.locator('.tab[data-tab="preview"]').click();
 
+  await expect(page.locator('.tab[data-tab="preview"]')).toHaveClass(/active/);
+  await expect(page.locator('#previewPanel')).toHaveClass(/active-panel/);
+  await expect(page.locator('#dataPanel')).not.toHaveClass(/active-panel/);
   const radar = page.locator('#radarCanvas svg.radar-svg');
   await expect(radar).toBeVisible();
   await expect(radar.locator('circle')).not.toHaveCount(0);
@@ -85,6 +87,7 @@ test('example picker supports keyboard, cancel, fetch failure, and undo', async 
 
 test('v1 shared links load view and edit data before stored source', async ({ page, browser }) => {
   await page.goto('/');
+  await page.locator('.tab[data-tab="data"]').click();
   const sharedSource = 'Radar Name,Category,Sub Category,Technology,Status,Dot Status\nShared Radar,Platform,Runtime,Shared Technology,Assess,Standard';
   await page.locator('#csvInput').fill(sharedSource);
   await expect(page.locator('#sourceStatus')).toHaveText('1 valid technologies');
