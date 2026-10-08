@@ -14,12 +14,11 @@ Read [agentic-delivery](../agentic-delivery/SKILL.md) for the shared document
 model, task tracker, evidence, session protocol and safety rules. Read this skill
 only for static-browser architecture and verification; do not repeat core rules.
 
-For testing, use the core's risk-based session protocol and the template's
-[verification selection](templates/architecture/solution-pattern.md#verification-selection).
-The profile lists possible checks, not a mandatory full browser matrix per edit.
-Encode required viewport widths and keyboard journeys as automated browser tests
-(for example Playwright) and run only the affected spec while iterating; reserve
-interactive browser or screenshot sessions for diagnosing failures.
+For browser-test authoring and execution, follow the repository's
+[playwright-tests skill](../playwright-tests/SKILL.md). Use the core's risk-based
+session protocol and the template's
+[verification selection](templates/architecture/solution-pattern.md#verification-selection);
+the profile lists possible checks, not a mandatory full browser matrix per edit.
 
 Use [the static solution pattern](templates/architecture/solution-pattern.md)
 as the target's `architecture/solution-pattern.md` when bootstrapping. Copy the

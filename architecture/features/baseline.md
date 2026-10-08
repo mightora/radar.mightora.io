@@ -12,6 +12,11 @@ This file records observed repository state and executed checks. Unrun checks re
 - Identified the earlier `/data/config.json` request as the shared `<mightora-author>` default `config-url`. It still returns 404 on the existing app. The guide explicitly supplies `data:application/json,%7B%7D`, supported by that component's fetch-and-read behavior, so its inline biography is retained without a missing local file or new config endpoint. No global fetch-patch changes or new dependencies were needed.
 - Pending release checks: real iOS Safari and Android Chrome, additional browser engines (Firefox/WebKit), interactive screen-reader checks, production app/guide URLs and navigation, successful Pages workflow and live shared components. No separate headed/manual browser session was run; evidence is automated local browser interaction and screenshot inspection. Production hosting settings were not checked or changed. No commit, push, deployment or `BACKLOG.md` change occurred. Task/release status and the next task remain owned by the build plan.
 
+## 2026-10-08 — T01 Playwright tooling verification
+
+- Added the task-scoped Playwright authoring skill and two full-suite local runners. `scripts/run-all-tests.ps1` passed `npm run check`, `npm test`, `npm run build`, and `npm run test:e2e` (25/25 Chromium tests); output is in `test-results/local-20261008-093116-144334/`. `bash scripts/run-all-tests.sh` passed the same checks (25/25); output is in `test-results/local-20261008-083257-yHiE48/`.
+- Both folders contain a summary, four command logs, Playwright artifacts, and `playwright-report/index.html`. `bash -n scripts/run-all-tests.sh` passed. The first Bash run exposed WSL/Windows report-path handling; the final run uses an explicit Playwright artifact path and collects the generated HTML report. All outputs are ignored local artifacts; no CI or Pages workflow change was made.
+
 ## Repository baseline
 
 - Applicable root `AGENTS.md` and feature index were absent at initial inspection; `design-system.instructions.md` and the active build plan were present. F00 added the missing root guidance and feature index, linking the existing design-system instructions without replacing them.
@@ -132,5 +137,3 @@ No destructive stateful tests exist. There is no service-backed integration envi
 - Observed command composition: `npm run test:e2e` already runs `npm run build` before Playwright; a separate preceding build is redundant for unchanged inputs.
 - `python .github/skills/agentic-delivery/scripts/validate.py` passed after protocol and profile edits: 34 Markdown documents, 78 local links. This validates pack structure, frontmatter presence, links and code fences, not future agent compliance or runtime savings.
 - Application syntax, smoke, build and browser suites are out of scope for these non-shipped documentation edits and were not run. The existing M01 failure and pending live/device checks are unchanged; no deployment was performed.
-
-

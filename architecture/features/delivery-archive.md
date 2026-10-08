@@ -4,6 +4,13 @@ Historical detail moved out of the [build plan](build-plan.md) to keep the activ
 
 ## Archived task details and exit checks
 
+### T01 — Playwright task-scoped authoring and local result runners
+
+- Added `.github/skills/playwright-tests/SKILL.md` to limit new browser specs to the active task and keep them in `tests/e2e/`; static-web delivery and repository guidance now route Playwright work through that skill.
+- Added `scripts/run-all-tests.ps1` and `scripts/run-all-tests.sh` to run `npm run check`, `npm test`, `npm run build`, and `npm run test:e2e`, continuing through failures and returning a failing exit code if any check fails.
+- Each run writes a summary, per-check logs, Playwright artifacts, and an HTML report under an ignored `test-results/local-*` directory. Bash translates the artifact path when WSL invokes Windows Node and collects the HTML report into that run folder.
+- Exit evidence: both runners passed all four checks and 25/25 Chromium tests. Bash run: `test-results/local-20261008-083257-yHiE48/`; PowerShell run: `test-results/local-20261008-093116-144334/`. `bash -n scripts/run-all-tests.sh` passed. The Pages workflow was not changed.
+
 ### F00 — baseline, method bootstrap and decisions
 
 - Bootstrap the method from `.github/skills/agentic-delivery/templates/` and `.github/skills/static-web-delivery/templates/architecture/solution-pattern.md`: create `AGENTS.md`, `BACKLOG.md` (the five requests above, verbatim), `architecture/solution-pattern.md`, `architecture/high-level-design.md`, `architecture/features/README.md`, `architecture/features/shared-contracts.md` and `architecture/features/baseline.md`. Keep shared contracts short: CSV schema (six required columns), `radar-definition.yaml` as the status/dot vocabulary, `localStorage` key `radar-builder-source`, share payload v1 per [docs/sharing.md](../../docs/sharing.md). Link the existing [design-system.instructions.md](../../design-system.instructions.md) from `AGENTS.md`; do not overwrite it.

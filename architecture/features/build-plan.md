@@ -80,10 +80,11 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 | D01 | User guide and in-app documentation link | M01, D-03 | Verified | Static guide, shared components, Documentation links, README and build copy implemented. `npm run check`, `npm test`, `npm run build` (inside browser command) passed; `npm run test:e2e` passed 22/22, including 7 guide tests. Crawlable without JS; local links/anchors, control names, keyboard and 360/390/768/1024/1280 px checks passed without guide console errors or page overflow. See [implementation record](d01-user-guide.md) and [baseline](baseline.md). |
 | S01 | SEO and AEO enrichment | D01, D-01 | In progress | Add canonical/social metadata and JSON-LD to app and guide; publish robots.txt, sitemap.xml and llms.txt plus a static OG image; keep the app H1 unchanged by loaded CSV data. |
 | R01 | Cross-feature regression and release readiness | X01, V01, V02, M01, Z01, P01, W01, D01, S01 | Not started | — |
+| T01 | Playwright task-scoped authoring and local result runners | F00 | Verified | Both local runners passed all checks and 25/25 browser tests; each saved logs, summary, browser artifacts and HTML report under `test-results/local-*`. See [baseline](baseline.md). |
 
 ## Task details and exit checks
 
-Only unfinished tasks are listed. Details for Verified tasks (F00, X01, V01, V02, M01, D01) are in the [delivery archive](delivery-archive.md).
+Only unfinished tasks are listed. Details for Verified tasks (F00, X01, V01, V02, M01, D01, T01) are in the [delivery archive](delivery-archive.md).
 
 ### Z01 — radar preview zoom controls
 
@@ -137,13 +138,14 @@ Only unfinished tasks are listed. Details for Verified tasks (F00, X01, V01, V02
 
 Newest first; one or two lines per session. Entries up to D01 are in the [delivery archive](delivery-archive.md).
 
+- **2026-10-08** — T01 verified: task-scoped Playwright skill and PowerShell/Bash full-suite runners added; both runners passed and saved local HTML reports. Pages workflow unchanged.
 - **2026-10-08** — Added P01 for clearer radar labels and an item table, followed by W01 for Word-compatible export; synchronized the feature index and implementation prompt. Plan-only; no application checks run.
 - **2026-10-08** — Efficiency maintenance: moved Verified task details and the delivery log to [delivery-archive.md](delivery-archive.md); slimmed the build prompt to one task per session with focused verification. Docs-only; no application checks run.
 
 ## Current handoff
 
-- State: F00, X01, V01, V02, M01, D01 Verified locally; S01 in progress; P01 and W01 planned; all features Not released; `BACKLOG.md` unchanged. No commit, push or deployment performed.
+- State: F00, X01, V01, V02, M01, D01 and T01 Verified locally; S01 in progress; P01 and W01 planned; all features Not released; `BACKLOG.md` unchanged. No commit, push or deployment performed.
 - Last full check (D01): `npm run check`, `npm test`, `npm run test:e2e` (builds first) passed 22/22 in Chromium.
 - Known limitation: the app's shared author component requests `/data/config.json` (404); the guide avoids it with an empty inline config.
 - Pending release checks (R01): real iOS Safari/Android Chrome, Firefox/WebKit, screen reader, live host at `https://radar.mightora.io/`, successful Pages run after maintainer confirms Settings → Pages → Source → GitHub Actions.
-- **Next task: Z01 - Radar preview zoom controls.** First step: mark Z01 In progress. The radar SVG is built as a string in `renderPreview()` ([src/app.js](../../src/app.js#L49), written to `#radarCanvas` at line 88); `#previewPanel` / `.preview-head` in [index.html](../../index.html#L45) hosts the controls. Exports read `#radarCanvas svg` in the `[data-export]` handler ([src/app.js](../../src/app.js#L225)), so apply zoom with CSS on a wrapper, not on the SVG's `viewBox`, to keep exports unscaled. Add `tests/e2e/zoom.spec.js`. P01 and W01 follow Z01; S01 is in progress concurrently.
+- **Next product task: Z01 - Radar preview zoom controls.** First step: mark Z01 In progress. The radar SVG is built as a string in `renderPreview()` ([src/app.js](../../src/app.js#L49), written to `#radarCanvas` at line 88); `#previewPanel` / `.preview-head` in [index.html](../../index.html#L45) hosts the controls. Exports read `#radarCanvas svg` in the `[data-export]` handler ([src/app.js](../../src/app.js#L225)), so apply zoom with CSS on a wrapper, not on the SVG's `viewBox`, to keep exports unscaled. Add `tests/e2e/zoom.spec.js`. P01 and W01 follow Z01; S01 is in progress concurrently. T01 local runners and reports are verified; see [baseline](baseline.md).

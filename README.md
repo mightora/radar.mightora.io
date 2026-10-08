@@ -22,6 +22,8 @@ python -m http.server 8080 -d dist
 
 Open `http://localhost:8080/` or the guide at `http://localhost:8080/guide/`. The build copies `index.html`, `src/`, `public/` and `guide/` into `dist`; edit those sources rather than generated files. `npm run test:e2e` rebuilds `dist`, starts the same Python static server, and runs the Chromium browser tests. The separate Python command is available for manual browser checks. Hash routes such as `#/view/<payload>` and `#/edit/<payload>` work beneath a repository subpath on GitHub Pages.
 
+To run the full local check suite and save its logs and Playwright report, run `scripts/run-all-tests.ps1` in PowerShell or `bash scripts/run-all-tests.sh` in Bash. Each run writes a summary, per-check logs, and the HTML report under a new `test-results/local-*` directory.
+
 ## Visual row tools
 
 Choose **Visual** in the Editor to edit cells or add, duplicate, delete and move rows. Each row action is one undo step. Move up/down swaps with the adjacent row in CSV order, including hidden rows. Duplicates keep all cell values and show the existing duplicate-entry validation error until edited. Deleting the final row leaves the CSV headers intact.

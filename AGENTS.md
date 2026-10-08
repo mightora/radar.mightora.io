@@ -7,6 +7,7 @@
 - Follow [architecture/solution-pattern.md](architecture/solution-pattern.md): this is a browser-only static site hosted by GitHub Pages. Do not add a backend, accounts, server storage, analytics, or tracking without an approved requirement.
 - Use `npm run check`, `npm test`, `npm run build`, and `npm run test:e2e` for local verification; serve built output with `python -m http.server 8080 -d dist` for manual browser checks.
 - No destructive stateful tests exist; user CSV data is processed in the browser. Never push or deploy without explicit user authorisation.
+- For Playwright authoring and focused browser checks, follow [.github/skills/playwright-tests/SKILL.md](.github/skills/playwright-tests/SKILL.md). Keep new specs scoped to the active task in `tests/e2e/`; local all-check runners save results under `test-results/local-*`.
 
 ## Implementation sessions
 
@@ -15,5 +16,5 @@
 - Read only the task's row and details, open decisions and handoff in the build plan, plus [shared-contracts.md](architecture/features/shared-contracts.md) (and the design system for UI work). Skip `delivery-archive.md` and `baseline.md` unless needed.
 - Search `src/app.js` for what you need rather than reading the whole file. Keep changes to it minimal.
 - Escape CSV-derived HTML. No new runtime dependencies, backend, tracking or share payload changes. Make routine decisions and record them; ask only if a pending-user decision blocks the task.
-- Verify by risk: iterate with `npx playwright test tests/e2e/<spec>.spec.js --reporter=dot`; finish once with `npm run -s check; npm test; npm run -s test:e2e -- --reporter=dot` (it builds first). Encode viewport (360/390/768/1024/1280) and keyboard checks as Playwright assertions. Use interactive browser or screenshot sessions only to diagnose a failure. Record checks you couldn't run as pending; never claim them passed.
+- Verify by risk: iterate with the affected Playwright spec; finish once with the required checks or `scripts/run-all-tests.ps1` / `scripts/run-all-tests.sh` (the e2e command builds first). Encode viewport (360/390/768/1024/1280) and keyboard checks as Playwright assertions when relevant. Use interactive browser or screenshot sessions only to diagnose a failure. Record checks you couldn't run as pending; never claim them passed.
 - Update the build plan twice: In progress with scope at start; at the end the tracker row, a one- or two-line log entry, decisions and handoff. Move Verified task details to `delivery-archive.md`. The handoff's first step names the files and functions to change.
