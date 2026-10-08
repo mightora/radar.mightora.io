@@ -50,7 +50,7 @@
   #shareDialog .share-options{flex-wrap:wrap;gap:12px;padding:8px 16px}
   #shareDialog .warning{margin:16px}
   #shareDialog .share-result{margin:14px 16px;overflow-wrap:anywhere}
-  #shareDialog .share-result input{width:100%;min-width:0;font-size:16px}
+  #shareDialog .share-result input,#shareDialog .share-result textarea{width:100%;min-width:0;font-size:16px}
   #shareDialog button{min-height:44px}
   .toast{right:12px;bottom:12px;left:12px;text-align:center}
 }

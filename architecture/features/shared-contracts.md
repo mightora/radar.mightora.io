@@ -32,7 +32,10 @@ The required CSV columns, in exact order, are `Radar Name`, `Category`, `Sub Cat
 
 ## Errors, diagnostics and privacy
 
-Validation preserves the user's source and keeps the last valid preview. Do not add analytics, tracking, or server-side diagnostics. Error messages and any rendered values derived from CSV must be safely escaped or inserted through DOM properties.
+Validation preserves the user's source and keeps the last valid preview. Preview-table edits commit on blur through canonical CSV/history only after validation; invalid drafts remain in their field until corrected or cancelled. Stale previews and shared View links have read-only tables. Do not add analytics, tracking, or server-side diagnostics. Error messages and any rendered values derived from CSV must be safely escaped or inserted through DOM properties.
+
+Category and subcategory edge labels have no text background filter, and category bands have no fill; technology-name labels retain their backing. Keep this treatment in the preview and standalone SVG/PNG exports.
+Radar text size is temporary view state (8-20 SVG px, default 11): it changes technology and curved section labels and their image/print exports, but not CSV, storage, history or share payloads. Placement checks dot and wrapped-label bounds, preserves status rings and category/subcategory membership, and retries with a larger fitted drawing radius when crowded. Extremely dense inputs beyond the bounded retries may still overlap; browser rendering remains a separate verification requirement.
 
 ## Behaviour that must not regress
 
@@ -40,4 +43,4 @@ CSV validation with a 300 ms debounce, last-valid preview, undo/redo, upload/dow
 
 ## Out of scope
 
-No backend, accounts, server storage, analytics or tracking, new runtime dependencies, framework migration, radar rendering redesign, or share payload format change.
+No backend, accounts, server storage, analytics or tracking, new runtime dependencies, framework migration, or share payload format change. The user-approved P02 rendering change places curved category labels on the outer edge and divides each equal category wedge into equal subcategory sections; status rings retain their configured meaning and order.

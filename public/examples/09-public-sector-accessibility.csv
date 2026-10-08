@@ -1,0 +1,31 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Public Sector | Digital Service Strategy,Accessibility,Legislation,Public Sector Accessibility Regulations 2018,Deploy,Caveated
+Public Sector | Digital Service Strategy,Accessibility,Standard,WCAG 2.2 AA for public websites,Deploy,Standard
+Public Sector | Digital Service Strategy,Accessibility,Transparency,Published accessibility statement,Deploy,Standard
+Public Sector | Digital Service Strategy,Service design,Standards,Technology Code of Practice,Deploy,Standard
+Public Sector | Digital Service Strategy,Service design,Interoperability,Open standards for government,Deploy,Standard
+Public Sector | Digital Service Strategy,Service design,Inclusion,Assisted digital alternatives,Deploy,Standard
+Public Sector | Digital Service Strategy,Algorithmic accountability,Transparency,ATRS disclosures for in-scope departments,Deploy,Caveated
+Public Sector | Digital Service Strategy,Algorithmic accountability,Governance,ATRS applicability and exemptions,Deploy,Caveated
+Public Sector | Digital Service Strategy,Cyber resilience,Standard,NCSC Cyber Assessment Framework v4.0,Trial,Caveated
+Public Sector | Digital Service Strategy,Technology,Reuse,Reuse and open source by default,Deploy,Caveated
+Public Sector | Digital Service Strategy,Technology,Legacy approach,Inaccessible PDF-only service forms,Sunset,Rejected
+Public Sector | Digital Service Strategy,Technology,Legacy approach,Undocumented automated decisions,Sunset,Caveated
+Public Sector | Accessibility and Transparency,Accessibility,Legal scope,2018 accessibility regulation assessment,Deploy,Caveated
+Public Sector | Accessibility and Transparency,Accessibility,Conformance,WCAG 2.2 AA testing,Deploy,Standard
+Public Sector | Accessibility and Transparency,Accessibility,Statements,Accessibility statement maintenance,Deploy,Standard
+Public Sector | Accessibility and Transparency,Accessibility,Contact route,Alternative accessible formats,Deploy,Standard
+Public Sector | Accessibility and Transparency,Accessibility,Usability,Assistive technology compatibility,Deploy,Standard
+Public Sector | Accessibility and Transparency,Accessibility,Usability,Mobile app accessible flows,Deploy,Standard
+Public Sector | Accessibility and Transparency,Architecture,Standards,Technology Code of Practice assessment,Deploy,Standard
+Public Sector | Accessibility and Transparency,Architecture,Interoperability,Open standards adoption,Deploy,Standard
+Public Sector | Accessibility and Transparency,Architecture,Reuse,Government reuse assessment,Deploy,Standard
+Public Sector | Accessibility and Transparency,Architecture,Cloud,Cloud-first considerations,Deploy,Caveated
+Public Sector | Accessibility and Transparency,Algorithmic accountability,Applicability,ATRS mandatory-scope decision,Deploy,Caveated
+Public Sector | Accessibility and Transparency,Algorithmic accountability,Publication,ATRS record publication,Deploy,Caveated
+Public Sector | Accessibility and Transparency,Algorithmic accountability,Content,ATRS record template,Deploy,Caveated
+Public Sector | Accessibility and Transparency,Algorithmic accountability,Exceptions,ATRS exemptions review,Deploy,Caveated
+Public Sector | Accessibility and Transparency,Security,Assessment,NCSC CAF v4.0 mapping,Trial,Caveated
+Public Sector | Accessibility and Transparency,Security,Controls,Security by design review,Deploy,Standard
+Public Sector | Accessibility and Transparency,Inclusion,Services,Assisted digital pathway testing,Deploy,Standard
+Public Sector | Accessibility and Transparency,Modernisation,Content,Accessible alternative to PDF-only forms,Trial,Standard

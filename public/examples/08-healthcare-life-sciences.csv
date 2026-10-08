@@ -1,0 +1,31 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Healthcare | Digital Assurance Strategy,Patient safety,Clinical risk,DCB0129 supplier clinical safety,Deploy,Caveated
+Healthcare | Digital Assurance Strategy,Patient safety,Clinical risk,DCB0160 deployment clinical safety,Deploy,Caveated
+Healthcare | Digital Assurance Strategy,Patient safety,Assurance,Clinical safety case and hazard log,Deploy,Standard
+Healthcare | Digital Assurance Strategy,Assurance,Standards evolution,DCB0129/DCB0160 review proposals,Assess,Caveated
+Healthcare | Digital Assurance Strategy,Data security,NHS assurance,Data Security and Protection Toolkit,Deploy,Caveated
+Healthcare | Digital Assurance Strategy,Data security,Annual update,DSP Toolkit version 9 (2026–27),Trial,Caveated
+Healthcare | Digital Assurance Strategy,Accessibility,Inclusive design,NHS WCAG 2.2 AA implementation,Deploy,Standard
+Healthcare | Digital Assurance Strategy,Accessibility,Assisted digital,NHS inclusive service pathways,Deploy,Standard
+Healthcare | Digital Assurance Strategy,Service design,Delivery standard,NHS Service Standard,Deploy,Standard
+Healthcare | Digital Assurance Strategy,Clinical content,Safety,NHS health content standard,Deploy,Standard
+Healthcare | Digital Assurance Strategy,Research,Patient needs,NHS user research standards,Deploy,Standard
+Healthcare | Digital Assurance Strategy,Digital risk,Legacy practice,No formal clinical safety owner,Sunset,Rejected
+Healthcare | Supplier Assurance Controls,Clinical safety,Manufacturers,DCB0129 clinical risk management,Deploy,Caveated
+Healthcare | Supplier Assurance Controls,Clinical safety,Deployment,DCB0160 implementing organisation,Deploy,Caveated
+Healthcare | Supplier Assurance Controls,Clinical safety,Accountability,Clinical Safety Officer involvement,Deploy,Standard
+Healthcare | Supplier Assurance Controls,Clinical safety,Hazards,Clinical hazard identification,Deploy,Standard
+Healthcare | Supplier Assurance Controls,Clinical safety,Hazards,Hazard log maintenance,Deploy,Standard
+Healthcare | Supplier Assurance Controls,Clinical safety,Evidence,Clinical safety case report,Deploy,Standard
+Healthcare | Supplier Assurance Controls,Clinical safety,Operations,Post-deployment hazard review,Deploy,Standard
+Healthcare | Supplier Assurance Controls,Clinical safety,Future change,DCB0129/DCB0160 national review,Assess,Caveated
+Healthcare | Supplier Assurance Controls,Information governance,Annual assurance,DSP Toolkit organisation submission,Deploy,Caveated
+Healthcare | Supplier Assurance Controls,Information governance,Annual assurance,DSP Toolkit 2026–27 version 9,Trial,Caveated
+Healthcare | Supplier Assurance Controls,Service standard,User needs,Health and care user research,Deploy,Standard
+Healthcare | Supplier Assurance Controls,Service standard,Assurance,NHS Service Standard assessment,Deploy,Standard
+Healthcare | Supplier Assurance Controls,Accessibility,Web content,WCAG 2.2 AA accessible interfaces,Deploy,Standard
+Healthcare | Supplier Assurance Controls,Accessibility,Inclusion,Assisted digital access arrangements,Deploy,Standard
+Healthcare | Supplier Assurance Controls,Accessibility,Testing,Research with access-needs users,Deploy,Standard
+Healthcare | Supplier Assurance Controls,Content assurance,Clinical accuracy,NHS health content review workflow,Deploy,Standard
+Healthcare | Supplier Assurance Controls,Content assurance,Communication,Clear accessible health content,Deploy,Standard
+Healthcare | Supplier Assurance Controls,Information governance,Modernisation,Informal patient-data sharing practice,Sunset,Rejected

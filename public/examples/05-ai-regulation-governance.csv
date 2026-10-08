@@ -1,0 +1,31 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+AI Governance | Regulatory Outlook,Governance,EU compliance,AI Act risk-based governance,Deploy,Caveated
+AI Governance | Regulatory Outlook,Governance,UK assurance,UK AI assurance principles,Deploy,Caveated
+AI Governance | Regulatory Outlook,Legislation,Amendments,2026 EU AI Omnibus amendments,Deploy,Caveated
+AI Governance | Regulatory Outlook,Legal duties,Restricted uses,Prohibited AI practices screening,Deploy,Standard
+AI Governance | Regulatory Outlook,Legal duties,Transparency,AI transparency duties: Aug 2026,Deploy,Caveated
+AI Governance | Regulatory Outlook,Legal duties,Transitional,Additional prohibited practices: Dec 2026,Trial,Caveated
+AI Governance | Regulatory Outlook,Legal duties,High-risk systems,Annex III high-risk readiness: Dec 2027,Trial,Caveated
+AI Governance | Regulatory Outlook,Legal duties,Regulated products,Annex I product-system timeline: Aug 2028,Assess,Caveated
+AI Governance | Regulatory Outlook,Governance,Legacy transition,Existing AI systems transition rules,Assess,Caveated
+AI Governance | Regulatory Outlook,Innovation,Experimentation,Regulatory AI sandboxes,Assess,Caveated
+AI Governance | Regulatory Outlook,Guidance,Draft material,High-risk AI interpretative guidance,Assess,Caveated
+AI Governance | Regulatory Outlook,Assurance,Evidence,AI risk and assurance register,Deploy,Standard
+AI Governance | Obligations and Controls,Risk classification,Scope,Provider vs deployer role mapping,Deploy,Caveated
+AI Governance | Obligations and Controls,Risk classification,Scope,Annex III high-risk use-case inventory,Trial,Caveated
+AI Governance | Obligations and Controls,Risk classification,Scope,Annex I regulated-product AI inventory,Assess,Caveated
+AI Governance | Obligations and Controls,Prohibited practices,Controls,Article 5 restricted-use assessments,Deploy,Caveated
+AI Governance | Obligations and Controls,Prohibited practices,Change,December 2026 added prohibitions,Trial,Caveated
+AI Governance | Obligations and Controls,Transparency,Disclosure,AI interaction transparency (Article 50),Deploy,Caveated
+AI Governance | Obligations and Controls,Transparency,Synthetic media,AI-generated content transparency,Deploy,Caveated
+AI Governance | Obligations and Controls,General-purpose AI,Provider requirements,GPAI model-provider obligations,Deploy,Caveated
+AI Governance | Obligations and Controls,High-risk assurance,Documentation,Technical documentation of high-risk AI,Trial,Caveated
+AI Governance | Obligations and Controls,High-risk assurance,Operations,Human oversight by design,Trial,Caveated
+AI Governance | Obligations and Controls,High-risk assurance,Testing,Risk management and post-market monitoring,Trial,Caveated
+AI Governance | Obligations and Controls,High-risk assurance,Data quality,Training-data governance controls,Trial,Caveated
+AI Governance | Obligations and Controls,Transitional compliance,Existing systems,Article 111 legacy-system transition,Assess,Caveated
+AI Governance | Obligations and Controls,Regulatory process,Oversight,AI Act market surveillance responsibilities,Deploy,Caveated
+AI Governance | Obligations and Controls,Regulatory process,Testing,National regulatory sandbox readiness,Assess,Caveated
+AI Governance | Obligations and Controls,UK assurance,Governance,AI accountability and ownership,Deploy,Standard
+AI Governance | Obligations and Controls,UK assurance,Impact,Fairness and contestability checks,Deploy,Caveated
+AI Governance | Obligations and Controls,Guidance,Interpretation,Draft EU high-risk AI guidelines,Assess,Caveated

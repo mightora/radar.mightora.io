@@ -1,0 +1,31 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Power Platform | Architecture Priorities,Governance,Environment control,Managed Environments baseline,Deploy,Standard
+Power Platform | Architecture Priorities,Governance,Risk management,Data policies and connector boundaries,Deploy,Standard
+Power Platform | Architecture Priorities,ALM,Delivery,Power Platform pipelines,Deploy,Standard
+Power Platform | Architecture Priorities,ALM,Source control,Native Git integration for solutions,Trial,Caveated
+Power Platform | Architecture Priorities,ALM,Packaging,Managed solutions in production,Deploy,Standard
+Power Platform | Architecture Priorities,Architecture,Environment strategy,Development and production separation,Deploy,Standard
+Power Platform | Architecture Priorities,Security,Least privilege,Managed Environment sharing limits,Deploy,Caveated
+Power Platform | Architecture Priorities,Operations,Quality,Solution checker at scale,Deploy,Standard
+Power Platform | Architecture Priorities,Operations,Release quality,Pre-deployment validation,Trial,Standard
+Power Platform | Architecture Priorities,Modernisation,Process,Ad hoc solution export process,Sunset,Rejected
+Power Platform | Architecture Priorities,Modernisation,Risk,Personal-owner production automations,Sunset,Rejected
+Power Platform | Architecture Priorities,Innovation,Agents,Copilot Studio enterprise use cases,Trial,Caveated
+Power Platform | ALM and Governance Controls,ALM,Pipelines,Pipelines host environment,Deploy,Standard
+Power Platform | ALM and Governance Controls,ALM,Pipelines,Pipeline stages and approvals,Deploy,Standard
+Power Platform | ALM and Governance Controls,ALM,Pipelines,Delegated deployment,Trial,Caveated
+Power Platform | ALM and Governance Controls,ALM,Pipelines,Pipeline deployment history,Deploy,Standard
+Power Platform | ALM and Governance Controls,ALM,Source control,Git integration in dev environments,Trial,Standard
+Power Platform | ALM and Governance Controls,ALM,Source control,Direct Git integration in production,Sunset,Rejected
+Power Platform | ALM and Governance Controls,ALM,Quality,Solution checker enforcement,Deploy,Standard
+Power Platform | ALM and Governance Controls,Governance,Environment,Managed Environments features,Deploy,Standard
+Power Platform | ALM and Governance Controls,Governance,Environment,Environment groups,Trial,Caveated
+Power Platform | ALM and Governance Controls,Governance,Environment,Default environment routing,Trial,Caveated
+Power Platform | ALM and Governance Controls,Governance,Security,Power Platform data policies,Deploy,Standard
+Power Platform | ALM and Governance Controls,Governance,Security,IP firewall for environments,Trial,Caveated
+Power Platform | ALM and Governance Controls,Governance,Security,Customer Lockbox controls,Trial,Caveated
+Power Platform | ALM and Governance Controls,Governance,Security,Managed Environment sharing controls,Deploy,Caveated
+Power Platform | ALM and Governance Controls,Governance,Data,Dataverse-backed solutions,Deploy,Standard
+Power Platform | ALM and Governance Controls,Operations,Releases,Regional GA deployment schedule,Deploy,Standard
+Power Platform | ALM and Governance Controls,Operations,Roadmaps,2026 wave 1 feature review,Assess,Caveated
+Power Platform | ALM and Governance Controls,Operations,Roadmaps,Release-plan publication transition,Assess,Caveated

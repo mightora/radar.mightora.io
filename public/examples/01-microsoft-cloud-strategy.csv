@@ -1,0 +1,31 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Microsoft Cloud | Executive Strategy,Strategy,Operating model,Cloud Adoption Framework adoption,Deploy,Standard
+Microsoft Cloud | Executive Strategy,Governance,Policy,Azure landing zone governance,Deploy,Standard
+Microsoft Cloud | Executive Strategy,Security,Zero Trust,Identity-led access controls,Deploy,Standard
+Microsoft Cloud | Executive Strategy,Architecture,Assurance,Well-Architected workload reviews,Deploy,Standard
+Microsoft Cloud | Executive Strategy,Operations,Cost control,Cloud cost optimisation discipline,Deploy,Standard
+Microsoft Cloud | Executive Strategy,Operations,Reliability,Resilience and disaster recovery,Deploy,Standard
+Microsoft Cloud | Executive Strategy,Sovereignty,Data control,Data sovereignty requirements,Trial,Caveated
+Microsoft Cloud | Executive Strategy,Innovation,AI services,Governed enterprise AI adoption,Trial,Caveated
+Microsoft Cloud | Executive Strategy,Integration,Architecture,Managed API integration strategy,Deploy,Standard
+Microsoft Cloud | Executive Strategy,Modernisation,Portfolio exit,Azure Front Door classic migration,Sunset,Standard
+Microsoft Cloud | Executive Strategy,Modernisation,Policy as code,Azure Blueprints replacement,Sunset,Standard
+Microsoft Cloud | Executive Strategy,Modernisation,Hosting,Linux Consumption to Flex Consumption,Trial,Caveated
+Microsoft Cloud | Foundation and Migration,Platform,Landing zones,Management group hierarchy,Deploy,Standard
+Microsoft Cloud | Foundation and Migration,Platform,Landing zones,Subscription vending,Deploy,Standard
+Microsoft Cloud | Foundation and Migration,Platform,Guardrails,Azure Policy assignments,Deploy,Standard
+Microsoft Cloud | Foundation and Migration,Platform,Infrastructure as code,Bicep deployment templates,Deploy,Standard
+Microsoft Cloud | Foundation and Migration,Platform,Infrastructure as code,Azure Deployment Stacks,Trial,Standard
+Microsoft Cloud | Foundation and Migration,Security,Access management,Microsoft Entra Conditional Access,Deploy,Standard
+Microsoft Cloud | Foundation and Migration,Security,Access management,Privileged access control,Deploy,Standard
+Microsoft Cloud | Foundation and Migration,Security,Data protection,Sovereign landing zone controls,Trial,Caveated
+Microsoft Cloud | Foundation and Migration,Operations,Architecture review,Reliability pillar assessment,Deploy,Standard
+Microsoft Cloud | Foundation and Migration,Operations,Architecture review,Operational Excellence pillar,Deploy,Standard
+Microsoft Cloud | Foundation and Migration,Operations,FinOps,Cost Optimisation pillar,Deploy,Standard
+Microsoft Cloud | Foundation and Migration,Networking,Edge delivery,Front Door Standard/Premium transition,Deploy,Standard
+Microsoft Cloud | Foundation and Migration,Networking,Edge delivery,Azure Front Door (classic),Sunset,Standard
+Microsoft Cloud | Foundation and Migration,Governance,Deprecation,Azure Blueprints (Preview),Sunset,Standard
+Microsoft Cloud | Foundation and Migration,Compute,Serverless,Functions Flex Consumption plan,Trial,Standard
+Microsoft Cloud | Foundation and Migration,Compute,Serverless,Functions Linux Consumption plan,Sunset,Standard
+Microsoft Cloud | Foundation and Migration,Integration,API lifecycle,API Management stv1 infrastructure,Decommission,Standard
+Microsoft Cloud | Foundation and Migration,Integration,API lifecycle,APIM legacy built-in analytics dashboard,Sunset,Caveated

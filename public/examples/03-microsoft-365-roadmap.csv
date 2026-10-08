@@ -1,0 +1,31 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Microsoft 365 | Collaboration Strategy,AI,Work productivity,Microsoft 365 Copilot adoption,Trial,Caveated
+Microsoft 365 | Collaboration Strategy,AI,Enterprise controls,Copilot licence request workflow,Deploy,Caveated
+Microsoft 365 | Collaboration Strategy,Collaboration,Meetings,Copilot meeting-topic retrieval,Trial,Caveated
+Microsoft 365 | Collaboration Strategy,Collaboration,Workspaces,Microsoft Places in collaboration,Trial,Caveated
+Microsoft 365 | Collaboration Strategy,Content,Knowledge,SharePoint permissions visibility,Deploy,Caveated
+Microsoft 365 | Collaboration Strategy,Content,Grounding,Copilot references to organisational files,Trial,Caveated
+Microsoft 365 | Collaboration Strategy,Governance,Communications,Microsoft 365 change adoption cadence,Deploy,Standard
+Microsoft 365 | Collaboration Strategy,Integration,Connectors,Third-party Copilot connectors,Assess,Caveated
+Microsoft 365 | Collaboration Strategy,Modernisation,SharePoint,SharePoint 2013 workflows,Decommission,Standard
+Microsoft 365 | Collaboration Strategy,Modernisation,SharePoint,SharePoint Add-Ins,Decommission,Standard
+Microsoft 365 | Collaboration Strategy,Modernisation,Teams,Classic Microsoft Teams client,Decommission,Standard
+Microsoft 365 | Collaboration Strategy,Extensibility,SharePoint,SharePoint Framework direction,Deploy,Standard
+Microsoft 365 | Features and Lifecycle,Copilot,Administration,Copilot licence requests page (561206),Trial,Caveated
+Microsoft 365 | Features and Lifecycle,Copilot,Meetings,Copilot meeting keyword search (559110),Trial,Caveated
+Microsoft 365 | Features and Lifecycle,Copilot,Chat,Copilot in Teams chats and channels (501107),Trial,Caveated
+Microsoft 365 | Features and Lifecycle,Copilot,Prompts,Edit scheduled Copilot prompts (531912),Trial,Caveated
+Microsoft 365 | Features and Lifecycle,Copilot,Agents,Declarative agent embedded images (531758),Assess,Caveated
+Microsoft 365 | Features and Lifecycle,Copilot,Documents,PowerPoint document references (555897),Trial,Caveated
+Microsoft 365 | Features and Lifecycle,Copilot,Insights,Viva Insights Cowork adoption (567005),Assess,Caveated
+Microsoft 365 | Features and Lifecycle,Copilot,OneDrive,Sharing AI file summaries (527840),Trial,Caveated
+Microsoft 365 | Features and Lifecycle,Copilot,PDFs,PDF reader Summarise and Explain (498641),Trial,Caveated
+Microsoft 365 | Features and Lifecycle,SharePoint,Permissions,Everyone-groups permissions report (561038),Deploy,Caveated
+Microsoft 365 | Features and Lifecycle,Microsoft Places,Profiles,Building rooms and desks (553219),Trial,Caveated
+Microsoft 365 | Features and Lifecycle,Copilot Connectors,Dev tools,Ask Bitbucket pull requests (515163),Assess,Caveated
+Microsoft 365 | Features and Lifecycle,Copilot Connectors,Dev tools,Ask GitLab issues (515158),Assess,Caveated
+Microsoft 365 | Features and Lifecycle,Copilot Connectors,Service,Zendesk Help Centre connector (513279),Assess,Caveated
+Microsoft 365 | Features and Lifecycle,SharePoint,Automation,SharePoint 2013 workflows: retired,Decommission,Standard
+Microsoft 365 | Features and Lifecycle,SharePoint,Extensibility,SharePoint Add-Ins: retired,Decommission,Standard
+Microsoft 365 | Features and Lifecycle,SharePoint,Extensibility,SharePoint Framework alternative,Deploy,Standard
+Microsoft 365 | Features and Lifecycle,Teams,Client,Classic Teams: unavailable,Decommission,Standard

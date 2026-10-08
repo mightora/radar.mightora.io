@@ -1,0 +1,31 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Azure | Portfolio Signals,Platform,Governance,Policy-driven Azure landing zones,Deploy,Standard
+Azure | Portfolio Signals,Platform,Architecture,Well-Architected reviews,Deploy,Standard
+Azure | Portfolio Signals,Delivery,Infrastructure as code,Bicep modernisation,Deploy,Standard
+Azure | Portfolio Signals,Delivery,Lifecycle,Deployment Stacks evaluation,Trial,Standard
+Azure | Portfolio Signals,Networking,Edge,Front Door modern tier migration,Deploy,Standard
+Azure | Portfolio Signals,Networking,Legacy,Azure CDN Standard from Microsoft exit,Sunset,Caveated
+Azure | Portfolio Signals,Compute,Serverless,Functions Flex Consumption migration,Trial,Standard
+Azure | Portfolio Signals,Compute,Legacy,Linux Consumption exit programme,Sunset,Standard
+Azure | Portfolio Signals,Integration,API management,API Management supported tiers,Deploy,Standard
+Azure | Portfolio Signals,Integration,Legacy,APIM stv1 migration completion,Decommission,Standard
+Azure | Portfolio Signals,Policy,Legacy,Azure Blueprints exit programme,Sunset,Standard
+Azure | Portfolio Signals,Security,Foundation,Azure identity guardrails,Deploy,Standard
+Azure | Service Retirements and Migrations,Networking,Front Door,Front Door (classic) retirement: 31 Mar 2027,Sunset,Standard
+Azure | Service Retirements and Migrations,Networking,Front Door,Front Door Standard,Deploy,Standard
+Azure | Service Retirements and Migrations,Networking,Front Door,Front Door Premium,Deploy,Caveated
+Azure | Service Retirements and Migrations,Networking,CDN,Azure CDN Standard from Microsoft classic exit,Sunset,Caveated
+Azure | Service Retirements and Migrations,Governance,Blueprints,New Azure Blueprints blocked: 31 Jul 2026,Decommission,Standard
+Azure | Service Retirements and Migrations,Governance,Blueprints,Blueprint editing restrictions: 31 Oct 2026,Sunset,Standard
+Azure | Service Retirements and Migrations,Governance,Blueprints,Blueprint assignment changes: 31 Dec 2026,Sunset,Standard
+Azure | Service Retirements and Migrations,Governance,Blueprints,Blueprint retirement: 31 Jan 2027,Sunset,Standard
+Azure | Service Retirements and Migrations,Governance,Replacement,Azure Deployment Stacks,Trial,Standard
+Azure | Service Retirements and Migrations,Governance,Replacement,Bicep template-based deployments,Deploy,Standard
+Azure | Service Retirements and Migrations,Compute,Functions,Functions Linux Consumption plan: 2028 exit,Sunset,Standard
+Azure | Service Retirements and Migrations,Compute,Functions,Functions Flex Consumption plan,Trial,Standard
+Azure | Service Retirements and Migrations,Compute,Functions,Functions runtime v3 on Linux Consumption,Decommission,Caveated
+Azure | Service Retirements and Migrations,APIs,Infrastructure,API Management stv1: retired 2024,Decommission,Standard
+Azure | Service Retirements and Migrations,APIs,Analytics,API Management built-in analytics dashboard,Sunset,Caveated
+Azure | Service Retirements and Migrations,Security,Operational controls,Entra access policy integration,Deploy,Standard
+Azure | Service Retirements and Migrations,Architecture,Assurance,Well-Architected reliability review,Deploy,Standard
+Azure | Service Retirements and Migrations,Architecture,Assurance,Well-Architected cost review,Deploy,Standard

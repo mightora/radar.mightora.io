@@ -1,0 +1,31 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Financial Services | Board Priorities,Operational resilience,UK rules,Important business services and impact tolerances,Deploy,Caveated
+Financial Services | Board Priorities,Operational resilience,Testing,Severe but plausible scenario testing,Deploy,Standard
+Financial Services | Board Priorities,Operational resilience,Remediation,Resilience vulnerabilities and remediation,Deploy,Standard
+Financial Services | Board Priorities,Third parties,UK oversight,Designated critical third-party providers,Assess,Caveated
+Financial Services | Board Priorities,Payments,Customer funds,New FCA safeguarding regime,Deploy,Caveated
+Financial Services | Board Priorities,Consumer outcomes,Retail customers,Consumer Duty outcomes monitoring,Deploy,Caveated
+Financial Services | Board Priorities,EU resilience,DORA,Digital Operational Resilience Act,Deploy,Caveated
+Financial Services | Board Priorities,EU resilience,Incidents,DORA major ICT incident reporting,Deploy,Caveated
+Financial Services | Board Priorities,EU resilience,Third parties,DORA ICT third-party risk controls,Deploy,Caveated
+Financial Services | Board Priorities,Regulatory engagement,Supervision,2026 FCA resilience observations,Deploy,Standard
+Financial Services | Board Priorities,Controls,Legacy practice,Annual-only resilience exercise,Sunset,Rejected
+Financial Services | Board Priorities,Controls,Legacy practice,Unmapped outsourced critical services,Sunset,Rejected
+Financial Services | Controls and Evidence,UK resilience,Service mapping,Important Business Services inventory,Deploy,Caveated
+Financial Services | Controls and Evidence,UK resilience,Tolerance,Impact tolerances,Deploy,Caveated
+Financial Services | Controls and Evidence,UK resilience,Dependencies,End-to-end service dependency mapping,Deploy,Standard
+Financial Services | Controls and Evidence,UK resilience,Testing,Severe but plausible scenarios,Deploy,Standard
+Financial Services | Controls and Evidence,UK resilience,Board evidence,March 2025 resilience milestone completed,Deploy,Standard
+Financial Services | Controls and Evidence,UK resilience,Supervisory review,FCA 2026 observations remediation,Deploy,Standard
+Financial Services | Controls and Evidence,Third party resilience,Designations,UK critical third-party oversight: Jul 2026,Assess,Caveated
+Financial Services | Controls and Evidence,Third party resilience,Supplier risk,Cloud provider concentration assessment,Deploy,Caveated
+Financial Services | Controls and Evidence,Payments safeguarding,Eligibility,PS25/12 firm applicability check,Deploy,Caveated
+Financial Services | Controls and Evidence,Payments safeguarding,Implementation,May 2026 safeguarding controls,Deploy,Caveated
+Financial Services | Controls and Evidence,Consumer Duty,Governance,Annual Consumer Duty board report,Deploy,Caveated
+Financial Services | Controls and Evidence,Consumer Duty,Evidence,Fair value and customer support outcomes,Deploy,Caveated
+Financial Services | Controls and Evidence,EU DORA,ICT governance,DORA ICT risk management framework,Deploy,Caveated
+Financial Services | Controls and Evidence,EU DORA,Incident management,Major ICT incident classification RTS,Deploy,Caveated
+Financial Services | Controls and Evidence,EU DORA,Reporting,DORA major incident reporting process,Deploy,Caveated
+Financial Services | Controls and Evidence,EU DORA,Resilience testing,Digital operational resilience testing,Deploy,Caveated
+Financial Services | Controls and Evidence,EU DORA,Third parties,DORA ICT third-party register,Deploy,Caveated
+Financial Services | Controls and Evidence,EU DORA,Lessons,First ESAs incident-report findings,Assess,Caveated

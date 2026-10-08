@@ -1,0 +1,30 @@
+Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Privacy | Regulatory Strategy,Legislation,UK reform,Data (Use and Access) Act 2025 changes,Deploy,Caveated
+Privacy | Regulatory Strategy,Rights,Complaints,Formal data complaints process,Deploy,Standard
+Privacy | Regulatory Strategy,Lawful processing,Legal basis,Recognised legitimate interests ground,Trial,Caveated
+Privacy | Regulatory Strategy,Lawful processing,Accountability,Ordinary legitimate interests assessment,Deploy,Standard
+Privacy | Regulatory Strategy,Transparency,Policy,Revised privacy notice and transparency review,Deploy,Caveated
+Privacy | Regulatory Strategy,Governance,Policy,Article 5 data protection principles,Deploy,Standard
+Privacy | Regulatory Strategy,Children,Safeguards,Age Appropriate Design Code,Deploy,Caveated
+Privacy | Regulatory Strategy,Rights,Operational delivery,Data subject rights response capability,Deploy,Standard
+Privacy | Regulatory Strategy,Governance,Regulatory change,ICO DUAA guidance monitoring,Deploy,Standard
+Privacy | Regulatory Strategy,Governance,Legacy process,Email-only complaints tracking,Sunset,Rejected
+Privacy | Regulatory Strategy,International data,Scope and transfer,Cross-border processing review,Trial,Caveated
+Privacy | Regulatory Strategy,Governance,Evidence,Data protection impact assessments,Deploy,Caveated
+Privacy | Compliance Operations,Complaints,Intake,Acknowledge complaints within 30 days,Deploy,Standard
+Privacy | Compliance Operations,Complaints,Resolution,Data protection complaint investigation,Deploy,Standard
+Privacy | Compliance Operations,Complaints,Evidence,Complaint logs and audit trail,Deploy,Standard
+Privacy | Compliance Operations,Lawful basis,UK GDPR,Recognised legitimate interests (Article 6),Trial,Caveated
+Privacy | Compliance Operations,Lawful basis,UK GDPR,Public task and legitimate interests distinction,Deploy,Caveated
+Privacy | Compliance Operations,Lawful basis,UK GDPR,Legitimate Interests Assessment,Deploy,Standard
+Privacy | Compliance Operations,Lawful basis,Governance,Lawful basis documentation,Deploy,Standard
+Privacy | Compliance Operations,Transparency,Notices,Layered fair-processing notices,Deploy,Standard
+Privacy | Compliance Operations,Transparency,Change,DUAA privacy notice review,Deploy,Caveated
+Privacy | Compliance Operations,Rights,User requests,Subject access request handling,Deploy,Standard
+Privacy | Compliance Operations,Rights,User requests,Rectification and erasure controls,Deploy,Caveated
+Privacy | Compliance Operations,Children,Impact,DPIA for child-accessible services,Deploy,Caveated
+Privacy | Compliance Operations,Children,Design,Privacy-by-default child settings,Deploy,Caveated
+Privacy | Compliance Operations,Controls,Accountability,Staff guidance refresh after DUAA,Deploy,Standard
+Privacy | Compliance Operations,Controls,Review,ICO post-DUAA guidance updates,Assess,Caveated
+Privacy | Compliance Operations,Controls,Modernisation,Untracked DSAR spreadsheets,Sunset,Rejected
+Privacy | Compliance Operations,International data,Governance,International transfer risk evaluation,Trial,Caveated

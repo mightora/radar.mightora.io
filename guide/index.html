@@ -125,8 +125,9 @@
     <section id="what-is-a-radar" aria-labelledby="radar-heading">
       <h2 id="radar-heading">What is a technology radar?</h2>
       <p>A technology radar is a picture of the technologies your team is considering, adopting or retiring. Each dot is one CSV row. Category divides the radar into sectors; Status chooses a ring; Dot Status adds a separate marker style.</p>
-      <p>This editor uses the <a href="#statuses">configured ring order</a>, from Assess on the outside to Decommission at the centre. Distance from the centre is not a score or a recommendation. Sub Category is recorded with each technology but does not create another sector.</p>
+      <p>This editor uses the <a href="#statuses">configured ring order</a>, from Assess on the outside to Decommission at the centre. Distance from the centre is not a score or a recommendation. Category names curve around the outer edge. Each category has an equal wedge, divided equally into its Sub Category sections, with subcategory names on the inner arc.</p>
       <p>The app opens on <strong>Preview</strong>. Use <strong>Radar</strong> to choose a named radar or <strong>All radars</strong>. Hover or focus a dot to inspect its CSV values. <strong>Toggle labels</strong> shows or hides technology names; <strong>Reset view</strong> returns the radar selection to All radars.</p>
+      <p><strong>Radar text size</strong> adjusts technology, category and subcategory labels from 8 to 20 px in the radar drawing. Focus the slider and use the arrow keys to adjust it. Technology names wrap and points are spaced within their existing rings and subsections. Crowded radars may need a larger drawing area, which is fitted to the available screen width. Text size is temporary: it does not change the CSV or shared links.</p>
     </section>
 
     <section id="quick-start" aria-labelledby="quick-start-heading">
@@ -150,6 +151,7 @@
     <section id="visual-editor" aria-labelledby="visual-heading">
       <h2 id="visual-heading">Visual editor</h2>
       <p>In <strong>Editor</strong>, choose <strong>Visual</strong>. Edit text fields directly and choose Status and Dot Status from their lists. Radar Name, Category and Sub Category offer suggestions from your current data. Changes update the same CSV used by the CSV editor, sharing and downloads.</p>
+      <p>You can also edit the Technologies table beneath the radar in <strong>Preview</strong>. Click a value, or focus it and press Enter, then type or choose a status. Click outside, press Tab or press Enter to save and update the radar. Shift+Enter adds a new line; Escape cancels. Invalid edits stay in the field with an error until corrected or cancelled; the saved CSV and radar keep their previous values. Undo and Redo include saved preview edits. The table is read-only while source errors remain or when opening a View link.</p>
       <ul>
         <li><strong>Add row</strong> appends a row and focuses its first empty field. It uses the selected radar, if any, and defaults to Assess and Standard. It also clears the text filter.</li>
         <li><strong>Duplicate</strong> copies all values. Change the copy to clear the duplicate-entry error.</li>
@@ -168,7 +170,7 @@
       <dl class="guide-definitions" id="csv-columns">
         <dt>Radar Name</dt><dd>The radar this technology belongs to. One CSV may contain several named radars.</dd>
         <dt>Category</dt><dd>The sector containing the dot, such as Platform or Data.</dd>
-        <dt>Sub Category</dt><dd>A further grouping recorded with the dot, such as Runtime or Storage.</dd>
+        <dt>Sub Category</dt><dd>The section within a category containing the dot, such as Runtime or Storage.</dd>
         <dt>Technology</dt><dd>The name displayed beside the dot.</dd>
         <dt>Status</dt><dd>The ring label, using an exact value from the status list below.</dd>
         <dt>Dot Status</dt><dd>The marker label, using an exact value from the dot-status list below.</dd>
@@ -214,7 +216,7 @@ Team Radar,Platform,Runtime,"Example, Inc. ""Engine""",Trial,Standard</code></pr
 
     <section id="sharing" aria-labelledby="sharing-heading">
       <h2 id="sharing-heading">Sharing</h2>
-      <p>Read the <a href="#privacy-warning">privacy warning</a>, then choose <strong>Share</strong>. Select <strong>View link</strong> to open Preview with the Editor panel hidden, or <strong>Edit link</strong> to open Editor. Select <strong>Generate link</strong>, then <strong>Copy link</strong>. If copying is unavailable, select and copy the Generated URL yourself. <strong>Close</strong> or Escape dismisses the dialog.</p>
+      <p>Read the <a href="#privacy-warning">privacy warning</a>, then choose <strong>Share</strong>. Select <strong>View link</strong> to open Preview with the Editor panel hidden, <strong>Radar page link</strong> for a page holding only the radar (choose <strong>Include technology table</strong> to add the table; embed code for an iframe is provided), <strong>Image link</strong> for an SVG or PNG image URL with <code>&lt;img&gt;</code> embed code, or <strong>Edit link</strong> to open Editor. Select <strong>Generate link</strong>, then <strong>Copy link</strong>. If copying is unavailable, select and copy the Generated URL yourself. <strong>Close</strong> or Escape dismisses the dialog.</p>
       <aside id="privacy-warning" class="guide-warning" aria-labelledby="privacy-warning-heading">
         <h3 id="privacy-warning-heading">Share privacy warning</h3>
         <p>Anyone with this link can read the radar data. It is encoded and compressed, but it is not encrypted. Do not include confidential information.</p>
@@ -234,7 +236,7 @@ Team Radar,Platform,Runtime,"Example, Inc. ""Engine""",Trial,Standard</code></pr
         <dt>PNG</dt><dd>Download the displayed radar graphic as a raster image.</dd>
         <dt>Print</dt><dd>Open the browser's print dialog. Check its print preview before printing or saving to PDF.</dd>
       </dl>
-      <p>Choose the Radar selection and label visibility in Preview before exporting an image. Resolve validation errors if you want the image to reflect your latest source.</p>
+      <p>Choose the Radar selection, label visibility and Radar text size in Preview before exporting an image. SVG, PNG and print use the displayed radar's typography and point layout. Resolve validation errors if you want the image to reflect your latest source.</p>
     </section>
 
     <section id="mobile" aria-labelledby="mobile-heading">

@@ -4,6 +4,15 @@ Historical detail moved out of the [build plan](build-plan.md) to keep the activ
 
 ## Archived task details and exit checks
 
+### P01 — preview label readability and technology table
+
+- Give words plotted on the radar a slightly transparent gray background so they remain legible over ring colors.
+- Show a neatly formatted table beneath the radar containing the technologies in the selected radar, using the existing radar vocabulary and six-column CSV data as appropriate.
+- Keep the preview and table usable at 360, 390, 768, 1024 and 1280 px; safely render all CSV-derived values and preserve the current radar, editor, share and export behavior.
+- Exit: table contents match the selected radar and valid source data, labels remain readable without obscuring the radar, keyboard/screen-reader users can understand the table, and focused browser checks show no page overflow or regressions.
+- Implementation record (2026-10-08): `renderPreview()` includes a translucent gray SVG filter for category/technology labels and passes the plot's rows to `renderTechnologyTable()`. The table preserves source order, uses safe DOM text, a caption and scoped headers, and retains the last valid data with an error notice. Its scroll region is keyboard accessible and long cells wrap. Label toggling and standalone SVG/PNG downloads retain their existing data and dimensions; sources were rebuilt into `dist`.
+- Exit evidence: `npm run check`, `npm test`, `npm run build`, and `npm run test:e2e -- --reporter=list,html` passed (34/34 Chromium); `npx playwright test tests/e2e/preview-table.spec.js --reporter=dot` passed 9/9. Assertions cover selection, visual editing/history, invalid/empty CSV, literal hostile text, table semantics, keyboard scrolling, no page overflow at all five widths, label toggling and SVG/PNG downloads. Interactive screen-reader/device/other-engine checks and integration with the unimplemented Z01 zoom remain pending; see the build plan for current status.
+
 ### T01 — Playwright task-scoped authoring and local result runners
 
 - Added `.github/skills/playwright-tests/SKILL.md` to limit new browser specs to the active task and keep them in `tests/e2e/`; static-web delivery and repository guidance now route Playwright work through that skill.
