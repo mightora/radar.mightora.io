@@ -27,6 +27,7 @@ const $ = id => document.getElementById(id);
 state.textSize = 11;
 const radarTextContext = document.createElement('canvas').getContext('2d');
 const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+const escapeXml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' }[char]));
 const csvCell = value => /[",\r\n]/.test(value) ? `"${String(value).replaceAll('"', '""')}"` : String(value);
 const csvString = rows => [REQUIRED, ...rows].map(row => row.map(csvCell).join(',')).join('\r\n');
 const updateTechnologyTable = createPreviewTable($('technologyTable'), REQUIRED, commitTechnologyEdit);
@@ -242,6 +243,81 @@ async function radarImageUrl(format) {
   canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
   return canvas.toDataURL('image/png');
 }
+function crc32(bytes) {
+  let crc = 0xffffffff;
+  bytes.forEach(byte => {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit += 1) crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
+  });
+  return (crc ^ 0xffffffff) >>> 0;
+}
+function zipStore(files) {
+  const encoder = new TextEncoder(), localRecords = [], directoryRecords = [];
+  let localOffset = 0;
+  files.forEach(([name, content]) => {
+    const nameBytes = encoder.encode(name), bytes = typeof content === 'string' ? encoder.encode(content) : content;
+    const checksum = crc32(bytes), local = new Uint8Array(30 + nameBytes.length + bytes.length), localView = new DataView(local.buffer);
+    localView.setUint32(0, 0x04034b50, true); localView.setUint16(4, 20, true); localView.setUint16(12, 0x21, true);
+    localView.setUint32(14, checksum, true); localView.setUint32(18, bytes.length, true); localView.setUint32(22, bytes.length, true);
+    localView.setUint16(26, nameBytes.length, true); local.set(nameBytes, 30); local.set(bytes, 30 + nameBytes.length);
+    localRecords.push(local);
+    const directory = new Uint8Array(46 + nameBytes.length), directoryView = new DataView(directory.buffer);
+    directoryView.setUint32(0, 0x02014b50, true); directoryView.setUint16(4, 20, true); directoryView.setUint16(6, 20, true);
+    directoryView.setUint16(14, 0x21, true); directoryView.setUint32(16, checksum, true);
+    directoryView.setUint32(20, bytes.length, true); directoryView.setUint32(24, bytes.length, true);
+    directoryView.setUint16(28, nameBytes.length, true); directoryView.setUint32(42, localOffset, true); directory.set(nameBytes, 46);
+    directoryRecords.push(directory); localOffset += local.length;
+  });
+  const directorySize = directoryRecords.reduce((size, record) => size + record.length, 0);
+  const end = new Uint8Array(22), endView = new DataView(end.buffer);
+  endView.setUint32(0, 0x06054b50, true); endView.setUint16(8, files.length, true); endView.setUint16(10, files.length, true);
+  endView.setUint32(12, directorySize, true); endView.setUint32(16, localOffset, true);
+  return new Blob([...localRecords, ...directoryRecords, end], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+}
+async function radarPng(svg) {
+  const root = new DOMParser().parseFromString(svg, 'image/svg+xml').documentElement;
+  const viewBox = (root.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(Number);
+  const sourceWidth = viewBox[2] || 1440, sourceHeight = viewBox[3] || 1400;
+  const maxRasterDimension = 4096;
+  const rasterScale = Math.min(maxRasterDimension / sourceWidth, maxRasterDimension / sourceHeight);
+  const width = Math.max(1, Math.round(sourceWidth * rasterScale)), height = Math.max(1, Math.round(sourceHeight * rasterScale));
+  root.setAttribute('width', String(width)); root.setAttribute('height', String(height));
+  const image = new Image(); image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(root))}`; await image.decode();
+  const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
+  canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  if (!blob) throw new Error('Could not render the radar graphic.');
+  return { bytes: new Uint8Array(await blob.arrayBuffer()), width: canvas.width, height: canvas.height };
+}
+function wordParagraph(text, size = 22, bold = false) {
+  const lines = String(text).split(/\r?\n/).map((line, index) => `${index ? '<w:br/>' : ''}<w:t xml:space="preserve">${escapeXml(line)}</w:t>`).join('');
+  return `<w:p><w:pPr><w:spacing w:after="120"/></w:pPr><w:r><w:rPr>${bold ? '<w:b/>' : ''}<w:sz w:val="${size}"/></w:rPr>${lines}</w:r></w:p>`;
+}
+function wordTable(headers, rows) {
+  const cellWidth = Math.floor(14500 / headers.length);
+  const cell = (value, heading) => `<w:tc><w:tcPr><w:tcW w:w="${cellWidth}" w:type="dxa"/>${heading ? '<w:shd w:fill="E8F0F2"/>' : ''}</w:tcPr>${wordParagraph(value, 18, heading)}</w:tc>`;
+  const row = (values, heading = false) => `<w:tr>${values.map(value => cell(value, heading)).join('')}</w:tr>`;
+  const borders = ['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map(edge => `<w:${edge} w:val="single" w:sz="4" w:color="9AABB5"/>`).join('');
+  return `<w:tbl><w:tblPr><w:tblW w:w="14500" w:type="dxa"/><w:tblBorders>${borders}</w:tblBorders></w:tblPr><w:tblGrid>${headers.map(() => `<w:gridCol w:w="${cellWidth}"/>`).join('')}</w:tblGrid>${row(headers, true)}${rows.map(values => row(values)).join('')}</w:tbl>`;
+}
+async function wordDocument(rows, svg) {
+  const title = state.selectedRadar || rows[0]?.[0] || 'Technology Radar';
+  const statuses = [...(state.config?.statuses || [])].sort((first, second) => Number(first.order) - Number(second.order));
+  const categories = [...new Set(rows.map(row => row[1]))];
+  const matrixRows = categories.map(category => [category, ...statuses.map(status => rows.filter(row => row[1] === category && row[4] === status.label).map(row => `${row[3]} (${row[2]}; Dot status: ${row[5]}${state.selectedRadar ? '' : `; Radar: ${row[0]}`})`).join('\n'))]);
+  if (!matrixRows.length) matrixRows.push(['No technologies to display.', ...statuses.map(() => '')]);
+  const technologyRows = rows.length ? rows : [REQUIRED.map(() => 'No technologies to display.')];
+  const maxWidth = 8_229_600, maxHeight = 5_394_960;
+  const image = await radarPng(svg);
+  const scale = Math.min(maxWidth / image.width, maxHeight / image.height);
+  const imageWidth = Math.round(image.width * scale), imageHeight = Math.round(image.height * scale);
+  const picture = `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${imageWidth}" cy="${imageHeight}"/><wp:docPr id="1" name="Radar graphic" descr="${escapeXml(title)} radar graphic"/><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="0" name="radar.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId1"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${imageWidth}" cy="${imageHeight}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;
+  const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><w:body>${wordParagraph(`${title} radar`, 36, true)}${wordParagraph('Radar graphic', 26, true)}${picture}${wordParagraph('Editable radar matrix', 26, true)}${wordTable(['Category', ...statuses.map(status => `Status ring: ${status.label}`)], matrixRows)}${wordParagraph('Technologies', 26, true)}${wordTable(REQUIRED, technologyRows)}<w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="360" w:footer="360" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+  const contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>';
+  const rootRelationships = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
+  const documentRelationships = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/radar.png"/></Relationships>';
+  return zipStore([['[Content_Types].xml', contentTypes], ['_rels/.rels', rootRelationships], ['word/document.xml', documentXml], ['word/_rels/document.xml.rels', documentRelationships], ['word/media/radar.png', image.bytes]]);
+}
 function updateShareOptions() { const mode = document.querySelector('[name=shareMode]:checked').value; $('shareEmbedOptions').classList.toggle('hidden', mode !== 'embed'); $('shareImageOptions').classList.toggle('hidden', mode !== 'image'); }
 async function decodeShare(value) { const binary = atob(value.replaceAll('-', '+').replaceAll('_', '/') + '='.repeat((4 - value.length % 4) % 4)); const bytes = Uint8Array.from(binary, char => char.charCodeAt(0)); const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw')); return JSON.parse(new TextDecoder().decode(await new Response(stream).arrayBuffer())); }
 function openTab(name) { document.querySelectorAll('.tab').forEach(tab => tab.classList.toggle('active', tab.dataset.tab === name)); document.querySelectorAll('.workspace-panel').forEach(panel => panel.classList.toggle('active-panel', panel.id === `${name}Panel`)); }
@@ -293,7 +369,18 @@ $('generateShare').addEventListener('click', async () => {
 });
 $('copyShare').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('shareUrl').value); showToast('Share link copied'); } catch { $('shareUrl').select(); showToast('Select the link and copy it'); } });
 $('copyEmbed').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('shareEmbed').value); showToast('Embed code copied'); } catch { $('shareEmbed').select(); showToast('Select the embed code and copy it'); } });
-document.querySelectorAll('[data-export]').forEach(button => button.addEventListener('click', () => { const svg = $('radarCanvas').querySelector('svg'); if (button.dataset.export === 'csv') download('technology-radar.csv', state.source, 'text/csv'); if (button.dataset.export === 'svg') download('technology-radar.svg', svg.outerHTML, 'image/svg+xml'); if (button.dataset.export === 'png') { const image = new Image(); image.onload = () => { const canvas = document.createElement('canvas'); canvas.width = 1640; canvas.height = 1140; canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height); canvas.toBlob(blob => download('technology-radar.png', blob, 'image/png')); }; image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg.outerHTML)}`; } if (button.dataset.export === 'print') window.print(); if (button.dataset.export === 'project') download('technology-radar.radar.json', JSON.stringify({ format: 'mightora-technology-radar', version: 1, createdAt: new Date().toISOString(), radarData: { csv: state.source }, configuration: { strategy: 'embedded' } }, null, 2), 'application/json'); }));
+document.querySelectorAll('[data-export]').forEach(button => button.addEventListener('click', async () => {
+  const svg = $('radarCanvas').querySelector('svg');
+  if (button.dataset.export === 'csv') download('technology-radar.csv', state.source, 'text/csv');
+  if (button.dataset.export === 'word') {
+    try { download('technology-radar.docx', await wordDocument(radarRows(), svg.outerHTML), 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'); }
+    catch { showToast('Could not create the Word document.'); }
+  }
+  if (button.dataset.export === 'svg') download('technology-radar.svg', svg.outerHTML, 'image/svg+xml');
+  if (button.dataset.export === 'png') { const image = new Image(); image.onload = () => { const canvas = document.createElement('canvas'); canvas.width = 1640; canvas.height = 1140; canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height); canvas.toBlob(blob => download('technology-radar.png', blob, 'image/png')); }; image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg.outerHTML)}`; }
+  if (button.dataset.export === 'print') window.print();
+  if (button.dataset.export === 'project') download('technology-radar.radar.json', JSON.stringify({ format: 'mightora-technology-radar', version: 1, createdAt: new Date().toISOString(), radarData: { csv: state.source }, configuration: { strategy: 'embedded' } }, null, 2), 'application/json');
+}));
 window.addEventListener('keydown', event => { if (!(event.ctrlKey || event.metaKey) || event.target.closest('.technology-cell-input')) return; if (event.key.toLowerCase() === 'z') { event.preventDefault(); (event.shiftKey ? $('redoButton') : $('undoButton')).click(); } if (event.key.toLowerCase() === 'y') { event.preventDefault(); $('redoButton').click(); } }); window.addEventListener('beforeunload', event => { if (state.dirty) { event.preventDefault(); event.returnValue = ''; } });
 async function loadShared() { const match = location.hash.match(/^#\/(view|edit|embed)\/(.+)$/); if (!match) return false; try { const payload = await decodeShare(match[2]); if (payload.version !== 1 || typeof payload.csv !== 'string') throw new Error('Unsupported share payload.'); state.selectedRadar = payload.selectedRadarName || ''; setSource(payload.csv, false); state.dirty = false; if (match[1] === 'edit') openTab('data'); else { $('dataPanel').classList.remove('active-panel'); $('dataPanel').classList.add('hidden'); openTab('preview'); if (match[1] === 'embed') { document.body.classList.add('embed-mode'); document.body.classList.toggle('embed-no-table', payload.table === false); } else showToast('View-only radar loaded.'); } return true; } catch (error) { showToast(`Could not open shared radar: ${error.message}`); return false; } }
 loadConfig().then(async () => { if (await loadShared()) return; state.source = localStorage.getItem('radar-builder-source') || EXAMPLE; $('csvInput').value = state.source; parseSource(); }); $('csvInput').addEventListener('input', () => localStorage.setItem('radar-builder-source', state.source));

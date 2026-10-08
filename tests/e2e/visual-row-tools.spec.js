@@ -351,7 +351,7 @@ test('M01 responsive layouts keep every panel and share dialog within the viewpo
     await page.locator('#csvInput').fill(validSource);
     await page.waitForTimeout(400);
     await page.locator('.tab[data-tab="exports"]').click();
-    await expect(page.locator('.export-card')).toHaveCount(5);
+    await expect(page.locator('.export-card')).toHaveCount(6);
     await expectNoPageOverflow('exports');
     if (width === 360) {
       await page.evaluate(() => { window.printCalls = 0; window.print = () => { window.printCalls += 1; }; });
