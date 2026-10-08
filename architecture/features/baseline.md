@@ -2,6 +2,12 @@
 
 This file records observed repository state and executed checks. Unrun checks remain pending. F00 status is owned by the [build plan](build-plan.md).
 
+## 2026-10-08 - CI01 Pages build failure
+
+- Actions run `37815244568`, build job `113442086736`, fails during `npm test` at `scripts/guide-test.mjs:23`: the static guide lists seven examples while `src/app.js` registers seventeen. Added the ten missing names with HTML-escaped ampersands and restricted the existing catalogue assertion to the loading examples section. No workflow, editor, dependency or generated-artifact changes.
+- `node scripts/guide-test.mjs`, `npm run check`, `npm test`, `npm run build` and `git diff --check` passed. `npm ci` installed the locked dependencies with zero reported vulnerabilities; `npx playwright install chromium` succeeded. Focused `npx playwright test tests/e2e/guide.spec.js --reporter=dot --workers=2`: 1/7 passed (built guide without JavaScript and local links/assets); six shared-header checks failed. `curl -I --max-time 20` for shared components and js-yaml on `cdn.jsdelivr.net` failed DNS resolution.
+- `npm run test:e2e -- --reporter=dot --workers=4`: 30/39 passed. Seven failures involve unavailable shared UI (six guide checks and responsive navigation); two concern unchanged preview editing/geometry behavior. Logs are `/tmp/radar-guide-tests.log` and `/tmp/radar-all-tests.log`; browser artifacts remain ignored under `test-results/`. Hosted CI rerun and release checks remain pending; no deployment performed.
+
 ## 2026-10-08 - P03 radar typography and spacing
 
 - Added a keyboard-operable 8-20 px radar text-size slider (default 11), measured/wrapped technology names, and deterministic placement considering dot and label boxes. Dot status, ring and subsection membership remain unchanged; crowded layouts retry with a larger internal radius and fitted SVG bounds. SVG/PNG/print use the chosen typography. No CSV, storage, history, share-format, runtime dependency or deployment changes. Preserved pre-existing work.
