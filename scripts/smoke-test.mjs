@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { strict as assert } from 'node:assert';
+import './guide-test.mjs';
 
 const app = await readFile('src/app.js', 'utf8');
 const html = await readFile('index.html', 'utf8');

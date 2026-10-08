@@ -1,3 +1,6 @@
+#docsButton{display:inline-flex;align-items:center;justify-content:center;min-height:44px;color:var(--ink);text-decoration:none}
+#docsButton:hover{border-color:var(--ink)}
+#docsButton:focus-visible{outline:3px solid var(--fb-accent,var(--orange));outline-offset:2px}
 @media screen and (max-width:900px){
   .toolbar{display:block}
   .toolbar-actions{width:100%;overflow:visible;flex-wrap:wrap;align-items:stretch}

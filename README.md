@@ -2,6 +2,12 @@
 
 A static, local-first CSV technology radar editor for GitHub Pages. Edit the source, validate it after a short debounce, and inspect the deterministic SVG preview. CSV, SVG, PNG, print, and portable `.radar.json` downloads are generated in the browser.
 
+## Usage
+
+Choose **Load example** or **Upload CSV**, then open **Editor** and select **Visual** or **CSV**. Fix any **Errors**, inspect **Preview**, and use **Download CSV**, **Exports** or **Share** to save or share your radar. Share links are encoded, not encrypted.
+
+Read the [user guide](guide/index.html) for a walkthrough, the required CSV columns, validation help, export formats and privacy details. The built guide is available at `/guide/`; both in-app **Documentation** links point there. [docs/sharing.md](docs/sharing.md) remains the technical share-format reference.
+
 ## Run locally
 
 ```sh
@@ -14,7 +20,7 @@ npm run test:e2e
 python -m http.server 8080 -d dist
 ```
 
-Open `http://localhost:8080/`. `npm run test:e2e` rebuilds `dist`, starts the same Python static server, and runs the Chromium browser tests. The separate Python command is available for manual browser checks. Hash routes such as `#/view/<payload>` and `#/edit/<payload>` work beneath a repository subpath on GitHub Pages.
+Open `http://localhost:8080/` or the guide at `http://localhost:8080/guide/`. The build copies `index.html`, `src/`, `public/` and `guide/` into `dist`; edit those sources rather than generated files. `npm run test:e2e` rebuilds `dist`, starts the same Python static server, and runs the Chromium browser tests. The separate Python command is available for manual browser checks. Hash routes such as `#/view/<payload>` and `#/edit/<payload>` work beneath a repository subpath on GitHub Pages.
 
 ## Visual row tools
 

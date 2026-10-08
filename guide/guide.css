@@ -1,0 +1,46 @@
+.guide-page { --fb-accent: var(--orange); }
+/* Keep the shared header and its own menu; supply an icon without an icon-font dependency. */
+.guide-page mightora-header .site-logo-text { white-space: normal; }
+.guide-page mightora-header .mobile-menu-btn::before { content: '\2630'; font: 22px/1 ui-sans-serif, sans-serif; }
+.guide-page mightora-header .mobile-menu-btn i { display: none; }
+.guide-main { max-width: 1000px; padding: 40px clamp(18px, 4vw, 48px) 56px; font-size: 16px; line-height: 1.75; overflow-wrap: anywhere; }
+.guide-intro { margin-bottom: 32px; }
+.guide-main h1 { max-width: 20ch; line-height: 1.12; }
+.guide-main h2 { font-size: clamp(22px, 3vw, 28px); line-height: 1.3; margin-bottom: 16px; }
+.guide-main h3 { font-size: 18px; line-height: 1.5; margin: 24px 0 8px; }
+.guide-main p, .guide-main ol, .guide-main ul { margin-bottom: 20px; }
+.guide-main li { margin-bottom: 10px; }
+.guide-main a { color: var(--blue); text-underline-offset: 3px; }
+.guide-main a:hover { color: var(--ink); }
+.guide-main .button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; color: var(--ink); text-decoration: none; }
+.guide-main .button:hover { border-color: var(--ink); }
+.guide-main section { padding-top: 28px; margin-top: 28px; border-top: 1px solid var(--line); }
+.guide-main :where(section, aside, h2, h3), #guide-content { scroll-margin-top: 100px; }
+.guide-main .connector-toc { padding: 24px; background: var(--panel); border: 1px solid var(--line); border-radius: 3px; }
+.guide-main .connector-toc ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; padding-left: 24px; margin-bottom: 0; }
+.guide-main .connector-toc li { margin: 0; }
+.guide-main .connector-toc a { display: flex; align-items: center; min-height: 44px; padding: 6px 0; }
+.guide-definitions { display: grid; grid-template-columns: minmax(130px, 1fr) minmax(0, 3fr); margin: 20px 0; border-top: 1px solid var(--line); }
+.guide-definitions dt, .guide-definitions dd { margin: 0; padding: 12px 8px; border-bottom: 1px solid var(--line); }
+.guide-definitions dt { font-weight: 800; }
+.guide-code { padding: 16px; border: 1px solid var(--line); background: var(--panel); white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.7 'DM Mono', monospace; }
+.guide-warning { padding: 20px; border-left: 4px solid var(--yellow); background: var(--panel); }
+.guide-warning h3 { margin-top: 0; }
+.guide-warning p { margin-bottom: 0; }
+.guide-return { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; margin-top: 32px; }
+.guide-return a { min-height: 44px; display: inline-flex; align-items: center; }
+.guide-skip { position: absolute; top: 8px; left: 12px; z-index: 10000; transform: translateY(-200%); padding: 12px; background: var(--panel); color: var(--ink); }
+.guide-skip:focus { transform: none; }
+.guide-page :where(a, button, input, select, textarea, [tabindex]):focus-visible { outline: 3px solid var(--fb-accent); outline-offset: 2px; }
+@media (max-width: 600px) {
+  .guide-main { padding-top: 28px; }
+  .guide-main .connector-toc { padding: 18px; }
+  .guide-main .connector-toc ol { grid-template-columns: minmax(0, 1fr); }
+  .guide-definitions { grid-template-columns: minmax(0, 1fr); }
+  .guide-definitions dt { padding-bottom: 0; border-bottom: 0; }
+  .guide-definitions dd { padding-top: 4px; }
+}
+@media print {
+  .guide-main { max-width: none; padding: 0; }
+  .guide-skip, .guide-return, .guide-intro .button { display: none; }
+}

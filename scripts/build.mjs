@@ -5,3 +5,4 @@ await mkdir('dist', { recursive: true });
 await cp('index.html', 'dist/index.html');
 await cp('src', 'dist/src', { recursive: true });
 await cp('public', 'dist/public', { recursive: true });
+await cp('guide', 'dist/guide', { recursive: true });

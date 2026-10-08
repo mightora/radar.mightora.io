@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a43">
+  <title>User guide | Technology Radar Live Editor | Mightora</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mightora/shared-ui@main/shared.css">
+  <link rel="stylesheet" href="../src/styles.css">
+  <link rel="stylesheet" href="../src/responsive.css">
+  <link rel="stylesheet" href="guide.css">
+  <script>
+    // Fix a known indentation syntax error in the shared-ui footer.yaml before js-yaml parses it.
+    if (window.fetch) {
+      const nativeFetch = window.fetch.bind(window);
+      window.fetch = async (input, init) => {
+        const url = typeof input === 'string' ? input : input.url;
+        const response = await nativeFetch(input, init);
+        if (url && url.includes('footer.yaml')) {
+          const text = await response.text();
+          return new Response(text.replace(/\t/g, '  '), { status: response.status, statusText: response.statusText, headers: response.headers });
+        }
+        return response;
+      };
+    }
+  </script>
+</head>
+<body class="guide-page">
+  <a class="guide-skip" href="#guide-content">Skip to guide</a>
+  <mightora-header
+    site-name="Technology Radar Live Editor"
+    site-url="../"
+    logo-light="https://raw.githubusercontent.com/mightora/mightora.io/main/static/images/mightoraIoLogo4-200x900.png"
+    logo-dark="https://raw.githubusercontent.com/mightora/mightora.io/main/static/images/mightoraIoLogo4-200x900.png"
+    nav-links='[
+      {"label":"Editor","url":"../"},
+      {"label":"Examples","url":"../#examples"},
+      {"label":"Documentation","url":"./"},
+      {"label":"GitHub","url":"https://github.com/mightora/radar.mightora.io","ext":true},
+      {"label":"Mightora.io ↗","url":"https://mightora.io","ext":true}
+    ]'>
+  </mightora-header>
+  <main id="guide-content" class="guide-main" tabindex="-1">
+    <header class="guide-intro">
+      <p class="eyebrow">Mightora / user guide</p>
+      <h1>Technology Radar Live Editor guide</h1>
+      <p>Turn a CSV of technologies into a radar, edit it in your browser, and share or export the result. No account is required.</p>
+      <a class="button" href="../">Open the editor</a>
+    </header>
+
+    <nav class="connector-toc" aria-label="On this page">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#what-is-a-radar">What is a technology radar?</a></li>
+        <li><a href="#quick-start">Quick start</a></li>
+        <li><a href="#examples">Loading an example</a></li>
+        <li><a href="#visual-editor">Visual editor</a></li>
+        <li><a href="#csv-editor">CSV editor and required columns</a></li>
+        <li><a href="#statuses">Statuses and dot statuses</a></li>
+        <li><a href="#validation">Validation errors</a></li>
+        <li><a href="#sharing">Sharing</a></li>
+        <li><a href="#exports">Exports</a></li>
+        <li><a href="#mobile">Using on mobile</a></li>
+        <li><a href="#privacy">Privacy and data</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <section id="what-is-a-radar" aria-labelledby="radar-heading">
+      <h2 id="radar-heading">What is a technology radar?</h2>
+      <p>A technology radar is a picture of the technologies your team is considering, adopting or retiring. Each dot is one CSV row. Category divides the radar into sectors; Status chooses a ring; Dot Status adds a separate marker style.</p>
+      <p>This editor uses the <a href="#statuses">configured ring order</a>, from Assess on the outside to Decommission at the centre. Distance from the centre is not a score or a recommendation. Sub Category is recorded with each technology but does not create another sector.</p>
+      <p>The app opens on <strong>Preview</strong>. Use <strong>Radar</strong> to choose a named radar or <strong>All radars</strong>. Hover or focus a dot to inspect its CSV values. <strong>Toggle labels</strong> shows or hides technology names; <strong>Reset view</strong> returns the radar selection to All radars.</p>
+    </section>
+
+    <section id="quick-start" aria-labelledby="quick-start-heading">
+      <h2 id="quick-start-heading">Quick start</h2>
+      <ol>
+        <li><a href="../">Open the editor</a> and choose a dataset from <strong>Load example</strong>, or use <strong>Upload CSV</strong> to choose a local CSV file. Download your current source first if you need to keep it.</li>
+        <li>Open <strong>Editor</strong>, then choose <strong>Visual</strong> for a table of fields or <strong>CSV</strong> for the text source. Change a technology or add a row.</li>
+        <li>Wait for validation, which runs 300 ms after your last edit. Check <strong>Errors</strong> and fix any reported issues.</li>
+        <li>Open <strong>Preview</strong> to inspect the radar. While errors remain, it shows the last valid version.</li>
+        <li>Use <strong>Download CSV</strong> to save an editable copy. Open <strong>Exports</strong> for other formats, or read the <a href="#privacy-warning">privacy warning</a> before using <strong>Share</strong>.</li>
+      </ol>
+      <p>To start from scratch, choose <strong>New</strong>, then Editor → Visual → <strong>Add row</strong>. New leaves the six-column CSV header in place. Fill every field before expecting a new preview.</p>
+    </section>
+
+    <section id="examples" aria-labelledby="examples-heading">
+      <h2 id="examples-heading">Loading an example</h2>
+      <p>The <strong>Load example</strong> list includes Power Platform Radar, Software Development Radar, Enterprise Architecture Radar, Cloud &amp; DevOps Radar, Data &amp; AI Radar, Cybersecurity Radar and Frontend Web Radar. Choose one to replace the current source.</p>
+      <p>If you have changed the source, the editor asks before replacing it. Cancel keeps your work. If an example cannot be fetched, a message appears and your source stays unchanged. <strong>Undo</strong> restores the source from before a successful example load; <strong>Redo</strong> reapplies it.</p>
+    </section>
+
+    <section id="visual-editor" aria-labelledby="visual-heading">
+      <h2 id="visual-heading">Visual editor</h2>
+      <p>In <strong>Editor</strong>, choose <strong>Visual</strong>. Edit text fields directly and choose Status and Dot Status from their lists. Radar Name, Category and Sub Category offer suggestions from your current data. Changes update the same CSV used by the CSV editor, sharing and downloads.</p>
+      <ul>
+        <li><strong>Add row</strong> appends a row and focuses its first empty field. It uses the selected radar, if any, and defaults to Assess and Standard. It also clears the text filter.</li>
+        <li><strong>Duplicate</strong> copies all values. Change the copy to clear the duplicate-entry error.</li>
+        <li><strong>Delete</strong> removes that row. Deleting the last row keeps a valid, header-only CSV.</li>
+        <li><strong>Move up</strong> and <strong>Move down</strong> swap with the adjacent row in CSV order, including rows hidden by filters. Each row action is one Undo step.</li>
+      </ul>
+      <p>The row buttons have accessible names such as <strong>Move up row 2</strong> and <strong>Delete row 2</strong>. Use Tab to move between fields and buttons. Undo and Redo also cover visual cell edits; use the toolbar buttons or Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z and Ctrl/Cmd+Y.</p>
+      <p><strong>Filter rows</strong> searches all six columns without case sensitivity. <strong>Filter by radar</strong> uses the same selection as Preview. <strong>Clear filters</strong> shows all rows again. Filters only hide rows: downloads and share links still include them. Filter changes do not add undo steps.</p>
+      <p>Malformed CSV makes the visual editor read-only. Choose <strong>Switch to CSV to fix</strong> to repair it; switching modes never discards the invalid source. The browser remembers your Visual/CSV preference.</p>
+    </section>
+
+    <section id="csv-editor" aria-labelledby="csv-heading">
+      <h2 id="csv-heading">CSV editor and required columns</h2>
+      <p>Choose <strong>Editor</strong> → <strong>CSV</strong> to edit the <strong>CSV radar source</strong>. Use these six column names in exactly this order, including spaces and capitalisation:</p>
+      <pre class="guide-code"><code>Radar Name,Category,Sub Category,Technology,Status,Dot Status</code></pre>
+      <dl class="guide-definitions" id="csv-columns">
+        <dt>Radar Name</dt><dd>The radar this technology belongs to. One CSV may contain several named radars.</dd>
+        <dt>Category</dt><dd>The sector containing the dot, such as Platform or Data.</dd>
+        <dt>Sub Category</dt><dd>A further grouping recorded with the dot, such as Runtime or Storage.</dd>
+        <dt>Technology</dt><dd>The name displayed beside the dot.</dd>
+        <dt>Status</dt><dd>The ring label, using an exact value from the status list below.</dd>
+        <dt>Dot Status</dt><dd>The marker label, using an exact value from the dot-status list below.</dd>
+      </dl>
+      <p>Every row needs all six fields. Wrap a field containing a comma, quote or newline in double quotes; write a literal quote as two double quotes. For example:</p>
+      <pre class="guide-code"><code>Radar Name,Category,Sub Category,Technology,Status,Dot Status
+Team Radar,Platform,Runtime,"Example, Inc. ""Engine""",Trial,Standard</code></pre>
+      <p><strong>Format CSV</strong> rewrites parseable CSV with consistent quoting and line endings. It does not repair validation errors. Use <strong>Upload CSV</strong> to replace the source with a local file, and <strong>Download CSV</strong> to save the current source, including any errors you are still fixing.</p>
+    </section>
+
+    <section id="statuses" aria-labelledby="statuses-heading">
+      <h2 id="statuses-heading">Statuses and dot statuses</h2>
+      <p>Status determines the ring. The following list is ordered from outside to centre and follows <a href="../public/config/radar-definition.yaml">radar-definition.yaml</a>. Use these exact labels in CSV.</p>
+      <!-- Kept in sync with the YAML labels, order and descriptions by the guide tests. -->
+      <dl class="guide-definitions" id="status-vocabulary">
+        <dt data-status-id="assess">Assess</dt><dd>Explore and understand its potential.</dd>
+        <dt data-status-id="trial">Trial</dt><dd>Test through a controlled pilot.</dd>
+        <dt data-status-id="deploy">Deploy</dt><dd>Approved for active adoption.</dd>
+        <dt data-status-id="sunset">Sunset</dt><dd>Avoid for new work and plan replacement.</dd>
+        <dt data-status-id="decommission">Decommission</dt><dd>Remove from service.</dd>
+      </dl>
+      <p>Dot Status is independent of the ring. It communicates whether the technology is standard, comes with caveats, or is rejected in your team's context:</p>
+      <dl class="guide-definitions" id="dot-vocabulary">
+        <dt data-dot-status-id="standard">Standard</dt><dd>A dark filled circle for a standard choice.</dd>
+        <dt data-dot-status-id="caveated">Caveated</dt><dd>A blue filled circle for a choice with conditions or caveats.</dd>
+        <dt data-dot-status-id="rejected">Rejected</dt><dd>A red outlined ring for a rejected choice.</dd>
+      </dl>
+      <p>The radar's legend shows both sets of labels. These are your data's decisions, not automatic recommendations from the editor.</p>
+    </section>
+
+    <section id="validation" aria-labelledby="validation-heading">
+      <h2 id="validation-heading">Validation errors</h2>
+      <p>Validation runs after a 300 ms pause in typing. <strong>Errors</strong> shows the error count and messages with CSV line numbers; the header is line 1. Visual cells also show their relevant messages.</p>
+      <ul>
+        <li><strong>Headers must be exactly…</strong>: restore the <a href="#csv-editor">six required column names</a> in order.</li>
+        <li><strong>Unclosed quoted value.</strong>: close the quoted field in CSV mode, and double any quotes inside it.</li>
+        <li><strong>Cannot be empty</strong> messages: fill in Radar Name, Category, Sub Category and Technology.</li>
+        <li><strong>Invalid value</strong>: choose one of the exact configured Status or Dot Status labels.</li>
+        <li><strong>Duplicate technology entry.</strong>: two rows have identical values in every column. Edit or delete the duplicate.</li>
+      </ul>
+      <p>Invalid source is preserved. Preview keeps the last valid radar until all errors are fixed. If the initial source is invalid, there may be no earlier valid radar to display. Check Errors before sharing or exporting: CSV, project and share links contain the current source, while visual exports use the displayed preview.</p>
+    </section>
+
+    <section id="sharing" aria-labelledby="sharing-heading">
+      <h2 id="sharing-heading">Sharing</h2>
+      <p>Read the <a href="#privacy-warning">privacy warning</a>, then choose <strong>Share</strong>. Select <strong>View link</strong> to open Preview with the Editor panel hidden, or <strong>Edit link</strong> to open Editor. Select <strong>Generate link</strong>, then <strong>Copy link</strong>. If copying is unavailable, select and copy the Generated URL yourself. <strong>Close</strong> or Escape dismisses the dialog.</p>
+      <aside id="privacy-warning" class="guide-warning" aria-labelledby="privacy-warning-heading">
+        <h3 id="privacy-warning-heading">Share privacy warning</h3>
+        <p>Anyone with this link can read the radar data. It is encoded and compressed, but it is not encrypted. Do not include confidential information.</p>
+      </aside>
+      <p>A share link contains the whole current CSV, including rows hidden by filters, plus the selected radar name when set. It is a snapshot: later edits do not update an existing link. Opening a valid share link loads its source ahead of the source saved in that browser and replaces that saved source.</p>
+      <p>A View link is a presentation choice, not access control. There is no link expiry, revocation or live collaboration. Large links may exceed browser or messaging limits; use a <a href="#exports">CSV download</a> instead. Compression support is required; if the browser reports that compressed sharing is unavailable, download the CSV.</p>
+      <p>For developers, <a href="https://github.com/mightora/radar.mightora.io/blob/main/docs/sharing.md">docs/sharing.md</a> is the technical reference for share payload v1.</p>
+    </section>
+
+    <section id="exports" aria-labelledby="exports-heading">
+      <h2 id="exports-heading">Exports</h2>
+      <p>Choose <strong>Exports</strong>. Files are generated locally in your browser.</p>
+      <dl class="guide-definitions">
+        <dt>CSV</dt><dd>Download the current editable source, including all radars and hidden rows. This is the same source saved by Download CSV, and it can be loaded with Upload CSV.</dd>
+        <dt>.radar.json</dt><dd>Download a portable project containing the CSV and format metadata. The current Upload CSV control only accepts CSV; there is no project JSON importer.</dd>
+        <dt>SVG</dt><dd>Download the displayed radar graphic as a vector image.</dd>
+        <dt>PNG</dt><dd>Download the displayed radar graphic as a raster image.</dd>
+        <dt>Print</dt><dd>Open the browser's print dialog. Check its print preview before printing or saving to PDF.</dd>
+      </dl>
+      <p>Choose the Radar selection and label visibility in Preview before exporting an image. Resolve validation errors if you want the image to reflect your latest source.</p>
+    </section>
+
+    <section id="mobile" aria-labelledby="mobile-heading">
+      <h2 id="mobile-heading">Using on mobile</h2>
+      <p>The toolbar wraps on small screens. Open the header's navigation menu to find Documentation and GitHub. The workspace tabs give access to Editor, Preview, Errors and Exports.</p>
+      <p>Visual mode shows a labelled card for each row on narrow screens, so you can work through the fields vertically. CSV mode keeps line numbers beside the text. In Preview, the radar fits the width and the legend moves below it. Toggle labels can reduce visual clutter.</p>
+      <p>The Share dialog scrolls if its contents are taller than the screen. With a keyboard, use Tab and Shift+Tab to move between controls, Enter to activate links and buttons, and Escape to close Share.</p>
+    </section>
+
+    <section id="privacy" aria-labelledby="privacy-heading">
+      <h2 id="privacy-heading">Privacy and data</h2>
+      <p>CSV editing, validation, share-link generation and exports happen in your browser. There are no accounts, product backend, server-side CSV storage, analytics or tracking added by this app.</p>
+      <p>Your source is saved in this browser's local storage, along with your Visual/CSV preference. It is not synchronised between devices. Browser settings, private browsing or clearing site data can remove it; keep CSV downloads as backups. Undo history belongs to the current page session and is lost on reload. Clearing this site's stored data in browser settings removes its saved source and preference.</p>
+      <p>The browser still makes network requests for site files, configuration, examples, shared Mightora components, fonts and images. Your CSV is not included in those ordinary requests. A shared URL carries the CSV in its fragment, after <code>#</code>, rather than sending it to the static host. Anyone or any service you give the full link to can decode its contents; see the <a href="#privacy-warning">share privacy warning</a>.</p>
+      <p>Downloads and copied links remain wherever you save or send them. Clearing browser storage does not delete those copies or revoke a link.</p>
+    </section>
+
+    <section id="faq" aria-labelledby="faq-heading">
+      <h2 id="faq-heading">FAQ</h2>
+      <h3>Why has my preview stopped updating?</h3>
+      <p>The source has validation errors, so Preview is retaining its last valid version. Open Errors, fix each issue and allow 300 ms after the last edit.</p>
+      <h3>Can I keep multiple radars in one CSV?</h3>
+      <p>Yes. Give rows different Radar Name values, then use Radar in Preview or Filter by radar in Visual mode to choose one. Downloads and share links still include the entire source.</p>
+      <h3>Is a View link private or protected?</h3>
+      <p>No. Anyone with either type of link can decode the CSV. View hides the Editor panel; it does not encrypt the data or enforce permissions.</p>
+      <h3>Can someone else's edits change my shared radar?</h3>
+      <p>No. A link is a snapshot and each browser edits its own copy. Send a newly generated link to share a later version.</p>
+      <h3>How do I back up and reopen my work?</h3>
+      <p>Use Download CSV, then Upload CSV when you want to reopen it. Local storage is a convenience, not a backup; the current app does not import .radar.json projects.</p>
+      <h3>Does this require an account or upload my CSV?</h3>
+      <p>No account is needed and the editor processes CSV locally. You decide whether to send a share link or downloaded file to anyone else.</p>
+      <h3>Can I read this guide without JavaScript?</h3>
+      <p>Yes. The guide and its section links are static HTML. The interactive radar editor requires JavaScript.</p>
+    </section>
+    <p class="guide-return"><a class="button" href="../">Open the editor</a> <a href="#guide-content">Back to top</a></p>
+  </main>
+  <!-- Empty author config keeps the inline biography without a missing config-file request. -->
+  <mightora-author config-url="data:application/json,%7B%7D">
+    <div class="author-section-overlay">
+      <div class="author-section-inner">
+        <div class="author-photos">
+          <img src="https://techtweedie.github.io/images/author/ian-tweedie-sq2_hu_a380911c6f4726de.png" alt="Ian Tweedie" class="author-avatar" />
+          <img src="https://raw.githubusercontent.com/TechTweedie/techtweedie.github.io/v2/assets/images/site/main-logo.png" alt="TechTweedie" class="author-blog-logo" />
+        </div>
+        <div class="author-text">
+          <h2 class="author-heading">Built by TechTweedie</h2>
+          <p class="author-bio">
+            Technology Radar Live Editor is a free tool created by <strong>Ian Tweedie</strong> — also known online as <strong>TechTweedie</strong>. Ian is a technology consultant and developer based in North East England with a background in enterprise IT, cloud infrastructure, and developer tooling. He builds free, practical tools and writes about technology on his blog.
+          </p>
+          <div class="author-links">
+            <a href="https://techtweedie.github.io" target="_blank" rel="noopener" class="author-link">
+              <i class="fas fa-blog"></i> Blog
+            </a>
+            <a href="https://github.com/itweedie" target="_blank" rel="noopener" class="author-link">
+              <i class="fab fa-github"></i> GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mightora-author>
+  <mightora-footer>
+    <div class="container">
+      <div class="footer-bottom">
+        <div class="footer-copy">
+          Technology Radar by <a href="https://mightora.io" target="_blank" rel="noopener noreferrer">Mightora</a>.
+          Open source on <a href="https://github.com/mightora/radar.mightora.io" target="_blank" rel="noopener noreferrer">GitHub</a>.
+        </div>
+        <div class="footer-bottom-links">
+          <span class="site-footer__note">Local-first: your radar data never leaves this browser unless you share it.</span>
+        </div>
+      </div>
+    </div>
+  </mightora-footer>
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/mightora/shared-ui@main/components.js"></script>
+</body>
+</html>
