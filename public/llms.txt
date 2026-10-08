@@ -1,0 +1,18 @@
+# Technology Radar Live Editor
+
+Technology Radar Live Editor turns a CSV of technologies into a visual radar. Edit the CSV in the browser, validate rows, inspect configured status rings and dot markers, and export or share the result. No account is required. CSV editing, validation and exports happen locally in the browser; sharing sends the CSV in a link, encoded but not encrypted.
+
+## Pages
+- App: https://radar.mightora.io/
+- User guide: https://radar.mightora.io/guide/
+- FAQ: https://radar.mightora.io/guide/#faq
+- Technology radar definition: https://radar.mightora.io/guide/#what-is-a-radar
+- CSV columns: https://radar.mightora.io/guide/#csv-editor
+- Status and dot-status vocabulary: https://radar.mightora.io/guide/#statuses
+- Privacy and data: https://radar.mightora.io/guide/#privacy
+
+## Product facts
+- Required CSV columns are Radar Name, Category, Sub Category, Technology, Status, and Dot Status.
+- Status selects a ring; Dot Status selects an independent marker style.
+- The app has no account, product backend, server-side CSV storage, analytics, or tracking.
+- A share link is a snapshot containing the current CSV. Anyone with it can decode the data.

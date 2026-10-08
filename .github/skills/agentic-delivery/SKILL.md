@@ -82,6 +82,11 @@ required broad gates once the slice is stable, and no duplicate runs for unchang
 inputs. Stop when acceptance criteria and required gates have evidence. A docs-only
 skill change normally needs document validation, not application/browser tests.
 
+Keep sessions cheap: one task per session unless the user scopes more; read only
+the claimed task's sections of the plan; write the tracker at claim and once after
+verification; prefer automated viewport/keyboard tests over interactive browser
+or screenshot sessions; archive Verified task detail out of the active plan.
+
 For repository layout, CI/CD, environment, hosting or data lifecycle work, read
 the selected profile and relevant project contract. Use the service skill's ALM
 guide and `architecture/alm.md` only for a project adopting that Azure pattern.

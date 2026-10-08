@@ -4,7 +4,38 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#102a43">
+  <meta name="description" content="Create and edit a technology radar from CSV in your browser. Validate data, view configured rings and markers, and export or share your radar.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://radar.mightora.io/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Mightora">
+  <meta property="og:title" content="Technology Radar Live Editor | Mightora">
+  <meta property="og:description" content="Create and edit a technology radar from CSV in your browser. Validate data, view configured rings and markers, and export or share your radar.">
+  <meta property="og:url" content="https://radar.mightora.io/">
+  <meta property="og:image" content="https://radar.mightora.io/technology-radar-preview.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="A sample technology radar with the Technology Radar Live Editor title.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Technology Radar Live Editor | Mightora">
+  <meta name="twitter:description" content="Create and edit a technology radar from CSV in your browser. Validate data, view configured rings and markers, and export or share your radar.">
+  <meta name="twitter:image" content="https://radar.mightora.io/technology-radar-preview.png">
+  <meta name="twitter:image:alt" content="A sample technology radar with the Technology Radar Live Editor title.">
   <title>Technology Radar Live Editor | Mightora</title>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Technology Radar Live Editor",
+      "url": "https://radar.mightora.io/",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Any (browser)",
+      "offers": { "@type": "Offer", "price": "0" },
+      "author": { "@type": "Person", "name": "Ian Tweedie", "url": "https://techtweedie.github.io/" },
+      "publisher": { "@type": "Organization", "name": "Mightora", "url": "https://mightora.io/" }
+    }
+  </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mightora/shared-ui@main/shared.css">
   <link rel="stylesheet" href="src/styles.css">
   <link rel="stylesheet" href="src/responsive.css">
@@ -38,7 +69,8 @@
     ]'>
   </mightora-header>
   <main>
-    <section class="intro"><div><p class="eyebrow">Mightora / browser workspace</p><h1 id="pageTitle">Technology Radar</h1><p class="subtitle">Edit CSV on the left. See a deterministic radar on the right. Your data stays in this browser.</p></div><span class="status-dot">No account required</span></section>
+    <section class="intro"><div><p class="eyebrow">Mightora / browser workspace</p><h1>Technology Radar</h1><p class="subtitle">Edit CSV on the left. See a deterministic radar on the right. Your data stays in this browser.</p></div><span class="status-dot">No account required</span></section>
+    <noscript><p class="subtitle">Technology Radar Live Editor turns a CSV of technologies into a visual radar. It runs in your browser without an account; the interactive editor requires JavaScript.</p></noscript>
     <nav class="toolbar" aria-label="Editor tools"><div class="toolbar-actions"><button id="undoButton" class="icon-button" aria-label="Undo" title="Undo">&#8630;</button><button id="redoButton" class="icon-button" aria-label="Redo" title="Redo">&#8631;</button><button id="newButton" class="button">New</button><label class="example-picker">Load example<select id="examples"><option value="">Choose an example</option></select></label><button id="uploadButton" class="button">Upload CSV</button><button id="downloadCsv" class="button">Download CSV</button><button id="shareButton" class="button primary">Share</button><button id="shareTopButton" class="hidden">Share</button><a id="docsButton" class="button" href="guide/" target="_blank" rel="noopener noreferrer">Documentation</a></div><div class="toolbar-actions"><button id="toggleLabels" class="button">Toggle labels</button><button id="resetView" class="button">Reset view</button></div></nav>
     <div class="segmented page-tabs"><button class="tab" data-tab="data">Editor</button><button class="tab active" data-tab="preview">Preview</button><button class="tab" data-tab="validation">Errors <span id="errorCount" class="count">0</span></button><button class="tab" data-tab="exports">Exports</button></div>
     <section id="dataPanel" class="workspace-panel"><div class="editor-head"><div><h2>Radar editor</h2><p>Required columns: Radar Name, Category, Sub Category, Technology, Status, Dot Status</p></div><div class="editor-head-actions"><div class="segmented editor-mode" role="group" aria-label="Editor mode"><button id="visualMode" class="small-button" type="button" aria-pressed="false">Visual</button><button id="csvMode" class="small-button active" type="button" aria-pressed="true">CSV</button></div><button id="formatCsv" class="small-button">Format CSV</button></div></div><div id="visualEditor" class="visual-editor hidden"><div id="visualTools" class="visual-tools"><button id="addVisualRow" class="button" type="button">Add row</button><label>Filter rows<input id="visualTextFilter" type="search" placeholder="Search all columns" aria-describedby="visualFilterHelp"></label><label>Filter by radar<select id="visualRadarFilter"><option value="">All radars</option></select></label><button id="clearVisualFilters" class="small-button" type="button">Clear filters</button><p id="visualFilterHelp">Filters only hide rows. The radar selection also controls Preview. Move buttons change CSV order, including hidden rows.</p></div><p id="visualFilterStatus" class="visual-filter-status" role="status" aria-live="polite"></p><div id="visualNotice" class="visual-notice hidden"><p id="visualNoticeText"></p><button id="switchToCsv" class="small-button" type="button">Switch to CSV to fix</button></div><div id="visualTableWrap" class="visual-table-wrap"><table id="visualTable" class="visual-table"></table></div></div><div id="codeEditor" class="code-editor"><pre id="lineNumbers" aria-hidden="true">1</pre><textarea id="csvInput" aria-label="CSV radar source" spellcheck="false"></textarea></div><div id="sourceActions" class="source-actions"><span id="sourceStatus" aria-live="polite">Loading source...</span><span>Debounced validation: 300ms</span></div></section>

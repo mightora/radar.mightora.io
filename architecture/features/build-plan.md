@@ -14,6 +14,7 @@ Use this as the execution and progress record for the Technology Radar Live Edit
 4. Update the table with paths or commit references, commands and outcomes. Never invent a commit, deployment or test result.
 5. Set `Verified` only after the task's exit checks pass. Set `Blocked` with the specific dependency or missing input, then continue an independent ready task where possible.
 6. Update the handoff and delivery log at the end of each session. Synchronise `BACKLOG.md` when a feature meets its release gate.
+7. Keep this file small. Delivery-log entries are one or two lines. When a task is Verified, move its task details and older log entries to the [delivery archive](delivery-archive.md); keep only its tracker row with a short evidence summary.
 
 Task states: `Not started`, `In progress`, `Blocked`, `Verified`. Feature release states: `Not released`, `Ready for release`, `Released`. `Verified` means implemented and checked locally, not deployed. Pushing to `main` deploys via [.github/workflows/pages.yml](../../.github/workflows/pages.yml), so pushes require explicit user authorisation.
 
@@ -27,6 +28,8 @@ Task states: `Not started`, `In progress`, `Blocked`, `Verified`. Feature releas
 | 4 | Documentation on how to use the tool | D01 |
 | 5 | SEO and AEO (answer-engine) enrichment | S01 |
 | 6 | Zoom in and out on the radar preview | Z01 |
+| 7 | Improve radar preview readability and show its technologies in a formatted table | P01 |
+| 8 | Export a radar to a Word-compatible document | W01 |
 
 ## Scope and dependencies
 
@@ -38,8 +41,11 @@ flowchart TD
     X01 --> M01[M01 Small-screen layout]
     V02 --> M01
     M01 --> Z01[Z01 Radar preview zoom]
+    Z01 --> P01[P01 Preview table and label readability]
+    P01 --> W01[W01 Word export]
     M01 --> D01[D01 User guide]
     D01 --> S01[S01 SEO and AEO]
+    W01 --> R01[R01 Regression and release]
     Z01 --> R01[R01 Regression and release]
     S01 --> R01
 ```
@@ -54,8 +60,10 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 | Visual (WYSIWYG) editor | V01, V02 | Not released | V01 and V02 verified locally; release gate remains R01. |
 | Small-screen layout | M01 | Not released | M01 verified locally; see task evidence below. |
 | Radar preview zoom | Z01 | Not released | Planned; not started. |
+| Preview readability and technology table | P01 | Not released | Planned; not started. |
+| Word export | W01 | Not released | Planned; not started. |
 | User documentation | D01 | Not released | D01 verified locally; static guide, navigation and build checks passed. Release gate remains R01. |
-| SEO / AEO enrichment | S01 | Not released | Not started |
+| SEO / AEO enrichment | S01 | Not released | In progress: add app/guide metadata and structured data, crawlable static app text, root discovery files, and focused checks. |
 
 ## Task tracker
 
@@ -67,61 +75,15 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 | V02 | Visual editor row tools (add, delete, duplicate, move, filter) | V01 | Verified | `npm run check`, `npm test`, `npm run build` passed; final `npm run test:e2e` passed 14/14 (6 V02 tests). Single-step undo, header-only deletion, configured defaults, hidden-row preservation, duplicate validation, accessible buttons and keyboard journeys at five widths passed. See [implementation record](v02-visual-row-tools.md) and [baseline](baseline.md). |
 | M01 | Small-screen responsive layout | X01, V02, D-04 | Verified | Preview-first startup and cohesive workspace tabs; responsive checks at 360, 390, 768, 1024 and 1280 px. `npm run check`, `npm test`, `npm run build`, and `npm run test:e2e` passed; 15/15 browser tests, no viewport overflow. Real-device checks remain pending. |
 | Z01 | Radar preview zoom controls | M01, D-04 | Not started | Add accessible zoom in/out and reset controls for the radar itself; preserve ring/sector meaning, responsive fit, and export behavior. |
+| P01 | Preview label readability and formatted technology table | Z01 | Not started | Add translucent neutral backing to radar labels and a formatted table of technologies beneath the selected radar; keep CSV-derived content safe and responsive. |
+| W01 | Word-compatible radar export | P01 | Not started | Add a Word-compatible export for the selected radar and its technology table; keep generation client-side and record the chosen file format. |
 | D01 | User guide and in-app documentation link | M01, D-03 | Verified | Static guide, shared components, Documentation links, README and build copy implemented. `npm run check`, `npm test`, `npm run build` (inside browser command) passed; `npm run test:e2e` passed 22/22, including 7 guide tests. Crawlable without JS; local links/anchors, control names, keyboard and 360/390/768/1024/1280 px checks passed without guide console errors or page overflow. See [implementation record](d01-user-guide.md) and [baseline](baseline.md). |
-| S01 | SEO and AEO enrichment | D01, D-01 | Not started | — |
-| R01 | Cross-feature regression and release readiness | X01, V01, V02, M01, Z01, D01, S01 | Not started | — |
+| S01 | SEO and AEO enrichment | D01, D-01 | In progress | Add canonical/social metadata and JSON-LD to app and guide; publish robots.txt, sitemap.xml and llms.txt plus a static OG image; keep the app H1 unchanged by loaded CSV data. |
+| R01 | Cross-feature regression and release readiness | X01, V01, V02, M01, Z01, P01, W01, D01, S01 | Not started | — |
 
 ## Task details and exit checks
 
-### F00 — baseline, method bootstrap and decisions
-
-- Bootstrap the method from `.github/skills/agentic-delivery/templates/` and `.github/skills/static-web-delivery/templates/architecture/solution-pattern.md`: create `AGENTS.md`, `BACKLOG.md` (the five requests above, verbatim), `architecture/solution-pattern.md`, `architecture/high-level-design.md`, `architecture/features/README.md`, `architecture/features/shared-contracts.md` and `architecture/features/baseline.md`. Keep shared contracts short: CSV schema (six required columns), `radar-definition.yaml` as the status/dot vocabulary, `localStorage` key `radar-builder-source`, share payload v1 per [docs/sharing.md](../../docs/sharing.md). Link the existing [design-system.instructions.md](../../design-system.instructions.md) from `AGENTS.md`; do not overwrite it.
-- Run and record: `npm install`, `npm run check`, `npm test`, `npm run build`, then serve `dist` (`python -m http.server 8080 -d dist`) and walk the main journey in a browser.
-- Record these pre-inspection findings and confirm them against the running app:
-  - Examples use `window.prompt()` with a free-text name ([src/app.js](../../src/app.js), `examplesButton` handler, `EXAMPLE_FILES` map).
-  - `loadShared()` is defined but never called, so `#/view/` and `#/edit/` links may not load their payload. Record as a pre-existing defect; see D-05.
-  - Header nav links to `#examples`, which has no matching element.
-  - Documentation button opens the GitHub repository; there is no user guide.
-  - `<head>` has only `title`, `viewport`, `theme-color`; no description, canonical, Open Graph, structured data, `robots.txt` or `sitemap.xml`. The `<h1>` is overwritten at runtime with the radar name.
-  - [scripts/smoke-test.mjs](../../scripts/smoke-test.mjs) asserts source text only; there are no behavioural or browser tests.
-  - [scripts/build.mjs](../../scripts/build.mjs) copies only `index.html`, `src/`, `public/`; any new root files (guide, robots, sitemap) need adding.
-- Install Playwright per D-04, add a minimal e2e test that loads the built app and asserts the radar SVG renders, and record its command and outcome.
-- D-01, D-04, and D-05 are decided.
-- Exit: baseline.md lists actual commands with observed outcomes, the findings above confirmed or corrected, browser checks performed (browser + viewport) and checks not performed marked pending.
-
-### X01 — example picker drop-down
-
-- Replace the `prompt()` flow with an accessible `<select>` (labelled "Load example") populated from `EXAMPLE_FILES`, with a placeholder option. Selecting loads the file; keep the existing "Replace the current source?" confirmation when `state.dirty`. Cancelling confirmation resets the select to the placeholder.
-- Either repurpose the `Examples` toolbar button into the select or place the select in the toolbar; give it `id="examples"` (or equivalent anchor) so the header nav link resolves.
-- Loading an example goes through `setSource()` so undo/redo and `localStorage` behave as for other edits (note: `setSource` currently does not persist to `localStorage`; persist consistently).
-- Add behavioural tests for: list matches files in `public/examples/`, every example parses with zero validation errors.
-- Exit: no `prompt(` call remains for examples; every example loads from the select in a browser; cancel leaves source unchanged; failed fetch shows the toast and leaves source unchanged; keyboard-only selection works; undo restores the prior source; `npm run check`, `npm test`, `npm run build` pass.
-
-### V01 — visual table editor with two-way CSV sync
-
-- Add an editor mode switch inside the Editor panel: `Visual` | `CSV`. CSV text remains the single source of truth (D-02); the visual editor reads parsed rows and writes back via `csvString()` + `setSource()`.
-- Render a table with one row per technology: text inputs for Radar Name, Category, Sub Category, Technology; `<select>` for Status and Dot Status populated from the loaded YAML config. Offer `<datalist>` suggestions for Radar Name/Category/Sub Category from existing values.
-- Per-cell validation: highlight cells referenced by `validate()` errors and expose the message via `aria-describedby`.
-- When the CSV cannot be parsed (e.g. unclosed quote, wrong headers), the visual editor shows a read-only notice with a "Switch to CSV to fix" action and never overwrites the source.
-- Remember the chosen mode in `localStorage`.
-- No new runtime dependency.
-- Exit: edits in Visual update CSV text, preview and error count after debounce; edits in CSV update Visual on switch; round-trip of every example through Visual → CSV produces identical parsed rows; values containing commas, quotes and newlines survive round-trip; invalid CSV is never rewritten by the visual editor; undo/redo covers visual edits; all user values rendered via `escapeHtml` or DOM properties (no HTML injection from CSV cells); keyboard Tab order moves across cells.
-
-### V02 — visual editor row tools
-
-- Add row, delete row, duplicate row, move up/down; a text filter to narrow visible rows; a radar-name filter aligned with the preview's radar selector.
-- New rows default Status/Dot Status to the first configured values.
-- Exit: each operation is a single undo step; deleting the last row leaves a valid header-only CSV; filter never drops hidden rows from the written CSV; duplicate rows surface the existing "Duplicate technology entry" error; screen reader labels on icon buttons.
-
-### M01 — small-screen responsive layout
-
-- Audit at 360, 390, 768 and 1024 px widths. Target: no horizontal page scroll; toolbar wraps or collapses into an overflow menu with primary actions (Examples, Share) visible; tabs scroll horizontally or stack without clipping; touch targets at least 44×44 px.
-- Visual editor: switch to a stacked card-per-row layout below a breakpoint (labels visible per field).
-- CSV editor: line numbers stay aligned; font size at least 16 px on inputs to avoid iOS zoom.
-- Radar preview: SVG scales to width; legend moves below the radar; category labels do not clip (adjust `viewBox` padding if needed); toggling labels remains available.
-- Share dialog fits within the viewport with scrollable content.
-- Respect `<mightora-header>` built-in mobile menu; do not duplicate it. Follow [design-system.instructions.md](../../design-system.instructions.md) focus styles.
-- Exit: screenshots or recorded browser checks at each width for Editor (both modes), Preview, Errors, Exports and Share dialog; no horizontal overflow (`document.documentElement.scrollWidth <= innerWidth`); desktop layout unchanged at 1280 px; print view unaffected. Real-device checks (iOS Safari, Android Chrome) are release checks if not available locally.
+Only unfinished tasks are listed. Details for Verified tasks (F00, X01, V01, V02, M01, D01) are in the [delivery archive](delivery-archive.md).
 
 ### Z01 — radar preview zoom controls
 
@@ -131,13 +93,18 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 - SVG, PNG and print output use the default fitted radar, independent of the current on-screen zoom.
 - Exit: controls work by mouse and keyboard, have accessible names and stable hit areas, cannot zoom beyond documented bounds, reset returns to fit, no viewport overflow occurs, exports are unscaled, and existing radar/share behavior still passes focused browser tests.
 
-### D01 — user guide and in-app documentation
+### P01 — preview label readability and technology table
 
-- Create a static, crawlable guide page (D-03, proposed `guide/index.html`) using the same header, author and footer components. Sections: What is a technology radar; Quick start; Loading an example; Visual editor; CSV editor and required columns; Statuses and dot statuses (generated from or kept in sync with `radar-definition.yaml`); Validation errors; Sharing (link to privacy warning, encoded not encrypted); Exports; Using on mobile; Privacy and data; FAQ.
-- Point the toolbar `Documentation` button and header nav `Documentation` link at the guide. Keep the GitHub link as a separate nav item.
-- Update [README.md](../../README.md) with a short usage section linking the guide; keep [docs/sharing.md](../../docs/sharing.md) as the technical format reference.
-- Update `scripts/build.mjs` to copy the guide into `dist`.
-- Exit: every documented control exists with the documented name; guide renders with no console errors and passes the M01 widths; internal links and anchors resolve in `dist`; test asserts the built guide exists and the docs button targets it.
+- Give words plotted on the radar a slightly transparent gray background so they remain legible over ring colors.
+- Show a neatly formatted table beneath the radar containing the technologies in the selected radar, using the existing radar vocabulary and six-column CSV data as appropriate.
+- Keep the preview and table usable at 360, 390, 768, 1024 and 1280 px; safely render all CSV-derived values and preserve the current radar, editor, share and export behavior.
+- Exit: table contents match the selected radar and valid source data, labels remain readable without obscuring the radar, keyboard/screen-reader users can understand the table, and focused browser checks show no page overflow or regressions.
+
+### W01 — Word-compatible radar export
+
+- Add a Word-compatible export to the existing export controls for the selected radar, including its formatted technology table.
+- Generate the file in the browser without uploading user data or adding a runtime dependency; choose and record the actual file format during implementation.
+- Exit: downloaded output opens in a supported Word-compatible application, includes the selected radar and its technologies with useful formatting, handles CSV-derived content safely, and does not change other export behavior.
 
 ### S01 — SEO and AEO enrichment
 
@@ -151,7 +118,7 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 
 ### R01 — regression and release readiness
 
-- Re-run all checks; browser journey on desktop and mobile widths: load each example, edit in both modes, validate errors, share link generate/open (subject to D-05), all five exports, guide navigation.
+- Re-run all checks; browser journey on desktop and mobile widths: load each example, edit in both modes, validate errors, share link generate/open (subject to D-05), all exports including Word, guide navigation.
 - Confirm `dist` contents and that `pages.yml` builds the same artifact.
 - Local exit: all checks pass and limitations recorded. Release gate: user-authorised push to `main`, successful Pages run, and the deployed journey plus S01 release checks pass on the live URL.
 
@@ -168,34 +135,15 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 
 ## Delivery log
 
-- **2026-10-08** — D01 started at `ab706357f8816fac0d8454d522c492755aa292d4` on `main`; working tree clean. User explicitly selected D01 only, before Z01. Loaded agentic/static delivery skills and repository contracts. Scope: crawlable guide using shared components, navigation, README, build copy, vocabulary/link/keyboard/viewport checks. Z01, S01 and release actions remain outside this session. Main risk is broken built navigation or inaccurate instructions; verify links and vocabulary first, then required syntax/smoke/build and Chromium browser gates at all five widths.
-- **2026-10-08** — D01 verified locally. Added the twelve-section static guide and static TOC, vocabulary guards, both Documentation destinations, separate GitHub navigation, README usage and build copy. Preserved the head footer patch and shared components. Used the shared author's supported empty inline config on the guide to retain its biography without a missing-file request; guide-only CSS fixes the shared mobile title overlap and missing menu glyph. Initial browser launch was blocked by sandbox `spawn EPERM`; approved rerun exposed the guide author 404 and incorrect closed-menu test assumptions (2/7 passed), then the focused suite passed 7/7 after fixes. Screenshot review prompted the mobile header polish. Final `npm run check`, `npm test`, and the build invoked by `npm run test:e2e` passed; full Chromium suite passed 22/22, including existing M01 checks. Screenshots inspected at all five widths; page width matched viewport width and guide console checks were clean. `git diff --check` passed. No commit, push, deployment or backlog release-state change; real-device, other-browser, screen-reader and live-host checks remain pending.
+Newest first; one or two lines per session. Entries up to D01 are in the [delivery archive](delivery-archive.md).
 
-- **2026-10-07** - Delivery-skill maintenance: added risk-based check selection, explicit stop conditions, focused browser/viewport guidance and duplicate-build avoidance to the skills and reusable planning/implementation templates. `python .github/skills/agentic-delivery/scripts/validate.py` passed (34 documents, 78 local links). No application changes or application test runs; existing release gates and the known M01 test limitation remain unchanged. See [baseline](baseline.md).
-- **2026-10-07** — User confirmed D-01 (`https://radar.mightora.io/`) and D-04 (Playwright approved). D-05 still pending.
-- **2026-10-07** — Plan created from repository inspection. No code changed; no checks run.
-- **2026-10-07** — F00 verified. Bootstrapped `AGENTS.md`, `BACKLOG.md`, `architecture/solution-pattern.md`, `architecture/high-level-design.md`, `architecture/features/README.md`, `shared-contracts.md`, and `baseline.md`; documented local commands in `README.md`; added Playwright Chromium smoke test. `npm install` -> 0 vulnerabilities; `npm run check` -> passed; `npm test` -> passed; `npm run build` -> passed; `npm run test:e2e` -> 1/1 passed. Local browser confirmed the listed behavior gaps and reproduced D-05. Pending viewport, real-device, and deployed-host checks are in `baseline.md`.
-- **2026-10-07** — CI repair locally verified: run `37627582404` failed in Pages configuration after a successful build. Separated `.github/workflows/pages.yml` build/artifact upload from dependent deployment with deployment-only write permissions and the `github-pages` environment; added workflow smoke assertions and README setup instructions. Regression test failed before the fix and passed afterward; `npm run check`, `npm test`, `npm run build`, `npm run test:e2e` (1/1), and `git diff --check` passed. Release remains blocked pending maintainer Pages setup and a successful live deployment; no feature release state changed. See [baseline](baseline.md).
-- **2026-10-07** — X01 started. D-05 remains pending; this session implements the example picker only.
-- **2026-10-07** — X01 verified locally. Added the accessible toolbar example select and ensured `setSource()` persists programmatic source changes. All seven example files matched the picker map and loaded with zero validation errors; keyboard selection, cancel, failed fetch, undo, and storage behavior passed. `npm run check`, `npm test`, `npm run build`, and `npm run test:e2e` (3/3) passed. Local browser width checks found overflow at 360, 390, and 768 px; responsive follow-up remains in M01. No deployment or commit performed; D-05 remains pending user approval.
-- **2026-10-07** — User approved D-05. X01 reopened to wire the existing v1 `loadShared()` path into startup and verify view/edit shared URLs; no payload format change.
-- **2026-10-07** — D-05 implemented and X01 re-verified. Startup now loads a valid v1 view/edit link before falling back to localStorage. `npm run check`, `npm test`, `npm run build`, and `npm run test:e2e` passed (4/4); test proves incoming shared CSV wins over a different stored source. Integrated browser confirmed a generated view URL loads its CSV and preview. Payload format and privacy warning unchanged.
-- **2026-10-07** — V01 started. D-02 resolved in line with the shared contract: CSV remains canonical; use DOM-created controls, preserve multiline cell values, and store the selected editor mode under `radar-builder-editor-mode`.
-- **2026-10-07** — V01 verified. Added the Visual/CSV switch, DOM-rendered table with configured status choices and suggestions, per-cell accessible validation, malformed-source read-only state, mode persistence, and visual-edit undo/redo. `npm run check`, `npm test`, `npm run build`, and `npm run test:e2e` passed; browser suite passed 8/8. Every example round-tripped to identical parsed rows; quoted, comma-containing and multiline values survived; invalid CSV stayed unchanged. Keyboard Tab traversal passed at 360, 390, 768, 1024, and 1280 px. The editor's table stayed within its own horizontal scroller; overall page overflow remains at 360 (468 px), 390 (468 px), and 768 (810 px), tracked for M01. No commit, push, or deployment performed.
-- **2026-10-07** — V02 started at `426cd4a00647056cdddd9c3b72d202d6128bbe8c`. Inspected the dirty worktree and preserved existing X01/V01 edits in source, tests, contracts, baseline, tracker and generated output. Scope is V02 only: add/delete/duplicate/move, text/radar filters, and their verification. M01 responsive redesign and all deployment actions remain outside this session.
-- **2026-10-07** — V02 implementation and browser tests added. `npm run check` and `npm test` passed. The first `npm run test:e2e` attempt stopped in the build with sandbox `EPERM` removing generated `dist`; retried with approved escalation. Browser verification remains in progress.
-- **2026-10-07** — V02 verification follow-up: initial browser run passed 10/14; four new tests used an exact label-text locator that included option text. Changed those tests to the select's accessible role/name. Next run passed all six V02 tests and 13/14 overall; the existing share-link test timed out in `page.goto()` waiting for full page load after the app rendered. Its receiving pages now wait for `domcontentloaded` and retain the existing source/preview assertions. Full regression rerun pending.
-- **2026-10-07** — V02 verified locally. Added add/delete/duplicate/move and combined text/radar filters, preserving hidden source rows, configured defaults, single-step row history and last-valid validation behavior. `npm run check` -> passed; `npm test` -> passed; `npm run build` (invoked by the browser command) -> passed; final `npm run test:e2e` -> 14/14 passed, including six V02 tests; `git diff --check` -> passed. Playwright Chromium exercised the generated artifact using the configured local Python server and saved screenshots at 360/390/768/1024/1280 px. Filter controls fit their containers; overall page widths remain 468/468/810/1024/1280 px, so the prior narrow-screen overflow remains for M01. README and [V02 implementation record](v02-visual-row-tools.md) document the behavior. No commit, push, deployment or backlog release-state change.
-- **2026-10-07** — Added workspace `agent-optimization` and `search-engine-optimization` skills for future S01 work. Validated skill headers, names and repository references; VS Code reported no diagnostics. No site files, feature status, or release state changed; S01 still depends on D01.
-- **2026-10-07** — M01 verified locally. Preview is now the default landing panel; edit-share links still open Editor. Restyled the workspace tabs to use a quiet underline treatment consistent with the page. Updated browser journeys to explicitly open Editor when editing. `npm run check`, `npm test`, `npm run build` passed; `npm run test:e2e` passed 15/15, including five responsive widths with no horizontal page overflow, share-dialog fit, and print behavior. Real iOS/Android and deployed-host checks remain pending; no deployment performed.
+- **2026-10-08** — Added P01 for clearer radar labels and an item table, followed by W01 for Word-compatible export; synchronized the feature index and implementation prompt. Plan-only; no application checks run.
+- **2026-10-08** — Efficiency maintenance: moved Verified task details and the delivery log to [delivery-archive.md](delivery-archive.md); slimmed the build prompt to one task per session with focused verification. Docs-only; no application checks run.
 
 ## Current handoff
 
-- Session scope (2026-10-08): D01 only, explicitly selected ahead of Z01. Started from clean `main` at `ab706357f8816fac0d8454d522c492755aa292d4`; the working tree now contains the D01 source/docs/tests and regenerated tracked build output.
-- Completed: D01. The twelve-section static guide at `guide/index.html` is copied to `dist/guide/index.html`; Documentation links in the toolbar and shared header lead there, with GitHub separate. Toolbar Documentation opens a new tab to preserve the current editor session. README, build script and vocabulary/link/browser checks were updated. See [D01 implementation record](d01-user-guide.md).
-- Checks: `npm run check`, `npm test`, `npm run build` (run by the browser command), and `git diff --check` passed. Final `npm run test:e2e` passed 22/22 in Playwright 1.63.0 Chromium on Windows, against built `dist` served by `python -m http.server 8080 -d dist`. All seven guide checks passed, including no-JavaScript content, local links/anchors, named controls, keyboard navigation and all five widths. Screenshots were inspected at 360/390/768/1024/1280 px; guide console errors and page overflow were absent. The earlier recorded M01 assertion limitation did not recur in the current tree; the existing M01 test passed without changes in this session.
-- Known existing limitation: the app's shared author still requests `/data/config.json` and receives 404; this request is now identified as the shared author's default config URL. The guide uses an empty inline config to keep its static biography without that request. App author behavior was outside D01 and remains unchanged.
-- Pending release checks: real iOS Safari and Android Chrome, Firefox/WebKit and any other unrun browsers, an interactive screen-reader session, deployed app/guide navigation at `https://radar.mightora.io/`, successful Pages workflow and shared-component behavior on the live host. Local headless browser sessions and screenshot review do not establish real-device or production results.
-- Pages release prerequisite remains maintainer verification of Settings → Pages → Source → GitHub Actions and Pages availability, followed by an authorised workflow run. This session did not verify or modify hosting settings.
-- Release: features remain Not released. `BACKLOG.md` is unchanged because the R01 release gate has not passed. No commit, push or deployment was performed.
-- **Next task: Z01 - Radar preview zoom controls.** First inspect repository state and the Z01 exit checks, then mark Z01 In progress before adding transient, keyboard-accessible zoom controls. S01 is dependency-ready after D01, but Z01 remains first in plan order.
+- State: F00, X01, V01, V02, M01, D01 Verified locally; S01 in progress; P01 and W01 planned; all features Not released; `BACKLOG.md` unchanged. No commit, push or deployment performed.
+- Last full check (D01): `npm run check`, `npm test`, `npm run test:e2e` (builds first) passed 22/22 in Chromium.
+- Known limitation: the app's shared author component requests `/data/config.json` (404); the guide avoids it with an empty inline config.
+- Pending release checks (R01): real iOS Safari/Android Chrome, Firefox/WebKit, screen reader, live host at `https://radar.mightora.io/`, successful Pages run after maintainer confirms Settings → Pages → Source → GitHub Actions.
+- **Next task: Z01 - Radar preview zoom controls.** First step: mark Z01 In progress. The radar SVG is built as a string in `renderPreview()` ([src/app.js](../../src/app.js#L49), written to `#radarCanvas` at line 88); `#previewPanel` / `.preview-head` in [index.html](../../index.html#L45) hosts the controls. Exports read `#radarCanvas svg` in the `[data-export]` handler ([src/app.js](../../src/app.js#L225)), so apply zoom with CSS on a wrapper, not on the SVG's `viewBox`, to keep exports unscaled. Add `tests/e2e/zoom.spec.js`. P01 and W01 follow Z01; S01 is in progress concurrently.

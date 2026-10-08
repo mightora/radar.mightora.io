@@ -14,6 +14,7 @@ Use this as the execution and progress record for the [feature specifications](R
 4. Update the table with paths or commit references, commands and outcomes. Never invent a commit, deployment or test result.
 5. Set `Verified` only after the task's exit checks pass. Set `Blocked` with the specific dependency or missing input, then continue an independent ready task where possible.
 6. Update the handoff and delivery log at the end of each implementation session. Synchronise the feature summary, backlog and feature status when a feature meets its release gate.
+7. Keep this file small. Delivery-log entries are one or two lines. When a task is Verified, move its task details and older log entries to `delivery-archive.md`; keep only its tracker row with a short evidence summary.
 
 Task states: `Not started`, `In progress`, `Blocked`, `Verified`. Feature release states: `Not released`, `Ready for release`, `Released`. `Verified` means implementation and checks are complete, not that production is deployed. Record deployment environment and evidence separately.
 

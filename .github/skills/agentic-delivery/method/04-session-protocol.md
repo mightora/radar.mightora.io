@@ -5,9 +5,10 @@ Every implementation session follows the same six phases.
 ## 1. Orient
 
 - Read the applicable `AGENTS.md` and any instruction files matching the files
-  you will touch.
-- Read `architecture/features/README.md`, `shared-contracts.md`, and the build
-  plan's task table, decisions and **current handoff**.
+  you will touch. Do not re-read files the harness already attached.
+- Read `shared-contracts.md`, and from the build plan only the task table, the
+  claimed task's details, open decisions and the **current handoff**. Skip the
+  delivery archive, baseline and other task records unless the task needs them.
 - Read the specs for the next ready task only.
 - Inspect `git status` and any existing uncommitted changes. Assume they are the
   user's in-progress work and preserve them.
@@ -18,6 +19,9 @@ Every implementation session follows the same six phases.
 - Resume the `In progress` task if it is still valid. Otherwise take the next
   `Not started` task whose dependencies are `Verified`. If a task is `Blocked`,
   check whether the recorded blocker has actually cleared.
+- Claim **one task per session** unless the user scopes more. Context grows with
+  every task and is re-sent on every turn, so a fresh session per task is cheaper
+  and more reliable than a long multi-task session.
 - Mark it `In progress` and write the **actual** scope you intend to deliver,
   including what you are explicitly excluding.
 - If a specific external dependency is unavailable, continue independent ready
@@ -71,6 +75,9 @@ Every implementation session follows the same six phases.
 - Stop when selected checks and required gates pass and acceptance criteria have
   evidence. Do not add another suite, browser pass or screenshot merely for
   reassurance. Expand only for a failure, uncovered risk or explicit requirement.
+- Prefer automated assertions (for example Playwright viewport and keyboard
+  tests) over interactive browser or screenshot sessions. Interactive sessions
+  are expensive; use them to diagnose a failure, not to re-confirm a pass.
 - Use the disposable environment when tests mutate state. Use controlled local
   receivers and mocks for external integrations where applicable.
 - Record commands verbatim and their outcomes with counts (`78/78 passed`).
@@ -80,13 +87,16 @@ Every implementation session follows the same six phases.
 
 ## 5. Record
 
-In the same change as the code:
+In the same change as the code, and in one tracker edit after verification (the
+only other tracker edit is the claim):
 
-- update the task row: state, evidence, commands and outcomes, paths or commit refs;
+- update the task row: state, short evidence, commands and outcomes, paths or commit refs;
 - set `Verified` only when the exit checks actually passed;
 - update the feature progress table and release state if it changed;
-- add a dated delivery-log entry;
-- update `baseline.md` with new commands, versions or newly discovered limitations;
+- add a dated delivery-log entry of one or two lines;
+- when a task is `Verified`, move its task details and older log entries to
+  `delivery-archive.md` so the active plan stays small;
+- update `baseline.md` only with new commands, versions or newly discovered limitations;
 - write a task record document for substantial work;
 - if a requirement changed, update `shared-contracts.md` and every affected spec;
 - synchronise `BACKLOG.md` only when a feature is genuinely delivered.
@@ -109,4 +119,7 @@ Then report the same summary to the user.
 - Editing an already-applied migration file instead of adding a new one.
 - Claiming a feature is released because the code is ready.
 - "Fixing" unrelated files, or reverting work you do not recognise.
-- Leaving the tracker for "the end" and running out of session.
+- Leaving the tracker for "the end" and running out of session. (Record the claim
+  first; then one update after verification.)
+- Rewriting the tracker after every step, or writing long narrative log entries.
+- Working through several tasks in one session without being asked.

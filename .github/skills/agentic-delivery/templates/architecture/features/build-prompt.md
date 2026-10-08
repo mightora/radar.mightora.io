@@ -15,8 +15,9 @@ restore its retired <!-- FILL: retired design --> design.
 Treat this as an implementation request, not another planning exercise. Resume
 any In progress task if it is still valid; otherwise start the next Not started
 task whose dependencies are verified. If a task is Blocked, check whether its
-recorded blocker has cleared. Work through ready tasks in the plan's order,
-completing coherent slices rather than stopping after a plan or scaffold.
+recorded blocker has cleared. Complete one task per session unless this prompt
+is scoped to more, delivering a coherent slice rather than stopping after a plan
+or scaffold, then stop. Read only that task's sections of the build plan.
 Continue independent ready work if a specific external dependency is unavailable.
 
 Use the shared contracts for <!-- FILL: the cross-cutting rules, e.g. tenant
@@ -60,9 +61,12 @@ document checks, not application/browser suites. Preserve explicit exit, standin
 and CI gates. Stop when acceptance criteria and required gates have evidence;
 record out-of-scope checks separately from required checks that remain pending.
 
-Update architecture/features/build-plan.md as work is completed: task state,
-evidence and commands/results, decisions, delivery log, feature release state and
-current handoff. Mark a task Verified only when its exit checks pass. Keep
+Update architecture/features/build-plan.md when claiming the task and once after
+verification: task state, short evidence and commands/results, decisions, a one-
+or two-line delivery-log entry, feature release state and current handoff. Move
+a Verified task's details to delivery-archive.md. Prefer automated viewport and
+keyboard tests over interactive browser or screenshot sessions. Mark a task
+Verified only when its exit checks pass. Keep
 implemented/verified separate from released. Synchronise feature documents and
 BACKLOG.md when a feature is actually delivered; preserve existing custom status
 markers until there is evidence to change them. If a requirement changes, update
@@ -73,4 +77,4 @@ and outcomes, any remaining blockers or release checks, and the exact next task.
 Leave a handoff that another session can resume without reconstructing your work.
 ```
 
-To constrain a session, append a concrete scope such as: `For this session, complete F00 and F01 only, then update the tracker and handoff.` To resume the full plan, use the prompt unchanged.
+To constrain a session, append a concrete scope such as: `For this session, complete F01 only.` To resume the plan, use the prompt unchanged; it takes the next ready task.

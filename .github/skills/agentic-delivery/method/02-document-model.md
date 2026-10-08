@@ -107,9 +107,15 @@ not independent current status. Sections, in order:
    that must pass before `Verified`.
 7. **Decisions** — numbered, dated design decisions (`D-01`, `D-02`, …) with the
    task that must not proceed without them.
-8. **Delivery log** — dated session entries.
+8. **Delivery log** — dated session entries of one or two lines; older entries
+   move to the archive.
 9. **Current handoff** — what was just done, what is in flight, and the exact next
    step, written so another session can resume cold.
+
+Keep the plan small: it is read every session. When a task is `Verified`, move its
+task details and older delivery-log entries to `architecture/features/delivery-archive.md`,
+leaving only the tracker row with a short evidence summary. The archive is a
+record, never a status source, and sessions do not need to read it.
 
 Task states: `Not started`, `In progress`, `Blocked`, `Verified`.
 Feature release states: `Not released`, `Ready for release`, `Released`.

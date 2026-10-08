@@ -100,7 +100,7 @@ function renderRadarSelector() {
   });
 }
 function selectRadar(name) { state.selectedRadar = name; renderRadarSelector(); renderPreview(); applyVisualFilters(); }
-function render() { renderErrors(); renderRadarSelector(); renderPreview(); updateLineNumbers(); if (state.editorMode === 'visual') { if (state.visualTableSource !== state.source) renderVisualEditor(); else { updateVisualErrors(); applyVisualFilters(); } } $('pageTitle').textContent = state.validRows[0]?.[0] || 'Technology Radar'; }
+function render() { renderErrors(); renderRadarSelector(); renderPreview(); updateLineNumbers(); if (state.editorMode === 'visual') { if (state.visualTableSource !== state.source) renderVisualEditor(); else { updateVisualErrors(); applyVisualFilters(); } } }
 function setEditorMode(mode, refresh = true) { state.editorMode = mode; localStorage.setItem('radar-builder-editor-mode', mode); $('visualMode').classList.toggle('active', mode === 'visual'); $('csvMode').classList.toggle('active', mode === 'csv'); $('visualMode').setAttribute('aria-pressed', String(mode === 'visual')); $('csvMode').setAttribute('aria-pressed', String(mode === 'csv')); $('visualEditor').classList.toggle('hidden', mode !== 'visual'); $('codeEditor').classList.toggle('hidden', mode !== 'csv'); $('sourceActions').classList.toggle('hidden', mode !== 'csv'); $('formatCsv').classList.toggle('hidden', mode !== 'csv'); if (mode === 'visual' && refresh) renderVisualEditor(); }
 function makeElement(tag, className, text) { const element = document.createElement(tag); if (className) element.className = className; if (text !== undefined) element.textContent = text; return element; }
 function renderVisualEditor() {

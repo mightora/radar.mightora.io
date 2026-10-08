@@ -34,6 +34,10 @@ The required CSV columns, in exact order, are `Radar Name`, `Category`, `Sub Cat
 
 Validation preserves the user's source and keeps the last valid preview. Do not add analytics, tracking, or server-side diagnostics. Error messages and any rendered values derived from CSV must be safely escaped or inserted through DOM properties.
 
+## Behaviour that must not regress
+
+CSV validation with a 300 ms debounce, last-valid preview, undo/redo, upload/download, the share dialog privacy warning, all exports, print view, the shared Mightora header, author and footer components, and the `footer.yaml` fetch patch in `<head>`.
+
 ## Out of scope
 
 No backend, accounts, server storage, analytics or tracking, new runtime dependencies, framework migration, radar rendering redesign, or share payload format change.

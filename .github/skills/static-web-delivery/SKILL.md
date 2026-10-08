@@ -17,6 +17,9 @@ only for static-browser architecture and verification; do not repeat core rules.
 For testing, use the core's risk-based session protocol and the template's
 [verification selection](templates/architecture/solution-pattern.md#verification-selection).
 The profile lists possible checks, not a mandatory full browser matrix per edit.
+Encode required viewport widths and keyboard journeys as automated browser tests
+(for example Playwright) and run only the affected spec while iterating; reserve
+interactive browser or screenshot sessions for diagnosing failures.
 
 Use [the static solution pattern](templates/architecture/solution-pattern.md)
 as the target's `architecture/solution-pattern.md` when bootstrapping. Copy the

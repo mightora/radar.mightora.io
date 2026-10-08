@@ -10,7 +10,9 @@ Start with the [shared contracts](shared-contracts.md), then follow the [build p
 | V01, V02 | Edit radar technologies visually while keeping CSV as the source of truth. |
 | M01 | Use the editor comfortably on small screens. |
 | Z01 | Zoom in and out on the radar preview. |
+| P01 | Improve radar label legibility and show a formatted table of its technologies. |
+| W01 | Export the selected radar and its technology table to a Word-compatible document. |
 | D01 | Find a crawlable user guide from the application. |
 | S01 | Improve search and answer-engine metadata without tracking. |
 
-F00 establishes the baseline first. X01 and V01 then proceed independently; V02 depends on V01, M01 depends on X01 and V02, Z01 and D01 depend on M01, S01 depends on D01, and R01 verifies the full feature set and release readiness.
+F00 establishes the baseline first. X01 and V01 then proceed independently; V02 depends on V01, M01 depends on X01 and V02, Z01 and D01 depend on M01, P01 depends on Z01, W01 depends on P01, S01 depends on D01, and R01 verifies the full feature set and release readiness.

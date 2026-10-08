@@ -4,7 +4,63 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#102a43">
+  <meta name="description" content="Learn how to create, edit, validate, share and export a technology radar with local, browser-based CSV editing.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://radar.mightora.io/guide/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Mightora">
+  <meta property="og:title" content="User guide | Technology Radar Live Editor | Mightora">
+  <meta property="og:description" content="Learn how to create, edit, validate, share and export a technology radar with local, browser-based CSV editing.">
+  <meta property="og:url" content="https://radar.mightora.io/guide/">
+  <meta property="og:image" content="https://radar.mightora.io/technology-radar-preview.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="A sample technology radar with the Technology Radar Live Editor title.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="User guide | Technology Radar Live Editor | Mightora">
+  <meta name="twitter:description" content="Learn how to create, edit, validate, share and export a technology radar with local, browser-based CSV editing.">
+  <meta name="twitter:image" content="https://radar.mightora.io/technology-radar-preview.png">
+  <meta name="twitter:image:alt" content="A sample technology radar with the Technology Radar Live Editor title.">
   <title>User guide | Technology Radar Live Editor | Mightora</title>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "HowTo",
+          "name": "Create a technology radar using the Technology Radar Live Editor",
+          "description": "Turn a CSV of technologies into a radar, edit it in your browser, and share or export the result. No account is required.",
+          "step": [
+            { "@type": "HowToStep", "text": "Open the editor and choose a dataset from Load example, or use Upload CSV to choose a local CSV file. Download your current source first if you need to keep it." },
+            { "@type": "HowToStep", "text": "Open Editor, then choose Visual for a table of fields or CSV for the text source. Change a technology or add a row." },
+            { "@type": "HowToStep", "text": "Wait for validation, which runs 300 ms after your last edit. Check Errors and fix any reported issues." },
+            { "@type": "HowToStep", "text": "Open Preview to inspect the radar. While errors remain, it shows the last valid version." },
+            { "@type": "HowToStep", "text": "Use Download CSV to save an editable copy. Open Exports for other formats, or read the privacy warning before using Share." }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            { "@type": "Question", "name": "Why has my preview stopped updating?", "acceptedAnswer": { "@type": "Answer", "text": "The source has validation errors, so Preview is retaining its last valid version. Open Errors, fix each issue and allow 300 ms after the last edit." } },
+            { "@type": "Question", "name": "Can I keep multiple radars in one CSV?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Give rows different Radar Name values, then use Radar in Preview or Filter by radar in Visual mode to choose one. Downloads and share links still include the entire source." } },
+            { "@type": "Question", "name": "Is a View link private or protected?", "acceptedAnswer": { "@type": "Answer", "text": "No. Anyone with either type of link can decode the CSV. View hides the Editor panel; it does not encrypt the data or enforce permissions." } },
+            { "@type": "Question", "name": "Can someone else's edits change my shared radar?", "acceptedAnswer": { "@type": "Answer", "text": "No. A link is a snapshot and each browser edits its own copy. Send a newly generated link to share a later version." } },
+            { "@type": "Question", "name": "How do I back up and reopen my work?", "acceptedAnswer": { "@type": "Answer", "text": "Use Download CSV, then Upload CSV when you want to reopen it. Local storage is a convenience, not a backup; the current app does not import .radar.json projects." } },
+            { "@type": "Question", "name": "Does this require an account or upload my CSV?", "acceptedAnswer": { "@type": "Answer", "text": "No account is needed and the editor processes CSV locally. You decide whether to send a share link or downloaded file to anyone else." } },
+            { "@type": "Question", "name": "Can I read this guide without JavaScript?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The guide and its section links are static HTML. The interactive radar editor requires JavaScript." } }
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Technology Radar Live Editor", "item": "https://radar.mightora.io/" },
+            { "@type": "ListItem", "position": 2, "name": "Technology Radar Live Editor guide", "item": "https://radar.mightora.io/guide/" }
+          ]
+        }
+      ]
+    }
+  </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mightora/shared-ui@main/shared.css">
   <link rel="stylesheet" href="../src/styles.css">
   <link rel="stylesheet" href="../src/responsive.css">
