@@ -28,8 +28,8 @@ Push-Location $repoRoot
 try {
     Invoke-LoggedCheck -Name 'check' -Command 'npm' -Arguments @('run', 'check')
     Invoke-LoggedCheck -Name 'unit' -Command 'npm' -Arguments @('test')
-    Invoke-LoggedCheck -Name 'build' -Command 'npm' -Arguments @('run', 'build')
 
+    # test:e2e builds first; its log and exit code cover both build and browser tests.
     $env:PLAYWRIGHT_HTML_OUTPUT_DIR = Join-Path $resultsDirectory 'playwright-report'
     Invoke-LoggedCheck -Name 'playwright' -Command 'npm' -Arguments @('run', 'test:e2e', '--', '--reporter=list,html', '--output', (Join-Path $resultsDirectory 'playwright-artifacts'))
 }

@@ -1,1 +1,1 @@
-add ability to toggle between names and nubers
+add ability to toggle between names and numbers

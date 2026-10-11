@@ -1,20 +1,28 @@
 # Repository Guidance
 
-- Before changing browser UI, read and follow [design-system.instructions.md](design-system.instructions.md).
-- Follow the delivery method in [architecture/features/README.md](architecture/features/README.md). [architecture/features/build-plan.md](architecture/features/build-plan.md) alone owns task and release status.
-- Keep [architecture/features/baseline.md](architecture/features/baseline.md) and the build plan current with observed decisions, commands, outcomes, and limitations.
 - Preserve the existing Technology Radar Live Editor and its behavior. Build output is generated from `index.html`, `src/`, and `public/` by `scripts/build.mjs`; update sources and build rather than editing `dist` by hand.
-- Follow [architecture/solution-pattern.md](architecture/solution-pattern.md): this is a browser-only static site hosted by GitHub Pages. Do not add a backend, accounts, server storage, analytics, or tracking without an approved requirement.
-- Use `npm run check`, `npm test`, `npm run build`, and `npm run test:e2e` for local verification; serve built output with `python -m http.server 8080 -d dist` for manual browser checks.
-- No destructive stateful tests exist; user CSV data is processed in the browser. Never push or deploy without explicit user authorisation.
-- For Playwright authoring and focused browser checks, follow [.github/skills/playwright-tests/SKILL.md](.github/skills/playwright-tests/SKILL.md). Keep new specs scoped to the active task in `tests/e2e/`; local all-check runners save results under `test-results/local-*`.
+- Keep the site browser-only and static on GitHub Pages. No new runtime dependencies or share payload changes. Do not add a backend, accounts, server storage, analytics or tracking without an approved requirement.
+- Process user CSV data in the browser and escape CSV-derived HTML. Never push or deploy without explicit user authorisation.
+- Before UI changes, read [design-system.instructions.md](design-system.instructions.md). Before authoring or debugging browser tests, read [.github/skills/playwright-tests/SKILL.md](.github/skills/playwright-tests/SKILL.md).
+- Search `src/app.js` for relevant code rather than reading the whole file. Keep changes to it minimal.
+
+## Scope and reading
+
+- This file owns the session protocol. [build-prompt.md](architecture/features/build-prompt.md) is a human-facing launch prompt, not required reading.
+- For a named feature task, read its row and details, open decisions and handoff in [build-plan.md](architecture/features/build-plan.md), plus [shared-contracts.md](architecture/features/shared-contracts.md).
+- Read other architecture documents only when relevant, including [README.md](architecture/features/README.md), [solution-pattern.md](architecture/solution-pattern.md), baseline and delivery archive. Do not open delivery skills' `method/` or `templates/` files.
+- Apply the implementation workflow below to feature implementation. Advice and documentation-only requests need task-appropriate review, not feature-status updates or application regression tests.
 
 ## Implementation sessions
 
 - One task per session; do only the named task, then stop. Implement, don't re-plan.
-- Treat [build-prompt.md](architecture/features/build-prompt.md) and this file as the session protocol; do not open the delivery skills' `method/` or `templates/` files.
-- Read only the task's row and details, open decisions and handoff in the build plan, plus [shared-contracts.md](architecture/features/shared-contracts.md) (and the design system for UI work). Skip `delivery-archive.md` and `baseline.md` unless needed.
-- Search `src/app.js` for what you need rather than reading the whole file. Keep changes to it minimal.
-- Escape CSV-derived HTML. No new runtime dependencies, backend, tracking or share payload changes. Make routine decisions and record them; ask only if a pending-user decision blocks the task.
-- Verify by risk: iterate with the affected Playwright spec; finish once with the required checks or `scripts/run-all-tests.ps1` / `scripts/run-all-tests.sh` (the e2e command builds first). Encode viewport (360/390/768/1024/1280) and keyboard checks as Playwright assertions when relevant. Use interactive browser or screenshot sessions only to diagnose a failure. Record checks you couldn't run as pending; never claim them passed.
-- Update the build plan twice: In progress with scope at start; at the end the tracker row, a one- or two-line log entry, decisions and handoff. Move Verified task details to `delivery-archive.md`. The handoff's first step names the files and functions to change.
+- Make routine decisions and record them; ask only if a pending-user decision blocks the task.
+- The build plan alone owns task and release status, decisions, checks and limitations. Update it at start (In progress with scope) and completion (tracker row, a one- or two-line log entry, decisions and handoff). Move Verified task details to `delivery-archive.md`. The handoff's first step names the files and functions to change.
+- Update [baseline.md](architecture/features/baseline.md) only when architecture, environment assumptions or baseline behavior changes.
+
+## Verification
+
+- Iterate with affected checks; keep Playwright specs in `tests/e2e/` scoped to the task. Assert relevant viewport (360/390/768/1024/1280) and keyboard behavior.
+- Finish feature implementation once with `npm run check`, `npm test`, and `npm run test:e2e`, or use `scripts/run-all-tests.ps1` / `scripts/run-all-tests.sh`. The e2e command runs `npm run build` first; do not build separately for the same verification run. Runners save results under `test-results/local-*`.
+- Use interactive browser or screenshot sessions only to diagnose failures. For manual checks, serve built output with `python -m http.server 8080 -d dist`.
+- Record checks you could not run as pending; never claim they passed.

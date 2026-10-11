@@ -40,8 +40,8 @@ playwright_path() {
 
 run_check check npm run check
 run_check unit npm test
-run_check build npm run build
 
+# test:e2e builds first; its log and exit code cover both build and browser tests.
 artifact_output_path="$(playwright_path "$results_directory/playwright-artifacts")"
 unset PLAYWRIGHT_HTML_OUTPUT_DIR
 run_check playwright npm run test:e2e -- --reporter=list,html --output "$artifact_output_path"

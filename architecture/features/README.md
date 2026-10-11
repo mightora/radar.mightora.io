@@ -2,7 +2,7 @@
 
 The Technology Radar Live Editor already supports raw CSV editing, validation, a radar preview, sharing, and exports. Requested improvements are designed and tracked in the [build plan](build-plan.md); task progress and release status live there.
 
-Start with the [shared contracts](shared-contracts.md), then follow the [build plan and delivery tracker](build-plan.md). The [implementation prompt](build-prompt.md) starts or resumes work. This index describes scope only; the tracker owns task and release status.
+This index is optional background reading. For implementation, follow [AGENTS.md](../../AGENTS.md), the relevant task and handoff in the [build plan](build-plan.md), and the [shared contracts](shared-contracts.md). The [implementation prompt](build-prompt.md) is a human-facing launch prompt. The tracker alone owns task and release status.
 
 | Feature | Purpose |
 | --- | --- |
