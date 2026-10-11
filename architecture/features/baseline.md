@@ -2,6 +2,10 @@
 
 This file records observed repository state and executed checks. Unrun checks remain pending. F00 status is owned by the [build plan](build-plan.md).
 
+## 2026-10-11 - Radar label mode
+
+Preview now offers Names (default) and Numbers. Numbers identify visible rows in source order with a wrapped technology key embedded in the SVG. Visual exports and image links retain that rendering; Word tables include matching numbers and project JSON stores `configuration.labelMode`. CSV and share formats are unchanged. Print styles show Preview even when printing from Exports. Verification and limitations are recorded under P04 in the build plan.
+
 ## 2026-10-08 - CI01 Pages build failure
 
 - Actions run `37815244568`, build job `113442086736`, fails during `npm test` at `scripts/guide-test.mjs:23`: the static guide lists seven examples while `src/app.js` registers seventeen. Added the ten missing names with HTML-escaped ampersands and restricted the existing catalogue assertion to the loading examples section. No workflow, editor, dependency or generated-artifact changes.

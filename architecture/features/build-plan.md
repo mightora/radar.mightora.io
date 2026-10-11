@@ -1,8 +1,8 @@
 # Feature build plan and delivery tracker
 
-Last updated: 2026-10-08.
+Last updated: 2026-10-11.
 Overall state: F00, X01, V01, V02, M01 and D01 verified; product features unreleased.
-Current task: **W01 - Word-compatible radar export follow-up; CI01 build fix verified locally.**
+Current task: **P04 - Names/numbers radar labels and export consistency.**
 Next planned task: **Z01 - Radar preview zoom controls.**
 
 Use this as the execution and progress record for the Technology Radar Live Editor improvements. Use the [implementation prompt](build-prompt.md) to start or resume work. Architecture profile: **static-web-delivery** (browser-only, GitHub Pages; no backend, sign-in or database).
@@ -33,6 +33,7 @@ Task states: `Not started`, `In progress`, `Blocked`, `Verified`. Feature releas
 | 8 | Export a radar to a Word-compatible document | W01 |
 | 9 | Edit values beneath the radar on click, save on blur, and curve category/subcategory names around nested radar sections | P02 |
 | 10 | Adjustable radar text size and fewer overlapping points | P03 |
+| 11 | Toggle radar labels between names and numbers, retaining the choice in exports | P04 |
 
 ## Scope and dependencies
 
@@ -73,6 +74,7 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 
 | ID | Task | Depends on | State | Evidence / blocker |
 | --- | --- | --- | --- | --- |
+| P04 | Names/numbers radar labels and export consistency | P01 | In progress | Add an accessible label-mode control, numbered key inside the SVG, matching visual exports and project metadata; preserve source CSV and sharing. |
 | F00 | Baseline, method bootstrap and decisions | None | Verified | Added method docs and Playwright smoke test. `npm install` passed (0 vulnerabilities); `npm run check`, `npm test`, `npm run build` passed; `npm run test:e2e` passed (1/1); local browser confirmed listed findings. See [baseline](baseline.md). |
 | X01 | Example picker drop-down | F00 | Verified | Accessible picker and D-05 shared-link loading verified. `npm run check`, `npm test`, `npm run build` passed; `npm run test:e2e` passed (4/4), including seven examples and v1 view/edit links overriding stored source. Integrated browser loaded a generated view link, showed Preview, and hid Editor. |
 | V01 | Visual table editor with two-way CSV sync | F00, D-02 | Verified | Dependency-free Visual/CSV editor with round-trip, validation, invalid-source, undo/redo, persistence, and keyboard checks; see V01 delivery log. |
@@ -91,6 +93,12 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 | CI01 | Fix failing Pages build guide/example check | D01 | Verified | Guide lists all 17 registered examples; regression checks their loading section. Focused Node check, syntax, smoke and build pass. Browser checks: focused 1/7, full 30/39; CDN DNS failures and two unchanged preview-table failures remain. Workflow/editor unchanged; hosted CI rerun pending. |
 
 ## Task details and exit checks
+
+### P04 - names/numbers labels
+
+- Default to names; number visible technologies in source order starting at 1. Include an escaped, wrapped numbered key in the SVG so standalone images remain understandable.
+- Preserve label visibility, text sizing, last-valid preview and selected-radar filtering. SVG, PNG, Word, print and image links use the selection; project metadata records it. CSV retains the six-column source format; share payloads are unchanged.
+- Verify keyboard switching and 360/390/768/1024/1280 px layout, safe content and exports, then run the required repository checks.
 
 Only unfinished tasks are listed. Details for Verified tasks (F00, X01, V01, V02, M01, D01, T01) are in the [delivery archive](delivery-archive.md).
 
@@ -152,6 +160,7 @@ Only unfinished tasks are listed. Details for Verified tasks (F00, X01, V01, V02
 | D-09 | 2026-10-08 | How to share radar-only pages and embeddable images on a static host? | H01 (user request): extend v1 payload with mode `embed` and optional `table` boolean; image links are client-generated data URLs because no hosted image file can exist without a backend. | H01 |
 | D-10 | 2026-10-08 | Word-compatible format and editability? | W01: generate a browser-only `.docx` package with the selected radar embedded as a PNG up to 4096 px on its longest side and editable status-by-category and six-column technology tables; escape all CSV-derived values. No runtime dependency or upload. User explicitly requested W01 before the Z01 handoff; keep Z01 pending. | W01 |
 | D-11 | 2026-10-08 | Fix build failure without weakening guide coverage? | CI01: synchronize the static guide with all registered examples and check the loading section specifically; preserve the Pages workflow, dependencies and editor. | CI01 |
+| D-12 | 2026-10-11 | Numbering and export behavior? | P04: Names is the default; number visible rows from 1 in source order and embed a wrapped number/name key in the SVG. Mode is temporary; image/Word/print exports retain it and project JSON stores `configuration.labelMode`. Keep six-column CSV names and share payloads unchanged. | P04 |
 
 ## Delivery log
 
@@ -171,6 +180,8 @@ Newest first; one or two lines per session. Entries up to D01 are in the [delive
 - **2026-10-08** — Efficiency maintenance: moved Verified task details and the delivery log to [delivery-archive.md](delivery-archive.md); slimmed the build prompt to one task per session with focused verification. Docs-only; no application checks run.
 
 ## Current handoff
+
+- **P04 first step:** update `src/app.js` (`renderPreview`, `wordDocument`, export handlers), `src/radar-sections.js` (numbered key), `index.html` (Preview controls) and `src/styles.css`; add scoped checks in `tests/e2e/radar-label-mode.spec.js`.
 
 - **CI01 handoff:** no further source change is indicated in `guide/index.html` or `scripts/guide-test.mjs`; verify the fixed revision in the Pages build after merge. `npm test` now passes; browser follow-up needs CDN access and investigation of the unchanged preview edit/geometry checks. No deployment performed.
 - **Current W01 follow-up:** `src/app.js` generates a real `.docx` package with the selected radar as `word/media/radar.png` at up to 4096 px on its longest side, plus editable status/category and six-column technology tables. `tests/e2e/word-export.spec.js` passed 1/1, confirming the ZIP container, drawing relationship, PNG signature and max dimension, selected-radar filtering, multiline values and safe text. Word-app rendering remains pending; keep W01 In progress until import is confirmed. CI01 resolved the guide/example smoke-test blocker.

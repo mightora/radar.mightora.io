@@ -126,7 +126,8 @@
       <h2 id="radar-heading">What is a technology radar?</h2>
       <p>A technology radar is a picture of the technologies your team is considering, adopting or retiring. Each dot is one CSV row. Category divides the radar into sectors; Status chooses a ring; Dot Status adds a separate marker style.</p>
       <p>This editor uses the <a href="#statuses">configured ring order</a>, from Assess on the outside to Decommission at the centre. Distance from the centre is not a score or a recommendation. Category names curve around the outer edge. Each category has an equal wedge, divided equally into its Sub Category sections, with subcategory names on the inner arc.</p>
-      <p>The app opens on <strong>Preview</strong>. Use <strong>Radar</strong> to choose a named radar or <strong>All radars</strong>. Hover or focus a dot to inspect its CSV values. <strong>Toggle labels</strong> shows or hides technology names; <strong>Reset view</strong> returns the radar selection to All radars.</p>
+      <p>The app opens on <strong>Preview</strong>. Use <strong>Radar</strong> to choose a named radar or <strong>All radars</strong>. Hover or focus a dot to inspect its CSV values. <strong>Toggle labels</strong> shows or hides the selected labels; <strong>Reset view</strong> returns the radar selection to All radars.</p>
+      <p><strong>Radar labels</strong> switches between Names (the default) and Numbers. Numbers follow the visible technologies in source order, starting at 1, with a technology key below the radar. The choice applies to SVG, PNG, Word, print and image links; project JSON records the choice. CSV keeps the original technology names. Shared page links and a fresh session use Names.</p>
       <p><strong>Radar text size</strong> adjusts technology, category and subcategory labels from 8 to 20 px in the radar drawing. Focus the slider and use the arrow keys to adjust it. Technology names wrap and points are spaced within their existing rings and subsections. Crowded radars may need a larger drawing area, which is fitted to the available screen width. Text size is temporary: it does not change the CSV or shared links.</p>
     </section>
 
@@ -237,7 +238,7 @@ Team Radar,Platform,Runtime,"Example, Inc. ""Engine""",Trial,Standard</code></pr
         <dt>PNG</dt><dd>Download the displayed radar graphic as a raster image.</dd>
         <dt>Print</dt><dd>Open the browser's print dialog. Check its print preview before printing or saving to PDF.</dd>
       </dl>
-      <p>Choose the Radar selection, label visibility and Radar text size in Preview before exporting an image. SVG, PNG and print use the displayed radar's typography and point layout. Resolve validation errors if you want the image to reflect your latest source.</p>
+      <p>Choose the Radar selection, Radar labels, label visibility and Radar text size in Preview before exporting an image. SVG, PNG, Word and print use the displayed radar's typography and point layout. Resolve validation errors if you want the image to reflect your latest source.</p>
     </section>
 
     <section id="mobile" aria-labelledby="mobile-heading">

@@ -39,6 +39,8 @@ Radar text size is temporary view state (8-20 SVG px, default 11): it changes te
 
 ## Behaviour that must not regress
 
+Radar label mode is temporary view state: Names by default, or Numbers assigned from 1 in visible source order. Number mode includes an escaped, wrapped technology key inside the SVG; filtering or editing regenerates that key from the last-valid rows. Label visibility still hides both point labels and the key. SVG, PNG, Word, print and image links retain the current choice; Word tables prefix technology names with the matching numbers. Project JSON records `configuration.labelMode`; CSV and share payloads remain unchanged.
+
 CSV validation with a 300 ms debounce, last-valid preview, undo/redo, upload/download, the share dialog privacy warning, all exports, print view, the shared Mightora header, author and footer components, and the `footer.yaml` fetch patch in `<head>`.
 
 ## Out of scope

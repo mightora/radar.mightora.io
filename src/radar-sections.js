@@ -65,6 +65,24 @@ export function wrapRadarLabel(text, textSize, measure) {
   return { lines, width: Math.max(...lines.map(measure)) + 6, height: lines.length * textSize * 1.3 + 6 };
 }
 
+// The key is part of the SVG so image downloads and Word retain the number/name mapping.
+export function radarNumberKey(rows, width, top, textSize, measure, escapeHtml, includeRadar) {
+  if (!rows.length) return { svg: '', height: 0 };
+  const columnWidth = textSize * 15, columns = Math.max(1, Math.floor((width - 40) / columnWidth));
+  const entries = [];
+  let y = top + textSize * 3;
+  for (let start = 0; start < rows.length; start += columns) {
+    const group = rows.slice(start, start + columns).map((row, column) => {
+      const label = wrapRadarLabel(`${start + column + 1}. ${row[3]}${includeRadar ? ` (${row[0]})` : ''}`, textSize, measure);
+      const x = 20 + column * columnWidth;
+      entries.push(`<text class="radar-number-key-entry" x="${x}" y="${y}">${label.lines.map((line, index) => `<tspan x="${x}" dy="${index ? textSize * 1.3 : 0}">${escapeHtml(line)}</tspan>`).join('')}</text>`);
+      return label.height;
+    });
+    y += Math.max(...group) + textSize;
+  }
+  return { svg: `<g class="radar-number-key" font-family="Manrope,sans-serif" font-size="${textSize}" font-weight="600" fill="#102a43"><text x="20" y="${top + textSize}">Technology key</text>${entries.join('')}</g>`, height: y - top + 20 };
+}
+
 export function radarPoints(rows, rings, positions, labels, initialRadius = 250) {
   const overlaps = (first, second) => first.left < second.right && first.right > second.left && first.top < second.bottom && first.bottom > second.top;
   let result;

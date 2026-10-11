@@ -1,5 +1,5 @@
 import { createPreviewTable } from './preview-table.js';
-import { radarSections, radarPoints, wrapRadarLabel } from './radar-sections.js';
+import { radarSections, radarPoints, wrapRadarLabel, radarNumberKey } from './radar-sections.js';
 
 const REQUIRED = ['Radar Name', 'Category', 'Sub Category', 'Technology', 'Status', 'Dot Status'];
 const EXAMPLE = `Radar Name,Category,Sub Category,Technology,Status,Dot Status\nPower Platform Radar,Model-driven Apps,UI,Model-driven Apps,Trial,Standard\nPower Platform Radar,Model-driven Apps,UI,Responsive Canvas,Trial,Standard\nPower Platform Radar,Model-driven Apps,UI,Unsupported UI,Sunset,Rejected\nPower Platform Radar,Power Automate,Automation,Cloud Automation,Assess,Standard\nPower Platform Radar,Power Automate,Automation,Power Automate,Deploy,Standard\nPower Platform Radar,Power Pages & Agents,Extensibility,Copilot Agents,Assess,Caveated\nPower Platform Radar,Power Pages & Agents,Extensibility,Power Pages,Deploy,Standard\nPower Platform Radar,UI Extensions,Controls,PCF Controls,Trial,Standard\nPower Platform Radar,UI Extensions,Controls,Low-code Plug-ins,Assess,Standard\nPower Platform Radar,Solutions & Build,Governance,Managed Solutions,Deploy,Standard\nPower Platform Radar,Solutions & Build,Governance,Native Git & Tests,Assess,Standard\nPower Platform Radar,Transaction Processing,Data,Custom Pages,Deploy,Standard\nPower Platform Radar,Transaction Processing,Data,Approvals,Deploy,Standard\nPower Platform Radar,Operational Data,Data,Fabric Links,Assess,Standard\nPower Platform Radar,Operational Data,Data,Elastic Tables,Assess,Standard\nPower Platform Radar,Analytics & Documents,Connectors,Custom APIs,Deploy,Standard\nPower Platform Radar,Connectors & APIs,Connectors,Giant Personal Flows,Decommission,Rejected`;
@@ -25,6 +25,7 @@ const EXAMPLE_FILES = {
 const state = { source: EXAMPLE, validRows: [], errors: [], config: null, history: [], future: [], labels: true, selectedRadar: '', dirty: false, timer: 0, editorMode: localStorage.getItem('radar-builder-editor-mode') || 'csv', visualTableSource: null, visualEditBefore: null, visualFilter: '' };
 const $ = id => document.getElementById(id);
 state.textSize = 11;
+state.labelMode = 'names';
 const radarTextContext = document.createElement('canvas').getContext('2d');
 const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
 const escapeXml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' }[char]));
@@ -91,7 +92,7 @@ function renderPreview() {
   const config = state.config || { statuses: [], dotStatuses: [] };
   const rings = config.statuses.length ? [...config.statuses].sort((a, b) => Number(a.order) - Number(b.order)) : [{ label: 'Assess' }, { label: 'Trial' }, { label: 'Deploy' }, { label: 'Decommission' }];
   radarTextContext.font = `600 ${state.textSize}px Manrope,sans-serif`;
-  const labels = rows.map(row => state.labels ? wrapRadarLabel(row[3], state.textSize, text => radarTextContext.measureText(text).width) : { lines: [], width: 0, height: 0 });
+  const labels = rows.map((row, index) => state.labels ? wrapRadarLabel(state.labelMode === 'numbers' ? String(index + 1) : row[3], state.textSize, text => radarTextContext.measureText(text).width) : { lines: [], width: 0, height: 0 });
   const positions = radarSections(rows, 0, 0, 250, escapeHtml).positions;
   const layout = radarPoints(rows, rings, positions, labels);
   const max = layout.radius, edge = max + Math.max(66, state.textSize * 4);
@@ -120,7 +121,8 @@ function renderPreview() {
   $('previewTitle').textContent = title;
   // Keep label backing and fallback typography inside the SVG for standalone exports.
   const labelBackground = '<defs><filter id="radar-label-background" x="-3%" y="-12%" width="106%" height="124%" color-interpolation-filters="sRGB"><feFlood flood-color="#eeeeee" flood-opacity="0.85"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
-  $('radarCanvas').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="radar-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(title)} radar"><title>${escapeHtml(title)}</title>${labelBackground}${ringSvg}${boundary}${sections.svg}${dots}</svg><div class="legend"><h3>Status</h3>${ringLegend}<h3>Dot status</h3>${dotLegend}</div>`;
+  const key = state.labels && state.labelMode === 'numbers' ? radarNumberKey(rows, width, height, state.textSize, text => radarTextContext.measureText(text).width, escapeHtml, !state.selectedRadar) : { svg: '', height: 0 };
+  $('radarCanvas').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="radar-svg" viewBox="0 0 ${width} ${height + key.height}" role="img" aria-label="${escapeHtml(title)} radar"><title>${escapeHtml(title)}</title>${labelBackground}${ringSvg}${boundary}${sections.svg}${dots}${key.svg}</svg><div class="legend"><h3>Status</h3>${ringLegend}<h3>Dot status</h3>${dotLegend}</div>`;
   renderTechnologyTable(rows);
 }
 function renderRadarSelector() {
@@ -301,6 +303,8 @@ function wordTable(headers, rows) {
   return `<w:tbl><w:tblPr><w:tblW w:w="14500" w:type="dxa"/><w:tblBorders>${borders}</w:tblBorders></w:tblPr><w:tblGrid>${headers.map(() => `<w:gridCol w:w="${cellWidth}"/>`).join('')}</w:tblGrid>${row(headers, true)}${rows.map(values => row(values)).join('')}</w:tbl>`;
 }
 async function wordDocument(rows, svg) {
+  // Keep editable tables tied to the same visible-row numbering as the graphic.
+  if (state.labelMode === 'numbers') rows = rows.map((row, index) => row.map((value, column) => column === 3 ? `${index + 1}. ${value}` : value));
   const title = state.selectedRadar || rows[0]?.[0] || 'Technology Radar';
   const statuses = [...(state.config?.statuses || [])].sort((first, second) => Number(first.order) - Number(second.order));
   const categories = [...new Set(rows.map(row => row[1]))];
@@ -339,6 +343,7 @@ $('visualTable').addEventListener('input', event => {
 });
 $('visualTable').addEventListener('focusout', () => { finishVisualEdit(); applyVisualFilters(); });
 setEditorMode(state.editorMode, false);
+$('radarLabelMode').addEventListener('change', event => { state.labelMode = event.target.value; renderPreview(); });
 $('radarTextSize').addEventListener('input', event => {
   state.textSize = Math.max(8, Math.min(20, Number(event.target.value) || 11));
   $('radarTextSizeValue').value = `${state.textSize} px`;
@@ -379,7 +384,7 @@ document.querySelectorAll('[data-export]').forEach(button => button.addEventList
   if (button.dataset.export === 'svg') download('technology-radar.svg', svg.outerHTML, 'image/svg+xml');
   if (button.dataset.export === 'png') { const image = new Image(); image.onload = () => { const canvas = document.createElement('canvas'); canvas.width = 1640; canvas.height = 1140; canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height); canvas.toBlob(blob => download('technology-radar.png', blob, 'image/png')); }; image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg.outerHTML)}`; }
   if (button.dataset.export === 'print') window.print();
-  if (button.dataset.export === 'project') download('technology-radar.radar.json', JSON.stringify({ format: 'mightora-technology-radar', version: 1, createdAt: new Date().toISOString(), radarData: { csv: state.source }, configuration: { strategy: 'embedded' } }, null, 2), 'application/json');
+  if (button.dataset.export === 'project') download('technology-radar.radar.json', JSON.stringify({ format: 'mightora-technology-radar', version: 1, createdAt: new Date().toISOString(), radarData: { csv: state.source }, configuration: { strategy: 'embedded', labelMode: state.labelMode } }, null, 2), 'application/json');
 }));
 window.addEventListener('keydown', event => { if (!(event.ctrlKey || event.metaKey) || event.target.closest('.technology-cell-input')) return; if (event.key.toLowerCase() === 'z') { event.preventDefault(); (event.shiftKey ? $('redoButton') : $('undoButton')).click(); } if (event.key.toLowerCase() === 'y') { event.preventDefault(); $('redoButton').click(); } }); window.addEventListener('beforeunload', event => { if (state.dirty) { event.preventDefault(); event.returnValue = ''; } });
 async function loadShared() { const match = location.hash.match(/^#\/(view|edit|embed)\/(.+)$/); if (!match) return false; try { const payload = await decodeShare(match[2]); if (payload.version !== 1 || typeof payload.csv !== 'string') throw new Error('Unsupported share payload.'); state.selectedRadar = payload.selectedRadarName || ''; setSource(payload.csv, false); state.dirty = false; if (match[1] === 'edit') openTab('data'); else { $('dataPanel').classList.remove('active-panel'); $('dataPanel').classList.add('hidden'); openTab('preview'); if (match[1] === 'embed') { document.body.classList.add('embed-mode'); document.body.classList.toggle('embed-no-table', payload.table === false); } else showToast('View-only radar loaded.'); } return true; } catch (error) { showToast(`Could not open shared radar: ${error.message}`); return false; } }
