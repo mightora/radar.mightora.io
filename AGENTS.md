@@ -23,6 +23,5 @@
 ## Verification
 
 - Iterate with affected checks; keep Playwright specs in `tests/e2e/` scoped to the task. Assert relevant viewport (360/390/768/1024/1280) and keyboard behavior.
-- Finish feature implementation once with `npm run check`, `npm test`, and `npm run test:e2e`, or use `scripts/run-all-tests.ps1` / `scripts/run-all-tests.sh`. The e2e command runs `npm run build` first; do not build separately for the same verification run. Runners save results under `test-results/local-*`.
 - Use interactive browser or screenshot sessions only to diagnose failures. For manual checks, serve built output with `python -m http.server 8080 -d dist`.
 - Record checks you could not run as pending; never claim they passed.
