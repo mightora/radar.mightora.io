@@ -19,8 +19,10 @@ assert.deepEqual(documentedStatuses, entries('statuses').sort((a, b) => a.order 
 assert.deepEqual([...guide.matchAll(/<dt data-dot-status-id="([^"]+)">([^<]+)<\/dt>/g)].map(([, id, label]) => ({ id, label })),
   entries('dotStatuses').map(({ id, label }) => ({ id, label })), 'Guide dot labels must match YAML');
 assert.ok(guide.includes(example.split(/\r?\n/)[0]), 'Guide must document the exact CSV header');
+const examplesSection = guide.match(/<section id="examples"[\s\S]*?<\/section>/)?.[0];
+assert.ok(examplesSection, 'Guide must have a loading examples section');
 for (const [, name] of app.matchAll(/'([^']+)': 'public\/examples\/[^']+\.csv'/g)) {
-  assert.ok(guide.includes(name.replaceAll('&', '&amp;')), `Guide must list example ${name}`);
+  assert.ok(examplesSection.includes(name.replaceAll('&', '&amp;')), `Guide must list example ${name} in the loading examples section`);
 }
 for (const component of ['header', 'author', 'footer']) assert.ok(guide.includes(`<mightora-${component}`));
 assert.equal(guide.match(/<script>[\s\S]*?<\/script>/)[0], html.match(/<script>[\s\S]*?<\/script>/)[0], 'Guide must preserve the head footer-fetch patch');
