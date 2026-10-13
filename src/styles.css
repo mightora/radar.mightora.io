@@ -78,3 +78,5 @@ body.published-mode .radar-svg .radar-point-dimmed{opacity:.12}
 body.published-mode .radar-svg .radar-point-dimmed:focus{opacity:1}
 @media(max-width:900px){.published-filters{grid-template-columns:1fr 1fr}.published-filters label:first-child{grid-column:1/-1}.published-hero{align-items:flex-start;flex-direction:column}}
 @media(max-width:600px){.pptx-settings{grid-template-columns:1fr}.pptx-colours{grid-template-columns:1fr 1fr}.published-filters{grid-template-columns:1fr;padding:18px}.published-filters label:first-child{grid-column:auto}.published-hero{padding:24px}.published-privacy{padding:12px 18px}body.published-mode #previewPanel{margin:0}}
+
+.pptx-settings input[type=text]{width:100%;min-width:0;padding:10px;border:1px solid var(--line);color:var(--ink);background:var(--panel)}
