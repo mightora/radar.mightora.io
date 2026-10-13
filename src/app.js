@@ -271,7 +271,8 @@ function updateVisualErrors() {
 function download(name, content, type) { const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([content], { type })); link.download = name; link.click(); URL.revokeObjectURL(link.href); }
 function showToast(message) { $('toast').textContent = message; $('toast').classList.add('show'); setTimeout(() => $('toast').classList.remove('show'), 2500); }
 function toBase64(bytes) { let binary = ''; bytes.forEach(byte => { binary += String.fromCharCode(byte); }); return btoa(binary); }
-async function encodeShare(mode) { const payload = JSON.stringify({ version: 1, csv: state.source, selectedRadarName: state.selectedRadar || undefined, mode, table: mode === 'embed' ? $('shareIncludeTable').checked : undefined }); const stream = new Blob([new TextEncoder().encode(payload)]).stream().pipeThrough(new CompressionStream('deflate-raw')); const bytes = new Uint8Array(await new Response(stream).arrayBuffer()); return `${location.origin}${location.pathname}#/${mode}/${toBase64(bytes).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '')}`; }
+async function encodeShare(mode, includeDisplay = false) { const payload = JSON.stringify({ version: 1, csv: state.source, selectedRadarName: state.selectedRadar || undefined, mode, table: mode === 'embed' ? $('shareIncludeTable').checked : undefined,
+    ...(includeDisplay ? { display: { textSize: state.textSize, labelMode: state.labelMode, labels: state.labels } } : {}) }); const stream = new Blob([new TextEncoder().encode(payload)]).stream().pipeThrough(new CompressionStream('deflate-raw')); const bytes = new Uint8Array(await new Response(stream).arrayBuffer()); return `${location.origin}${location.pathname}#/${mode}/${toBase64(bytes).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '')}`; }
 async function radarImageUrl(format) {
   const svgUrl = `data:image/svg+xml;base64,${toBase64(new TextEncoder().encode($('radarCanvas').querySelector('svg').outerHTML))}`;
   if (format === 'svg') return svgUrl;
@@ -379,7 +380,7 @@ $('generateShare').addEventListener('click', async () => {
       url = await radarImageUrl(format); embed = `<img src="${url}" alt="${title}">`;
       meta = `${url.length} characters; self-contained ${format.toUpperCase()} image of the displayed radar. Use it as an image source; it is a snapshot and does not update.`;
     } else {
-      url = mode === 'publish' ? (await encodeShare('view')).replace('#/view/', '#/publish/') : await encodeShare(mode);
+      url = mode === 'publish' ? (await encodeShare('view', true)).replace('#/view/', '#/publish/') : await encodeShare(mode);
       if (mode === 'embed') embed = `<iframe src="${url}" title="${title}" width="100%" height="${$('shareIncludeTable').checked ? 1400 : 800}" style="border:0" loading="lazy"></iframe>`;
       meta = `${url.length} characters; ${state.validRows.length} technologies; ${mode === 'publish' ? 'public read-only snapshot; ' : ''}encoded, not encrypted.`;
     }
@@ -442,6 +443,17 @@ document.querySelectorAll('[data-export]').forEach(button => button.addEventList
   if (button.dataset.export === 'project') download('technology-radar.radar.json', JSON.stringify({ format: 'mightora-technology-radar', version: 1, createdAt: new Date().toISOString(), radarData: { csv: state.source }, configuration: { strategy: 'embedded', labelMode: state.labelMode } }, null, 2), 'application/json');
 }));
 window.addEventListener('keydown', event => { if (!(event.ctrlKey || event.metaKey) || event.target.closest('.technology-cell-input')) return; if (event.key.toLowerCase() === 'z') { event.preventDefault(); (event.shiftKey ? $('redoButton') : $('undoButton')).click(); } if (event.key.toLowerCase() === 'y') { event.preventDefault(); $('redoButton').click(); } }); window.addEventListener('beforeunload', event => { if (state.dirty) { event.preventDefault(); event.returnValue = ''; } });
+function restoreSharedDisplay(payload) {
+  // Display options are optional v1 extensions. Older shared links keep editor defaults.
+  const display = payload.display;
+  if (!display || typeof display !== 'object' || Array.isArray(display)) return;
+  if (display.labelMode === 'names' || display.labelMode === 'numbers') state.labelMode = display.labelMode;
+  if (Number.isInteger(display.textSize) && display.textSize >= 8 && display.textSize <= 20) state.textSize = display.textSize;
+  if (typeof display.labels === 'boolean') state.labels = display.labels;
+  $('radarLabelMode').value = state.labelMode;
+  $('radarTextSize').value = String(state.textSize);
+  $('radarTextSizeValue').value = `${state.textSize} px`;
+}
 async function loadShared() {
   const match = location.hash.match(/^#\/(view|edit|embed|publish)\/(.+)$/);
   if (!match) return false;
@@ -449,6 +461,7 @@ async function loadShared() {
     const payload = await decodeShare(match[2]);
     if (payload.version !== 1 || typeof payload.csv !== 'string') throw new Error('Unsupported share payload.');
     state.selectedRadar = payload.selectedRadarName || '';
+    restoreSharedDisplay(payload);
     state.published = match[1] === 'publish';
     setSource(payload.csv, false);
     state.dirty = false;

@@ -4,9 +4,9 @@ The editor stores share data in the URL fragment so the CSV is not sent to the s
 
 `#/view/<base64url-deflate-payload>`, `#/edit/<base64url-deflate-payload>` or `#/embed/<base64url-deflate-payload>` or `#/publish/<base64url-deflate-payload>`
 
-Version 1 contains `version`, `csv`, `mode`, an optional `selectedRadarName`, and for `embed` an optional boolean `table` (default `true`). The JSON is UTF-8 encoded, compressed with browser `deflate-raw`, and encoded as unpadded Base64URL.
+Version 1 contains `version`, `csv`, `mode`, an optional `selectedRadarName`, and for `embed` an optional boolean `table` (default `true`). Newly generated published links add an optional `display` object: `{ "textSize": 18, "labelMode": "numbers", "labels": true }`. Allowed `textSize` values are integers from 8 to 20 inclusive; `labelMode` is `names` or `numbers`; `labels` is a boolean. Invalid individual display values are ignored. The JSON is UTF-8 encoded, compressed with browser `deflate-raw`, and encoded as unpadded Base64URL.
 
-`publish` uses the unchanged v1 view payload with a different route. It opens an interactive read-only landing with technology search, category and status filters. This is a static snapshot; source updates require a fresh published URL. A recipient's existing local editor source is not overwritten by opening a published link. There is no server storage, expiry, revocation, access control or permanent short URL. Publishing requires valid CSV.
+`publish` uses the existing version 1 view payload with backwards-compatible optional display preferences and a different route. It opens an interactive read-only landing with technology search, category and status filters. This is a static snapshot; source updates require a fresh published URL. A recipient's existing local editor source is not overwritten by opening a published link. There is no server storage, expiry, revocation, access control or permanent short URL. Publishing requires valid CSV. Older published links without a `display` object still work, using 11px, Names and visible labels. Display preferences are captured when the link is generated, not changed by later edits.
 
 `embed` opens a read-only page containing only the radar, its legend and, unless `table` is `false`, the technology table. The dialog offers matching `<iframe>` embed code.
 

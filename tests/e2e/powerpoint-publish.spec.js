@@ -103,3 +103,69 @@ test('Published radar link offers a read-only interactive landing without overwr
   await expect(guest.locator('#publishedLanding')).toBeVisible();
   await recipient.close();
 });
+
+
+test('Published links restore font size, names/numbers and label visibility while old links use defaults', async ({ page, browser }) => {
+  await page.route(/^https:\/\//, route => route.abort());
+  await page.addInitScript(csv => localStorage.setItem('radar-builder-source', csv), source);
+  await page.goto('/');
+  await expect(page.locator('#sourceStatus')).toHaveText('2 valid technologies', { timeout: 15000 });
+
+  async function publish() {
+    await page.locator('#publishButton').click();
+    await expect(page.locator('[name=shareMode][value=publish]')).toBeChecked();
+    await page.locator('#generateShare').click();
+    const link = await page.locator('#shareUrl').inputValue();
+    expect(link).toContain('#/publish/');
+    await page.locator('#cancelShare').click();
+    return link;
+  }
+
+  await page.locator('#radarLabelMode').selectOption('numbers');
+  await page.locator('#radarTextSize').focus();
+  await page.keyboard.press('End');
+  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('ArrowLeft');
+  await expect(page.locator('#radarTextSize')).toHaveValue('18');
+  const numbered = await publish();
+
+  await page.locator('#radarLabelMode').selectOption('names');
+  await page.locator('#radarTextSize').focus();
+  await page.keyboard.press('Home');
+  await expect(page.locator('#radarTextSize')).toHaveValue('8');
+  const named = await publish();
+
+  await page.locator('#toggleLabels').click();
+  const noLabels = await publish();
+
+  // Generate a v1 link without display preferences to simulate an existing published URL.
+  await page.locator('#shareButton').click();
+  await page.locator('[name=shareMode][value=view]').check();
+  await page.locator('#generateShare').click();
+  const legacy = (await page.locator('#shareUrl').inputValue()).replace('#/view/', '#/publish/');
+  await page.locator('#cancelShare').click();
+
+  const receiver = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const savedSource = headers + '\nPersonal,Private,Not Shared,Private tool,Assess,Standard';
+  await receiver.addInitScript(csv => localStorage.setItem('radar-builder-source', csv), savedSource);
+  const guest = await receiver.newPage();
+  await guest.route(/^https:\/\//, route => route.abort());
+
+  for (const [url, labelMode, size, visible] of [
+    [numbered, 'numbers', '18', true],
+    [named, 'names', '8', true],
+    [noLabels, 'names', '8', false],
+    [legacy, 'names', '11', true]
+  ]) {
+    await guest.goto(url);
+    await expect(guest.locator('#publishedLanding')).toBeVisible();
+    await expect(guest.locator('#radarTextSize')).toHaveValue(size);
+    await expect(guest.locator('#radarLabelMode')).toHaveValue(labelMode);
+    await expect(guest.locator('#technologyTable tbody tr')).toHaveCount(2);
+    await expect(guest.locator('#radarCanvas svg')).toBeVisible();
+    await expect(guest.locator('#radarCanvas svg .dot-number')).toHaveCount(visible && labelMode === 'numbers' ? 2 : 0);
+    await expect(guest.locator('#radarCanvas svg .dot-label')).toHaveCount(visible ? 2 : 0);
+    expect(await guest.evaluate(() => localStorage.getItem('radar-builder-source'))).toBe(savedSource);
+  }
+  await receiver.close();
+});
