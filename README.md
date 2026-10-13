@@ -4,7 +4,7 @@ A static, local-first CSV technology radar editor for GitHub Pages. Edit the sou
 
 ## Usage
 
-Choose **Load example** or **Upload CSV**, then open **Editor** and select **Visual** or **CSV**. Fix any **Errors**, inspect **Preview**, and use **Download CSV**, **Exports** or **Share** to save or share your radar. Use **PowerPoint (.pptx)** in Exports for native editable shapes, labels, legends and technology-detail slides. Select Plain, Mightora, Ocean, Forest, Sunset or custom colours and fonts. **Publish roadmap** creates a branded, interactive, view-only snapshot with search, category and status filtering. Publish a new link whenever the source changes. Share links are encoded, not encrypted.
+Choose **Load example** or **Upload CSV**, then open **Editor** and select **Visual** or **CSV**. Fix any **Errors**, inspect **Preview**, and use **Download CSV**, **Exports** or **Share** to save or share your radar. Use **PowerPoint (.pptx)** in Exports for native editable shapes, labels, legends and technology-detail slides. Select Plain, Mightora, Ocean, Forest, Sunset or custom colours and fonts. **Publish roadmap** creates a branded, interactive, view-only snapshot with search, category and status filtering, preserving your selected radar text size, Names/Numbers mode and label visibility. Publish a new link whenever the source changes. Share links are encoded, not encrypted.
 
 Read the [user guide](guide/index.html) for a walkthrough, the required CSV columns, validation help, export formats and privacy details. The built guide is available at `/guide/`; both in-app **Documentation** links point there. [docs/sharing.md](docs/sharing.md) remains the technical share-format reference.
 
