@@ -217,12 +217,12 @@ Team Radar,Platform,Runtime,"Example, Inc. ""Engine""",Trial,Standard</code></pr
 
     <section id="sharing" aria-labelledby="sharing-heading">
       <h2 id="sharing-heading">Sharing</h2>
-      <p>Read the <a href="#privacy-warning">privacy warning</a>, then choose <strong>Share</strong>. Select <strong>View link</strong> to open Preview with the Editor panel hidden, <strong>Radar page link</strong> for a page holding only the radar (choose <strong>Include technology table</strong> to add the table; embed code for an iframe is provided), <strong>Image link</strong> for an SVG or PNG image URL with <code>&lt;img&gt;</code> embed code, or <strong>Edit link</strong> to open Editor. Select <strong>Generate link</strong>, then <strong>Copy link</strong>. If copying is unavailable, select and copy the Generated URL yourself. <strong>Close</strong> or Escape dismisses the dialog.</p>
+      <p>Read the <a href="#privacy-warning">privacy warning</a>, then choose <strong>Share</strong>. Select <strong>View link</strong> to open Preview with the Editor panel hidden, <strong>Publish roadmap page</strong> to share an interactive read-only page with search, category and status filters, <strong>Radar page link</strong> for a page holding only the radar (choose <strong>Include technology table</strong> to add the table; embed code for an iframe is provided), <strong>Image link</strong> for an SVG or PNG image URL with <code>&lt;img&gt;</code> embed code, or <strong>Edit link</strong> to open Editor. Select <strong>Generate link</strong>, then <strong>Copy link</strong>. If copying is unavailable, select and copy the Generated URL yourself. <strong>Close</strong> or Escape dismisses the dialog.</p>
       <aside id="privacy-warning" class="guide-warning" aria-labelledby="privacy-warning-heading">
         <h3 id="privacy-warning-heading">Share privacy warning</h3>
         <p>Anyone with this link can read the radar data. It is encoded and compressed, but it is not encrypted. Do not include confidential information.</p>
       </aside>
-      <p>A share link contains the whole current CSV, including rows hidden by filters, plus the selected radar name when set. It is a snapshot: later edits do not update an existing link. Opening a valid share link loads its source ahead of the source saved in that browser and replaces that saved source.</p>
+      <p>A share link contains the whole current CSV, including rows hidden by filters, plus the selected radar name when set. It is a snapshot: later edits do not update an existing link. Opening View and Edit links loads their source ahead of the source saved in that browser, whereas opening a Publish roadmap link does not overwrite the viewer's saved editor source.</p>
       <p>A View link is a presentation choice, not access control. There is no link expiry, revocation or live collaboration. Large links may exceed browser or messaging limits; use a <a href="#exports">CSV download</a> instead. Compression support is required; if the browser reports that compressed sharing is unavailable, download the CSV.</p>
       <p>For developers, <a href="https://github.com/mightora/radar.mightora.io/blob/main/docs/sharing.md">docs/sharing.md</a> is the technical reference for share payload v1.</p>
     </section>
@@ -234,11 +234,12 @@ Team Radar,Platform,Runtime,"Example, Inc. ""Engine""",Trial,Standard</code></pr
         <dt>CSV</dt><dd>Download the current editable source, including all radars and hidden rows. This is the same source saved by Download CSV, and it can be loaded with Upload CSV.</dd>
         <dt>.radar.json</dt><dd>Download a portable project containing the CSV and format metadata. The current Upload CSV control only accepts CSV; there is no project JSON importer.</dd>
         <dt>Word (.docx)</dt><dd>Download the selected radar graphic, an editable status-by-category matrix and a six-column technology table in a Word document. The radar uses separate editable Word shapes and text boxes, grouped to preserve layout. Select the group and then an object to edit it, or use Shape Format → Group → Ungroup in desktop Microsoft Word. Curved lettering uses separate character boxes; all content is generated in your browser and includes only the selected radar, or all radars when All radars is selected.</dd>
-        <dt>SVG</dt><dd>Download the displayed radar graphic as a vector image.</dd>
+        <dt>PowerPoint (.pptx)</dt><dd>Download a 16:9 presentation built from native editable PowerPoint shapes, labels, legends and technology-detail objects. Choose Plain, Mightora, Ocean, Forest or Sunset, or select custom colours and fonts.</dd>
+         <dt>SVG</dt><dd>Download the displayed radar graphic as a vector image.</dd>
         <dt>PNG</dt><dd>Download the displayed radar graphic as a raster image.</dd>
         <dt>Print</dt><dd>Open the browser's print dialog. Check its print preview before printing or saving to PDF.</dd>
       </dl>
-      <p>Choose the Radar selection, Radar labels, label visibility and Radar text size in Preview before exporting an image. SVG, PNG, Word and print use the displayed radar's typography and point layout. Resolve validation errors if you want the image to reflect your latest source.</p>
+      <p>Choose the Radar selection, Radar labels, label visibility and Radar text size in Preview before exporting an image. SVG, PNG, Word, PowerPoint and print use the displayed radar's typography and point layout. Resolve validation errors if you want the image to reflect your latest source.</p>
     </section>
 
     <section id="mobile" aria-labelledby="mobile-heading">
