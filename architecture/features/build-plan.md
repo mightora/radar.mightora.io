@@ -2,7 +2,7 @@
 
 Last updated: 2026-10-13.
 Overall state: F00, X01, V01, V02, M01, D01, P01, W01 and P04 verified; product features unreleased.
-Current task: **XP01 in progress - editable PowerPoint and published roadmap page.**
+Current task: **XP02 in progress - preserve published radar display settings (font size, label mode, visibility).**
 Next planned task: **Z01 - Radar preview zoom controls.**
 
 Use this as the execution and progress record for the Technology Radar Live Editor improvements. Use the [implementation prompt](build-prompt.md) to start or resume work. Architecture profile: **static-web-delivery** (browser-only, GitHub Pages; no backend, sign-in or database).
@@ -36,6 +36,7 @@ Task states: `Not started`, `In progress`, `Blocked`, `Verified`. Feature releas
 | 11 | Toggle radar labels between names and numbers, retaining the choice in exports | P04 |
 | 12 | Native editable PowerPoint export, presets and custom fonts/colours | XP01 |
 | 13 | Published interactive roadmap landing page with shareable link | XP01 |
+| 14 | Retain text size, names/numbers, and label visibility when published | XP02 |
 
 ## Scope and dependencies
 
@@ -76,6 +77,7 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 
 | ID | Task | Depends on | State | Evidence / blocker |
 | --- | --- | --- | --- | --- |
+| XP02 | Published display preferences | XP01 | In progress | Add optional v1 `display` preferences to published snapshots and validate values on restore. Focused browser regression added, execution pending. |
 | XP01 | Editable PPTX and published page | P04, H01 | In progress | Feature branch implementation and focused browser test added; unverified in desktop PowerPoint and Chromium. |
 | P04 | Names/numbers radar labels and export consistency | P01 | Verified | Centered numbered dots, names beside dots, consistent 8-20 px text and native editable Word objects. Syntax, smoke/geometry, build, 9/9 focused Chromium checks and Word 16 open/edit/ungroup/save passed; see archive. |
 | F00 | Baseline, method bootstrap and decisions | None | Verified | Added method docs and Playwright smoke test. `npm install` passed (0 vulnerabilities); `npm run check`, `npm test`, `npm run build` passed; `npm run test:e2e` passed (1/1); local browser confirmed listed findings. See [baseline](baseline.md). |
@@ -156,6 +158,8 @@ Only unfinished tasks are listed. Details for Verified tasks are in the [deliver
 
 ## Delivery log
 
+- **2026-10-13** - XP02 implemented on a feature branch: publish links capture 8–20px font size, Names/Numbers mode and label visibility; payload remains version 1 and earlier links fall back to defaults. Updated guide/sharing contracts and added focused browser regression. Syntax inspection performed; browser suite/deployed check pending.
+
 - **2026-10-13** - XP01 implemented on a feature branch: native OOXML PPTX with native editable shapes/text, preset and custom themes, plus `#/publish/` interactive snapshot page. Added focused Playwright tests and documentation. Local Node/Chromium and desktop PowerPoint checks could not be run; no production deployment.
 
 Newest first; one or two lines per session. Entries up to D01 are in the [delivery archive](delivery-archive.md).
@@ -174,6 +178,8 @@ Newest first; one or two lines per session. Entries up to D01 are in the [delive
 - **2026-10-08** — Efficiency maintenance: moved Verified task details and the delivery log to [delivery-archive.md](delivery-archive.md); slimmed the build prompt to one task per session with focused verification. Docs-only; no application checks run.
 
 ## Current handoff
+
+- **XP02 next step:** run `npm run check`, `npm test`, `npm run build`, and `npx playwright test tests/e2e/powerpoint-publish.spec.js --reporter=dot`, then browser-check an existing published URL and one newly generated URL. Keep changes on this feature branch until verified and merged. Do not deploy automatically.
 
 - **XP01 next step:** run `npm run check`, `npm test`, `npm run build`, `npx playwright test tests/e2e/powerpoint-publish.spec.js --reporter=dot` and manually open/edit/save a generated PPTX with desktop PowerPoint. Verify published page responsive and privacy behaviour before merging to main. Status remains In progress.
 
