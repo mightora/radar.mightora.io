@@ -1,4 +1,5 @@
 import { createPreviewTable } from './preview-table.js';
+import { wordRadar } from './word-radar.js';
 import { radarSections, radarPoints, wrapRadarLabel, radarNumberKey } from './radar-sections.js';
 
 const REQUIRED = ['Radar Name', 'Category', 'Sub Category', 'Technology', 'Status', 'Dot Status'];
@@ -92,9 +93,11 @@ function renderPreview() {
   const config = state.config || { statuses: [], dotStatuses: [] };
   const rings = config.statuses.length ? [...config.statuses].sort((a, b) => Number(a.order) - Number(b.order)) : [{ label: 'Assess' }, { label: 'Trial' }, { label: 'Deploy' }, { label: 'Decommission' }];
   radarTextContext.font = `600 ${state.textSize}px Manrope,sans-serif`;
-  const labels = rows.map((row, index) => state.labels ? wrapRadarLabel(state.labelMode === 'numbers' ? String(index + 1) : row[3], state.textSize, text => radarTextContext.measureText(text).width) : { lines: [], width: 0, height: 0 });
+  const numbered = state.labels && state.labelMode === 'numbers';
+  const dotRadius = numbered ? Math.max(9, state.textSize * .7, radarTextContext.measureText(String(rows.length || 1)).width / 2 + 4) : 7;
+  const labels = rows.map(row => state.labels && !numbered ? wrapRadarLabel(row[3], state.textSize, text => radarTextContext.measureText(text).width) : { lines: [], width: 0, height: 0 });
   const positions = radarSections(rows, 0, 0, 250, escapeHtml).positions;
-  const layout = radarPoints(rows, rings, positions, labels);
+  const layout = radarPoints(rows, rings, positions, labels, 250, dotRadius);
   const max = layout.radius, edge = max + Math.max(66, state.textSize * 4);
   const left = Math.min(-edge, ...layout.points.map(point => point.boxes[1]?.left ?? point.x));
   const right = Math.max(edge, ...layout.points.map(point => point.boxes[1]?.right ?? point.x));
@@ -111,8 +114,8 @@ function renderPreview() {
     const labelX = cx + point.labelX, labelY = cy + point.labelY + state.textSize;
     const dot = config.dotStatuses.find(item => item.label === row[5]) || {};
     const color = dot.color || '#111827';
-    const shape = dot.shape === 'ring' ? `<circle cx="${x}" cy="${y}" r="7" fill="#fff" stroke="${color}" stroke-width="3"/>` : `<circle cx="${x}" cy="${y}" r="7" fill="${color}"/>`;
-    const label = state.labels ? `<text x="${labelX}" y="${labelY}" class="dot-label" font-family="Manrope,sans-serif" font-size="${state.textSize}" font-weight="600" fill="#102a43" filter="url(#radar-label-background)">${labels[index].lines.map((line, lineIndex) => `<tspan x="${labelX}" dy="${lineIndex ? state.textSize * 1.3 : 0}">${escapeHtml(line)}</tspan>`).join('')}</text>` : '';
+    const shape = dot.shape === 'ring' ? `<circle cx="${x}" cy="${y}" r="${dotRadius}" fill="#fff" stroke="${color}" stroke-width="3"/>` : `<circle cx="${x}" cy="${y}" r="${dotRadius}" fill="${color}"/>`;
+    const label = numbered ? `<text x="${x}" y="${y}" class="dot-label dot-number" text-anchor="middle" dominant-baseline="central" font-family="Manrope,sans-serif" font-size="${state.textSize}" font-weight="600" fill="${dot.shape === 'ring' ? color : '#fff'}">${index + 1}</text>` : state.labels ? `<text x="${labelX}" y="${labelY}" class="dot-label" font-family="Manrope,sans-serif" font-size="${state.textSize}" font-weight="600" fill="#102a43" filter="url(#radar-label-background)">${labels[index].lines.map((line, lineIndex) => `<tspan x="${labelX}" dy="${lineIndex ? state.textSize * 1.3 : 0}">${escapeHtml(line)}</tspan>`).join('')}</text>` : '';
     return `<g tabindex="0"><title>${escapeHtml(row.join(' / '))}</title>${shape}${label}</g>`;
   }).join('');
   const ringLegend = rings.map(ring => `<span><i style="background:${ring.backgroundColor || '#fff'}"></i>${escapeHtml(ring.label)}</span>`).join('');
@@ -276,21 +279,6 @@ function zipStore(files) {
   endView.setUint32(12, directorySize, true); endView.setUint32(16, localOffset, true);
   return new Blob([...localRecords, ...directoryRecords, end], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
 }
-async function radarPng(svg) {
-  const root = new DOMParser().parseFromString(svg, 'image/svg+xml').documentElement;
-  const viewBox = (root.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(Number);
-  const sourceWidth = viewBox[2] || 1440, sourceHeight = viewBox[3] || 1400;
-  const maxRasterDimension = 4096;
-  const rasterScale = Math.min(maxRasterDimension / sourceWidth, maxRasterDimension / sourceHeight);
-  const width = Math.max(1, Math.round(sourceWidth * rasterScale)), height = Math.max(1, Math.round(sourceHeight * rasterScale));
-  root.setAttribute('width', String(width)); root.setAttribute('height', String(height));
-  const image = new Image(); image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(root))}`; await image.decode();
-  const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
-  canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
-  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-  if (!blob) throw new Error('Could not render the radar graphic.');
-  return { bytes: new Uint8Array(await blob.arrayBuffer()), width: canvas.width, height: canvas.height };
-}
 function wordParagraph(text, size = 22, bold = false) {
   const lines = String(text).split(/\r?\n/).map((line, index) => `${index ? '<w:br/>' : ''}<w:t xml:space="preserve">${escapeXml(line)}</w:t>`).join('');
   return `<w:p><w:pPr><w:spacing w:after="120"/></w:pPr><w:r><w:rPr>${bold ? '<w:b/>' : ''}<w:sz w:val="${size}"/></w:rPr>${lines}</w:r></w:p>`;
@@ -311,16 +299,11 @@ async function wordDocument(rows, svg) {
   const matrixRows = categories.map(category => [category, ...statuses.map(status => rows.filter(row => row[1] === category && row[4] === status.label).map(row => `${row[3]} (${row[2]}; Dot status: ${row[5]}${state.selectedRadar ? '' : `; Radar: ${row[0]}`})`).join('\n'))]);
   if (!matrixRows.length) matrixRows.push(['No technologies to display.', ...statuses.map(() => '')]);
   const technologyRows = rows.length ? rows : [REQUIRED.map(() => 'No technologies to display.')];
-  const maxWidth = 8_229_600, maxHeight = 5_394_960;
-  const image = await radarPng(svg);
-  const scale = Math.min(maxWidth / image.width, maxHeight / image.height);
-  const imageWidth = Math.round(image.width * scale), imageHeight = Math.round(image.height * scale);
-  const picture = `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${imageWidth}" cy="${imageHeight}"/><wp:docPr id="1" name="Radar graphic" descr="${escapeXml(title)} radar graphic"/><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="0" name="radar.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId1"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${imageWidth}" cy="${imageHeight}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;
-  const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><w:body>${wordParagraph(`${title} radar`, 36, true)}${wordParagraph('Radar graphic', 26, true)}${picture}${wordParagraph('Editable radar matrix', 26, true)}${wordTable(['Category', ...statuses.map(status => `Status ring: ${status.label}`)], matrixRows)}${wordParagraph('Technologies', 26, true)}${wordTable(REQUIRED, technologyRows)}<w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="360" w:footer="360" w:gutter="0"/></w:sectPr></w:body></w:document>`;
-  const contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>';
+  const picture = wordRadar(svg);
+  const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"><w:body>${wordParagraph(`${title} radar`, 36, true)}${wordParagraph('Editable radar — select the group, then a shape to move or edit it; ungroup in Word for independent objects.', 22)}${picture}${wordParagraph('Editable radar matrix', 26, true)}${wordTable(['Category', ...statuses.map(status => `Status ring: ${status.label}`)], matrixRows)}${wordParagraph('Technologies', 26, true)}${wordTable(REQUIRED, technologyRows)}<w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="360" w:footer="360" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+  const contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>';
   const rootRelationships = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
-  const documentRelationships = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/radar.png"/></Relationships>';
-  return zipStore([['[Content_Types].xml', contentTypes], ['_rels/.rels', rootRelationships], ['word/document.xml', documentXml], ['word/_rels/document.xml.rels', documentRelationships], ['word/media/radar.png', image.bytes]]);
+  return zipStore([['[Content_Types].xml', contentTypes], ['_rels/.rels', rootRelationships], ['word/document.xml', documentXml]]);
 }
 function updateShareOptions() { const mode = document.querySelector('[name=shareMode]:checked').value; $('shareEmbedOptions').classList.toggle('hidden', mode !== 'embed'); $('shareImageOptions').classList.toggle('hidden', mode !== 'image'); }
 async function decodeShare(value) { const binary = atob(value.replaceAll('-', '+').replaceAll('_', '/') + '='.repeat((4 - value.length % 4) % 4)); const bytes = Uint8Array.from(binary, char => char.charCodeAt(0)); const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw')); return JSON.parse(new TextDecoder().decode(await new Response(stream).arrayBuffer())); }

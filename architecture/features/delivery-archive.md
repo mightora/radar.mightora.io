@@ -4,6 +4,28 @@ Historical detail moved out of the [build plan](build-plan.md) to keep the activ
 
 ## Archived task details and exit checks
 
+### P04 - names/numbers labels
+
+- User follow-up (2026-10-12): center numbers inside dots, retain names beside dots, fix text sizing across the drawing, and replace the Word PNG with separate editable shapes and text boxes.
+
+- Default to names; number visible technologies in source order starting at 1. Include an escaped, wrapped numbered key in the SVG so standalone images remain understandable.
+- User follow-up (2026-10-12): center numbers inside dots, retain names beside dots, fix text sizing across the drawing, and replace the Word radar PNG with separate editable shapes and text boxes.
+- Preserve label visibility, text sizing, last-valid preview and selected-radar filtering. SVG, PNG, Word, print and image links use the selection; project metadata records it. CSV retains the six-column source format; share payloads are unchanged.
+- Verify keyboard switching and 360/390/768/1024/1280 px layout, safe content and exports, then run the required repository checks.
+
+- Implementation (2026-10-12): numbered dots grow to fit digits/font; measured name labels remain beside dots; fixed CSS category/subcategory/technology font overrides. Browser-only `wordRadar()` emits unlocked floating native Word shapes/text boxes, retaining numbered key, safe text, layout and two editable tables. No runtime dependencies or CSV/share changes.
+- Exit evidence: `npm run check`, `npm test`, `npm run build` passed; subsequent `node scripts/smoke-test.mjs` (large-dot assertions), `node scripts/build.mjs`, JS syntax and `git diff --check` passed. `node node_modules/@playwright/test/cli.js test tests/e2e/radar-label-mode.spec.js tests/e2e/word-export.spec.js --reporter=dot --workers=1`: 9/9 passed (2.4m), including keyboard/360-1280 px sizing, filtering, stale/empty data, safe content, SVG/PNG/Word/project/CSV/print/image exports.
+- Native check: `cscript //nologo //T:180 scripts/verify-word-export.vbs` passed in Word 16: opened native group, edited ring position/fill and text, ungrouped 22 independent objects, saved `test-results/word-roundtrip.docx`. The initial inline group imported editable objects but Word prevented ungrouping; switched to an unlocked floating anchor and repeated checks.
+- Limitations: curved lettering is separate character text boxes and curved boundaries are vector approximations. Very dense layouts can still overlap after bounded retries. Other Word versions, other browser engines, real devices, full regression and deployment checks were not run in this task.
+
+### W01 — Word-compatible radar export
+
+- Add a Word-compatible export to the existing export controls for the selected radar, including its formatted technology table.
+- Generate the file in the browser without uploading user data or adding a runtime dependency; choose and record the actual file format during implementation.
+- Exit: downloaded output opens in a supported Word-compatible application, includes the selected radar and its technologies with useful formatting, handles CSV-derived content safely, and does not change other export behavior.
+
+- P04 user follow-up supersedes the original bitmap export. Native Word import/edit/ungroup/save now passes as recorded above.
+
 ### P01 — preview label readability and technology table
 
 - Give words plotted on the radar a slightly transparent gray background so they remain legible over ring colors.
@@ -99,3 +121,8 @@ Historical detail moved out of the [build plan](build-plan.md) to keep the activ
 - **2026-10-07** — V02 verified locally. Added add/delete/duplicate/move and combined text/radar filters, preserving hidden source rows, configured defaults, single-step row history and last-valid validation behavior. `npm run check` -> passed; `npm test` -> passed; `npm run build` (invoked by the browser command) -> passed; final `npm run test:e2e` -> 14/14 passed, including six V02 tests; `git diff --check` -> passed. Playwright Chromium exercised the generated artifact using the configured local Python server and saved screenshots at 360/390/768/1024/1280 px. Filter controls fit their containers; overall page widths remain 468/468/810/1024/1280 px, so the prior narrow-screen overflow remains for M01. README and [V02 implementation record](v02-visual-row-tools.md) document the behavior. No commit, push, deployment or backlog release-state change.
 - **2026-10-07** — Added workspace `agent-optimization` and `search-engine-optimization` skills for future S01 work. Validated skill headers, names and repository references; VS Code reported no diagnostics. No site files, feature status, or release state changed; S01 still depends on D01.
 - **2026-10-07** — M01 verified locally. Preview is now the default landing panel; edit-share links still open Editor. Restyled the workspace tabs to use a quiet underline treatment consistent with the page. Updated browser journeys to explicitly open Editor when editing. `npm run check`, `npm test`, `npm run build` passed; `npm run test:e2e` passed 15/15, including five responsive widths with no horizontal page overflow, share-dialog fit, and print behavior. Real iOS/Android and deployed-host checks remain pending; no deployment performed.
+
+### W01 historical delivery log
+
+- **2026-10-08** - W01 implemented: browser-generated `.docx` with embedded PNG radar, editable radar matrix and technology table. Focused Playwright package/image/safe-content test passed 1/1; `npm run build` passed. Word-app import remains pending. No commit, push or deployment.
+- **2026-10-08** - W01 resolution follow-up: rasterization now uses up to 4096 px on the PNG's longest side. Focused DOCX test passed 1/1, including exact max-dimension and package checks. Word-app rendering remains pending.

@@ -2,6 +2,10 @@
 
 This file records observed repository state and executed checks. Unrun checks remain pending. F00 status is owned by the [build plan](build-plan.md).
 
+## 2026-10-12 - Radar objects and typography
+
+Numbers are centered inside dots sized to fit the current font and digit count; names remain beside dots. Category, subcategory, technology and key text inherit the selected 8-20 px size without fixed CSS font overrides. Word DOCX generation uses the browser-only `src/word-radar.js` converter to produce grouped native circles, vector paths and editable text boxes. Curved lettering is represented by separate character boxes. CSV, storage and sharing are unchanged; task evidence and limitations belong to the build plan.
+
 ## 2026-10-11 - Radar label mode
 
 Preview now offers Names (default) and Numbers. Numbers identify visible rows in source order with a wrapped technology key embedded in the SVG. Visual exports and image links retain that rendering; Word tables include matching numbers and project JSON stores `configuration.labelMode`. CSV and share formats are unchanged. Print styles show Preview even when printing from Exports. Verification and limitations are recorded under P04 in the build plan.

@@ -26,6 +26,15 @@ for (const labelSize of [0, 100, 160]) {
 	});
 	assert.deepEqual(radarPoints(crowdedRows, testRings, testSections.positions, labels), layout, 'Placement must be deterministic');
 }
+// Larger numbered dots need actual circle clearance, even without name labels.
+const numberLayout = radarPoints(crowdedRows, testRings, testSections.positions, crowdedRows.map(() => ({ width: 0, height: 0 })), 250, 22);
+assert.equal(numberLayout.collisions, 0);
+numberLayout.points.forEach((point, index) => {
+  assert.ok(Math.abs(point.boxes[0].right - point.boxes[0].left - 50) < 1e-8);
+  const distance = Math.hypot(point.x, point.y);
+  assert.ok(distance + 22 < numberLayout.radius / 3, 'Numbered dots stay within the inner ring');
+  numberLayout.points.slice(0, index).forEach(previous => assert.ok(Math.hypot(point.x - previous.x, point.y - previous.y) >= 44, 'Large numbered dots must not overlap'));
+});
 assert.deepEqual(radarPoints([], testRings, new Map(), []).points, []);
 const nestedRows = Array.from({ length: 32 }, (_, index) => ['Radar', `Category ${index % 4}`, `Subcategory ${index % 8}`, `Technology ${index}`, testRings[index % 3].label, 'Standard']);
 const nestedSections = radarSections(nestedRows, 0, 0, 250, value => value);

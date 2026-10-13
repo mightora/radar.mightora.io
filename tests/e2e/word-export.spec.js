@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 
 const headers = ['Radar Name', 'Category', 'Sub Category', 'Technology', 'Status', 'Dot Status'];
 const rows = [
@@ -20,6 +20,7 @@ function storedZipEntry(archive, entryName) {
 }
 
 test('Word export is keyboard accessible, editable, selected-radar-only, and escapes CSV markup', async ({ page }) => {
+  await page.route(/^https:\/\//, route => route.abort());
   await page.addInitScript(source => localStorage.setItem('radar-builder-source', source), csv);
   await page.goto('/');
   await expect(page.locator('#sourceStatus')).toHaveText('2 valid technologies', { timeout: 15000 });
@@ -35,15 +36,31 @@ test('Word export is keyboard accessible, editable, selected-radar-only, and esc
   expect(download.suggestedFilename()).toBe('technology-radar.docx');
 
   const document = await readFile(await download.path());
+  await writeFile('test-results/editable-radar.docx', document);
   expect(document.readUInt32LE(0)).toBe(0x04034b50);
   expect(document.includes(Buffer.from('word/document.xml'))).toBe(true);
-  expect(document.includes(Buffer.from('word/_rels/document.xml.rels'))).toBe(true);
-  expect(document.includes(Buffer.from('word/media/radar.png'))).toBe(true);
-  const radarPng = storedZipEntry(document, 'word/media/radar.png');
-  expect(radarPng.subarray(0, 8)).toEqual(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
-  expect(Math.max(radarPng.readUInt32BE(16), radarPng.readUInt32BE(20))).toBe(4096);
-  expect(document.includes(Buffer.from('<w:drawing>'))).toBe(true);
-  expect(document.includes(Buffer.from('r:embed="rId1"'))).toBe(true);
+  expect(document.includes(Buffer.from('word/media/'))).toBe(false);
+  const xml = storedZipEntry(document, 'word/document.xml').toString();
+  const structure = await page.evaluate(xml => {
+    const document = new DOMParser().parseFromString(xml, 'application/xml');
+    const ns = 'http://schemas.microsoft.com/office/word/2010/wordprocessingShape';
+    const shapes = [...document.getElementsByTagNameNS(ns, 'wsp')];
+    return { errors: document.getElementsByTagName('parsererror').length,
+      shapes: shapes.length, textBoxes: document.getElementsByTagNameNS(ns, 'txbx').length,
+      ids: shapes.map(shape => shape.firstElementChild.getAttribute('id')),
+      text: document.documentElement.textContent };
+  }, xml);
+  expect(structure.errors).toBe(0);
+  expect(structure.shapes).toBeGreaterThan(15);
+  expect(structure.textBoxes).toBeGreaterThan(5);
+  expect(new Set(structure.ids).size).toBe(structure.shapes);
+  expect(structure.text).toContain('<script>alert(1)</script>');
+  expect(xml).toContain('<wpg:wgp>');
+  expect(xml).toContain('<wp:anchor');
+  expect(xml).toContain('noUngrp="0"');
+  expect(xml).toContain('prst="ellipse"');
+  expect(xml).toContain('<a:custGeom>');
+  expect(xml).not.toContain('<a:blip');
   const documentXml = document.toString('utf8');
   expect(documentXml).toContain('Editable radar matrix');
   expect(documentXml).toContain('Status ring: Sunset');

@@ -54,6 +54,19 @@ for (const width of [360, 390, 768, 1024, 1280]) {
     await expect(mode).toBeFocused();
     await expect(page.locator('.dot-label')).toHaveText(['1', '2', '3']);
     await expect(page.locator('.radar-number-key-entry')).toHaveCount(3);
+    expect(await page.locator('.dot-number').evaluateAll(labels => labels.every(label => {
+      const dot = label.previousElementSibling, bounds = label.getBBox();
+      const x = Number(dot.getAttribute('cx')), y = Number(dot.getAttribute('cy')), radius = Number(dot.getAttribute('r'));
+      return Number(label.getAttribute('x')) === x && Number(label.getAttribute('y')) === y && bounds.width < radius * 2 && bounds.height < radius * 2;
+    }))).toBe(true);
+    const slider = page.getByRole('slider', { name: 'Radar text size' });
+    await slider.focus(); await slider.press('End');
+    await expect(slider).toHaveValue('20');
+    await expect(page.locator('#radarTextSizeValue')).toHaveText('20 px');
+    expect(await page.locator('.dot-label, .category-label, .subcategory-label, .radar-number-key-entry').evaluateAll(labels => labels.every(label => parseFloat(getComputedStyle(label).fontSize) >= 18))).toBe(true);
+    await slider.press('Home');
+    await expect(slider).toHaveValue('8');
+    expect(await page.locator('.dot-label, .category-label, .subcategory-label, .radar-number-key-entry').evaluateAll(labels => labels.every(label => parseFloat(getComputedStyle(label).fontSize) <= 8))).toBe(true);
     await expect(page.locator('.radar-number-key b')).toHaveCount(0);
     await page.locator('#radarSelector select').selectOption('Alpha');
     await expect(page.locator('.dot-label')).toHaveText(['1', '2']);
@@ -68,24 +81,31 @@ for (const width of [360, 390, 768, 1024, 1280]) {
     await mode.focus(); await mode.press('ArrowUp'); await mode.press('Enter');
     await expect(page.locator('.dot-label')).toHaveText(['Alpha runtime', 'Alpha data']);
     await expect(page.locator('.radar-number-key')).toHaveCount(0);
+    expect(await page.locator('.dot-label').evaluateAll(labels => labels.every(label => !label.classList.contains('dot-number') && getComputedStyle(label).fontSize === '8px'))).toBe(true);
     expect(await page.evaluate(() => localStorage.getItem('radar-builder-source'))).toBe(source);
   });
 }
 
 for (const mode of ['names', 'numbers']) {
   test(`${mode} carry through SVG, PNG, Word, project, print and image links`, async ({ page }) => {
+    test.setTimeout(90000); // Six downloads plus image decoding on Windows.
     await openRadar(page);
     await page.getByRole('combobox', { name: 'Radar labels', exact: true }).selectOption(mode);
+    await page.getByRole('slider', { name: 'Radar text size' }).focus();
+    await page.getByRole('slider', { name: 'Radar text size' }).press('End');
     const svg = await page.locator('#radarCanvas svg').evaluate(node => node.outerHTML);
     await page.locator('[data-tab="exports"]').click();
     const exportedSvg = (await download(page, 'svg')).toString();
     expect(exportedSvg).toBe(svg);
     const png = await download(page, 'png');
-    expect(png.equals(await expectedPng(page, svg, 1640, 1140)), 'PNG matches preview').toBe(true);
+    expect(png.equals(await expectedPng(page, svg, png.readUInt32BE(16), png.readUInt32BE(20))), 'PNG matches preview').toBe(true);
     const word = await download(page, 'word');
-    const wordPng = zipEntry(word, 'word/media/radar.png');
-    expect(wordPng.equals(await expectedPng(page, svg, wordPng.readUInt32BE(16), wordPng.readUInt32BE(20), true)), 'Word graphic matches preview').toBe(true);
+    expect(word.includes(Buffer.from('word/media/'))).toBe(false);
     const xml = zipEntry(word, 'word/document.xml').toString();
+    expect(xml).toContain('<wpg:wgp>');
+    expect(xml).toContain('<wps:txbx>');
+    expect(xml).toContain('prst="ellipse"');
+    expect(xml).not.toContain('<pic:pic>');
     expect(xml).toContain(mode === 'numbers' ? '2. &lt;b&gt;Build&lt;/b&gt; &amp; tools' : '&lt;b&gt;Build&lt;/b&gt; &amp; tools');
     const project = JSON.parse((await download(page, 'project')).toString());
     expect(project.configuration.labelMode).toBe(mode);

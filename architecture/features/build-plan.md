@@ -1,8 +1,8 @@
 # Feature build plan and delivery tracker
 
-Last updated: 2026-10-11.
-Overall state: F00, X01, V01, V02, M01 and D01 verified; product features unreleased.
-Current task: **P04 - Names/numbers radar labels and export consistency.**
+Last updated: 2026-10-12.
+Overall state: F00, X01, V01, V02, M01, D01, P01, W01 and P04 verified; product features unreleased.
+Current task: **P04 complete - numbers inside dots, consistent typography and editable Word objects.**
 Next planned task: **Z01 - Radar preview zoom controls.**
 
 Use this as the execution and progress record for the Technology Radar Live Editor improvements. Use the [implementation prompt](build-prompt.md) to start or resume work. Architecture profile: **static-web-delivery** (browser-only, GitHub Pages; no backend, sign-in or database).
@@ -65,7 +65,7 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 | Small-screen layout | M01 | Not released | M01 verified locally; see task evidence below. |
 | Radar preview zoom | Z01 | Not released | Planned; not started. |
 | Preview readability and technology table | P01 | Not released | Verified locally: translucent label backgrounds and an accessible, responsive technology table; 9 focused and 34 full-suite Chromium checks passed. Z01 integration remains pending. |
-| Word export | W01 | Not released | Genuine `.docx` with embedded radar PNG capped at 4096 px and editable tables; focused resolution test passes. Word-app rendering remains pending. |
+| Word export | W01 | Not released | Browser-only DOCX with editable native radar objects and two tables; focused package checks and Word 16 edit/ungroup/save passed. |
 | Inline preview editing and nested radar sections | P02 | Not released | Implemented locally with transparent outer labels; initial focused 13/13 passed. Full suite 36/38; preview test race corrected, rerun skipped by user. |
 | User documentation | D01 | Not released | D01 verified locally; static guide, navigation and build checks passed. Release gate remains R01. |
 | SEO / AEO enrichment | S01 | Not released | In progress: add app/guide metadata and structured data, crawlable static app text, root discovery files, and focused checks. |
@@ -74,7 +74,7 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 
 | ID | Task | Depends on | State | Evidence / blocker |
 | --- | --- | --- | --- | --- |
-| P04 | Names/numbers radar labels and export consistency | P01 | In progress | Add an accessible label-mode control, numbered key inside the SVG, matching visual exports and project metadata; preserve source CSV and sharing. |
+| P04 | Names/numbers radar labels and export consistency | P01 | Verified | Centered numbered dots, names beside dots, consistent 8-20 px text and native editable Word objects. Syntax, smoke/geometry, build, 9/9 focused Chromium checks and Word 16 open/edit/ungroup/save passed; see archive. |
 | F00 | Baseline, method bootstrap and decisions | None | Verified | Added method docs and Playwright smoke test. `npm install` passed (0 vulnerabilities); `npm run check`, `npm test`, `npm run build` passed; `npm run test:e2e` passed (1/1); local browser confirmed listed findings. See [baseline](baseline.md). |
 | X01 | Example picker drop-down | F00 | Verified | Accessible picker and D-05 shared-link loading verified. `npm run check`, `npm test`, `npm run build` passed; `npm run test:e2e` passed (4/4), including seven examples and v1 view/edit links overriding stored source. Integrated browser loaded a generated view link, showed Preview, and hid Editor. |
 | V01 | Visual table editor with two-way CSV sync | F00, D-02 | Verified | Dependency-free Visual/CSV editor with round-trip, validation, invalid-source, undo/redo, persistence, and keyboard checks; see V01 delivery log. |
@@ -82,9 +82,9 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 | M01 | Small-screen responsive layout | X01, V02, D-04 | Verified | Preview-first startup and cohesive workspace tabs; responsive checks at 360, 390, 768, 1024 and 1280 px. `npm run check`, `npm test`, `npm run build`, and `npm run test:e2e` passed; 15/15 browser tests, no viewport overflow. Real-device checks remain pending. |
 | Z01 | Radar preview zoom controls | M01, D-04 | Not started | Add accessible zoom in/out and reset controls for the radar itself; preserve ring/sector meaning, responsive fit, and export behavior. |
 | P01 | Preview label readability and formatted technology table | Z01 | Verified | Translucent gray label backing and a six-column technology table follow the selected radar's last-valid rows. Keyboard, safe rendering, SVG/PNG exports and 360/390/768/1024/1280 px checks passed; check, smoke, build and 34/34 Chromium tests passed. Explicitly implemented before outstanding Z01; recheck zoom integration there. See [archive](delivery-archive.md) and [baseline](baseline.md). |
-| W01 | Word-compatible radar export | P01 | In progress | Client-generated `.docx` with embedded PNG radar capped at 4096 px and editable status/category matrix and six-column technology table. Focused Playwright package/resolution test passed 1/1. Word-app import remains pending. |
+| W01 | Word-compatible radar export | P01 | Verified | P04 follow-up replaces PNG with separate native objects. Focused DOCX checks pass; Word 16 opened the document, edited shape/text, ungrouped 22 objects and saved. Other Word versions remain unverified. |
 | P02 | Inline preview editing and curved category/subcategory sections | P01 | In progress | Six-column click/blur edits and transparent outer labels implemented; focused 13/13 passed, syntax/smoke/build passed, full browser run 36/38. Preview share test race corrected but rerun skipped; unrelated unregistered-example failure remains. See baseline. |
-| P03 | Adjustable radar text and collision-aware point placement | P01 | In progress | Implemented 8-20 px slider, wrapped/measured labels and collision-aware placement. Focused Node geometry checks, syntax and build passed; npm test fails the existing guide/example mismatch after radar assertions pass. E2e explicitly skipped; browser/keyboard/export checks pending. |
+| P03 | Adjustable radar text and collision-aware point placement | P01 | In progress | P04 fixes CSS sizing and verifies slider keyboard/viewport/export behavior. Smoke checks include large numbered dots and crowded geometry; dense browser visual checks remain pending. |
 | D01 | User guide and in-app documentation link | M01, D-03 | Verified | Static guide, shared components, Documentation links, README and build copy implemented. `npm run check`, `npm test`, `npm run build` (inside browser command) passed; `npm run test:e2e` passed 22/22, including 7 guide tests. Crawlable without JS; local links/anchors, control names, keyboard and 360/390/768/1024/1280 px checks passed without guide console errors or page overflow. See [implementation record](d01-user-guide.md) and [baseline](baseline.md). |
 | S01 | SEO and AEO enrichment | D01, D-01 | In progress | Add canonical/social metadata and JSON-LD to app and guide; publish robots.txt, sitemap.xml and llms.txt plus a static OG image; keep the app H1 unchanged by loaded CSV data. |
 | R01 | Cross-feature regression and release readiness | X01, V01, V02, M01, Z01, P01, W01, D01, S01 | Not started | — |
@@ -94,13 +94,7 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 
 ## Task details and exit checks
 
-### P04 - names/numbers labels
-
-- Default to names; number visible technologies in source order starting at 1. Include an escaped, wrapped numbered key in the SVG so standalone images remain understandable.
-- Preserve label visibility, text sizing, last-valid preview and selected-radar filtering. SVG, PNG, Word, print and image links use the selection; project metadata records it. CSV retains the six-column source format; share payloads are unchanged.
-- Verify keyboard switching and 360/390/768/1024/1280 px layout, safe content and exports, then run the required repository checks.
-
-Only unfinished tasks are listed. Details for Verified tasks (F00, X01, V01, V02, M01, D01, T01) are in the [delivery archive](delivery-archive.md).
+Only unfinished tasks are listed. Details for Verified tasks are in the [delivery archive](delivery-archive.md).
 
 ### Z01 — radar preview zoom controls
 
@@ -109,12 +103,6 @@ Only unfinished tasks are listed. Details for Verified tasks (F00, X01, V01, V02
 - Keep zoom as transient view state: do not modify CSV, localStorage, undo history or share payload v1. Reset zoom returns to the default fit.
 - SVG, PNG and print output use the default fitted radar, independent of the current on-screen zoom.
 - Exit: controls work by mouse and keyboard, have accessible names and stable hit areas, cannot zoom beyond documented bounds, reset returns to fit, no viewport overflow occurs, exports are unscaled, and existing radar/share behavior still passes focused browser tests.
-
-### W01 — Word-compatible radar export
-
-- Add a Word-compatible export to the existing export controls for the selected radar, including its formatted technology table.
-- Generate the file in the browser without uploading user data or adding a runtime dependency; choose and record the actual file format during implementation.
-- Exit: downloaded output opens in a supported Word-compatible application, includes the selected radar and its technologies with useful formatting, handles CSV-derived content safely, and does not change other export behavior.
 
 ### S01 — SEO and AEO enrichment
 
@@ -143,7 +131,7 @@ Only unfinished tasks are listed. Details for Verified tasks (F00, X01, V01, V02
 
 - Temporary radar text-size slider: 8-20 px, default 11; resize technology and curved category/subcategory labels, retaining image/print typography without CSV/storage/history/share changes.
 - Measure and wrap technology names; choose dot and label positions without changing status rings or subsection membership. Retry crowded layouts with a larger fitted drawing area; bound retries to avoid unbounded work. Beyond that bound, extremely dense data can still overlap.
-- Focused Node checks cover collision bounds, ring/subsection membership, empty input, wrapping and deterministic layout. Browser checks for visual clarity, keyboard/viewport behavior and exports remain pending because the user explicitly requested no e2e tests. Do not mark Verified until required pending checks pass.
+- Focused Node checks cover collision bounds, ring/subsection membership, empty input, wrapping and deterministic layout. P04 now verifies slider keyboard/viewport behavior and export typography at the five supported widths. Dense browser visual fixtures remain pending; do not mark this separate placement task Verified until those checks pass.
 
 ## Decisions
 
@@ -160,15 +148,16 @@ Only unfinished tasks are listed. Details for Verified tasks (F00, X01, V01, V02
 | D-09 | 2026-10-08 | How to share radar-only pages and embeddable images on a static host? | H01 (user request): extend v1 payload with mode `embed` and optional `table` boolean; image links are client-generated data URLs because no hosted image file can exist without a backend. | H01 |
 | D-10 | 2026-10-08 | Word-compatible format and editability? | W01: generate a browser-only `.docx` package with the selected radar embedded as a PNG up to 4096 px on its longest side and editable status-by-category and six-column technology tables; escape all CSV-derived values. No runtime dependency or upload. User explicitly requested W01 before the Z01 handoff; keep Z01 pending. | W01 |
 | D-11 | 2026-10-08 | Fix build failure without weakening guide coverage? | CI01: synchronize the static guide with all registered examples and check the loading section specifically; preserve the Pages workflow, dependencies and editor. | CI01 |
+| D-13 | 2026-10-12 | Follow-up radar and Word editability? | P04 (user): numbers inside dots, names beside dots, consistent text sizing; replace the Word bitmap with native editable grouped shapes/text boxes. Use desktop Word to ungroup; curved lettering uses character boxes and curved boundaries use vector approximations. Supersedes D-10 raster choice; no runtime dependencies or share changes. | P04, W01 |
 | D-12 | 2026-10-11 | Numbering and export behavior? | P04: Names is the default; number visible rows from 1 in source order and embed a wrapped number/name key in the SVG. Mode is temporary; image/Word/print exports retain it and project JSON stores `configuration.labelMode`. Keep six-column CSV names and share payloads unchanged. | P04 |
 
 ## Delivery log
 
 Newest first; one or two lines per session. Entries up to D01 are in the [delivery archive](delivery-archive.md).
 
+- **2026-10-12** - P04 completed with centered numbered dots, sizing fixes and native editable Word export. Syntax, smoke/geometry, build, diff check and 9/9 focused Chromium checks passed; Word 16 edited shape/text, ungrouped 22 objects and saved. No push or deployment.
+
 - **2026-10-08** - CI01: Actions job 113442086736 failed because the guide omitted ten registered examples; synchronized the list and strengthened section-specific coverage. Focused Node, syntax, smoke and build pass; full browser suite 30/39 (CDN DNS/shared UI failures and two unchanged preview-table failures); hosted CI verification pending.
-- **2026-10-08** - W01 implemented: browser-generated `.docx` with embedded PNG radar, editable radar matrix and technology table. Focused Playwright package/image/safe-content test passed 1/1; `npm run build` passed. Word-app import remains pending. No commit, push or deployment.
-- **2026-10-08** - W01 resolution follow-up: rasterization now uses up to 4096 px on the PNG's longest side. Focused DOCX test passed 1/1, including exact max-dimension and package checks. Word-app rendering remains pending.
 - **2026-10-08** - H01 share radar page/image links implemented in `index.html`, `src/app.js`, CSS, guide and docs/sharing.md. Check/build passed; npm test fails the existing guide/example mismatch. E2e skipped by request. No commit, push or deployment.
 
 - **2026-10-08** - P03 text sizing and spacing implemented: focused Node geometry/wrapping checks, syntax and build passed; npm test fails the existing guide/example mismatch. E2e skipped by request; viewport/keyboard/export verification pending. No commit, push or deployment.
@@ -181,15 +170,14 @@ Newest first; one or two lines per session. Entries up to D01 are in the [delive
 
 ## Current handoff
 
-- **P04 first step:** update `src/app.js` (`renderPreview`, `wordDocument`, export handlers), `src/radar-sections.js` (numbered key), `index.html` (Preview controls) and `src/styles.css`; add scoped checks in `tests/e2e/radar-label-mode.spec.js`.
+- **Next task Z01 first step:** update `src/app.js` (`renderPreview` and export integration), `index.html` (`.preview-head`) and `src/styles.css` (radar wrapper); add `tests/e2e/zoom.spec.js`. P04 and W01 are complete; retain fitted export dimensions and native Word editability.
 
 - **CI01 handoff:** no further source change is indicated in `guide/index.html` or `scripts/guide-test.mjs`; verify the fixed revision in the Pages build after merge. `npm test` now passes; browser follow-up needs CDN access and investigation of the unchanged preview edit/geometry checks. No deployment performed.
-- **Current W01 follow-up:** `src/app.js` generates a real `.docx` package with the selected radar as `word/media/radar.png` at up to 4096 px on its longest side, plus editable status/category and six-column technology tables. `tests/e2e/word-export.spec.js` passed 1/1, confirming the ZIP container, drawing relationship, PNG signature and max dimension, selected-radar filtering, multiline values and safe text. Word-app rendering remains pending; keep W01 In progress until import is confirmed. CI01 resolved the guide/example smoke-test blocker.
+- **P04/W01 handoff:** `src/word-radar.js` exports unlocked floating Word shapes; `scripts/verify-word-export.vbs` validates the fixture emitted by `tests/e2e/word-export.spec.js`. Word 16 import/edit/ungroup/save passed. Curved labels use individual character boxes, boundaries use bounded vector paths; other Word versions, Firefox/WebKit and deployed behavior remain unverified.
 - **Current H01 follow-up:** browser-verify the share dialog (`generateShare` handler, `radarImageUrl`, `loadShared` embed branch in `src/app.js`; `body.embed-mode` rules in `src/styles.css`): radar page with/without table, iframe embed, SVG/PNG image links, existing view/edit tests, and 360-1280 px dialog layout.
-- **Current P03 follow-up:** inspect `src/app.js` (`renderPreview`, `radarTextSize` input handler) and `src/radar-sections.js` (`radarPoints`, `wrapRadarLabel`) for browser verification when authorised. Check slider keyboard behavior and legibility at five supported widths, crowded fixtures and SVG/PNG/print typography. Node checks pass; CI01 resolved the guide/example smoke-test blocker. P03-specific verification remains pending; P03 remains In progress.
+- **Current P03 follow-up:** `src/radar-sections.js` (`radarPoints`, `wrapRadarLabel`) still needs dense-fixture browser visual checks. P04 covers the text-size slider, names/numbers and exports at 360/390/768/1024/1280 px; crowded Node geometry checks pass.
 - **Current P02 follow-up:** inspect the share URL wait in `tests/e2e/preview-table.spec.js` (read-only test), then rerun that spec when authorised. Product code is in `src/preview-table.js` (`createPreviewTable`), `src/app.js` (`commitTechnologyEdit`) and `src/radar-sections.js` (`radarSections`); no additional product change is currently indicated. Initial focused checks passed 13/13; full run passed 36/38, with syntax/smoke/build passing. The corrected share-test race is unverified because its rerun was skipped. Existing ten unregistered example files cause the unrelated full-suite example-picker failure. Keep P02 In progress until its remaining check passes; do not expand into example-picker work without authorisation.
-- State: F00, X01, V01, V02, M01, D01, T01 and P01 Verified locally; W01 implemented but awaiting Word-app import verification; S01 in progress; Z01 not started; all features Not released; `BACKLOG.md` unchanged. W01 was explicitly requested before the Z01 handoff; Z01 remains the next product task. No commit, push or deployment performed.
-- Last W01 checks: `npm run check` and `npm run build` passed; `npm test` failed only the guide's missing Microsoft Cloud Strategy Radar check. Focused W01 Playwright passed 1/1 and responsive panel check passed 1/1 at 360/390/768/1024/1280 px. Full runner passed 31/39 browser checks before the W01 startup wait and export-card count fixes; seven unrelated browser failures remain, and no full-suite rerun followed those fixes.
+- State: F00, X01, V01, V02, M01, D01, T01 and P01 Verified locally; W01 and P04 Verified; S01 in progress; Z01 not started; all features Not released; `BACKLOG.md` unchanged. W01 was explicitly requested before the Z01 handoff; Z01 remains the next product task. No commit, push or deployment performed.
 - Known limitation: the app's shared author component requests `/data/config.json` (404); the guide avoids it with an empty inline config.
 - Pending release checks (R01): real iOS Safari/Android Chrome, Firefox/WebKit, screen reader, live host at `https://radar.mightora.io/`, successful Pages run after maintainer confirms Settings → Pages → Source → GitHub Actions.
-- **Next product task: Z01 - Radar preview zoom controls.** First step: update `renderPreview()` and the `[data-export]` integration in [src/app.js](../../src/app.js), the `.preview-head` controls in [index.html](../../index.html), and wrapper styles in [src/styles.css](../../src/styles.css), after marking Z01 In progress. Keep the SVG viewBox/export dimensions unchanged and apply zoom to a wrapper around the radar; keep `#technologyTableWrap` outside that wrapper. Add `tests/e2e/zoom.spec.js` and rerun `tests/e2e/preview-table.spec.js` for the P01 integration. Z01 remains pending as explicitly requested W01 was completed first; retain W01's Word-app import verification as a follow-up. S01 remains in progress; see [baseline](baseline.md).
+- **Next product task: Z01 - Radar preview zoom controls.** First step: update `renderPreview()` and the `[data-export]` integration in [src/app.js](../../src/app.js), the `.preview-head` controls in [index.html](../../index.html), and wrapper styles in [src/styles.css](../../src/styles.css), after marking Z01 In progress. Keep the SVG viewBox/export dimensions unchanged and apply zoom to a wrapper around the radar; keep `#technologyTableWrap` outside that wrapper. Add `tests/e2e/zoom.spec.js` and rerun `tests/e2e/preview-table.spec.js` for the P01 integration. Z01 remains pending as explicitly requested W01 was completed first; retain P04's native Word editability during zoom integration. S01 remains in progress; see [baseline](baseline.md).

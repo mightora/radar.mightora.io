@@ -83,32 +83,33 @@ export function radarNumberKey(rows, width, top, textSize, measure, escapeHtml, 
   return { svg: `<g class="radar-number-key" font-family="Manrope,sans-serif" font-size="${textSize}" font-weight="600" fill="#102a43"><text x="20" y="${top + textSize}">Technology key</text>${entries.join('')}</g>`, height: y - top + 20 };
 }
 
-export function radarPoints(rows, rings, positions, labels, initialRadius = 250) {
+export function radarPoints(rows, rings, positions, labels, initialRadius = 250, dotRadius = 7) {
   const overlaps = (first, second) => first.left < second.right && first.right > second.left && first.top < second.bottom && first.bottom > second.top;
+  const padding = dotRadius + 3, offset = dotRadius + 6;
   let result;
   for (let attempt = 0; attempt < 9; attempt += 1) {
-    const radius = Math.max(initialRadius, rings.length * 24) * 1.25 ** attempt, step = radius / rings.length;
+    const radius = Math.max(initialRadius, rings.length * (padding * 2 + 4)) * 1.25 ** attempt, step = radius / rings.length;
     const occupied = [], points = [];
     let collisions = 0;
     rows.forEach((row, index) => {
       const foundRing = rings.findIndex(ring => ring.label === row[4]);
       const ring = foundRing < 0 ? rings.length - 1 : foundRing;
       const section = positions.get(row[1]).get(row[2]);
-      const inner = radius - (ring + 1) * step + 10, outer = radius - ring * step - 10;
+      const inner = radius - (ring + 1) * step + padding, outer = radius - ring * step - padding;
       const label = labels[index];
       let best;
-      for (let distance = outer; distance >= Math.max(inner, 10); distance -= 10) {
-        const margin = Math.min(section.angle / 2, 10 / distance);
+      for (let distance = outer; distance >= Math.max(inner, padding); distance -= 10) {
+        const margin = Math.min(section.angle / 2, padding / distance);
         const count = Math.max(1, Math.ceil((section.angle - 2 * margin) * distance / 10));
         for (let slot = 0; slot <= count; slot += 1) {
           const angle = section.start + margin + (section.angle - 2 * margin) * slot / count;
           const x = Math.cos(angle) * distance, y = Math.sin(angle) * distance;
-          const dotBox = { left: x - 10, right: x + 10, top: y - 10, bottom: y + 10 };
+          const dotBox = { left: x - padding, right: x + padding, top: y - padding, bottom: y + padding };
           const alternatives = label.width ? [
-            { left: x + 13, top: y - label.height / 2 },
-            { left: x - 13 - label.width, top: y - label.height / 2 },
-            { left: x - label.width / 2, top: y + 13 },
-            { left: x - label.width / 2, top: y - 13 - label.height }
+            { left: x + offset, top: y - label.height / 2 },
+            { left: x - offset - label.width, top: y - label.height / 2 },
+            { left: x - label.width / 2, top: y + offset },
+            { left: x - label.width / 2, top: y - offset - label.height }
           ] : [{ left: x, top: y }];
           for (const alternative of alternatives) {
             const labelBox = { ...alternative, right: alternative.left + label.width, bottom: alternative.top + label.height };
