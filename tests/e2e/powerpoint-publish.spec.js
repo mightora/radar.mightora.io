@@ -33,7 +33,8 @@ test('PowerPoint produces editable vector slides with preset and customised them
   await expect(page.locator('#pptxDialog')).toBeVisible();
   await page.locator('#pptxTheme').selectOption('ocean');
   await expect(page.locator('#pptx-background')).toHaveValue('#f0f8fd');
-  await page.locator('#pptxFont').selectOption('Georgia');
+  await page.locator('#pptxFont').selectOption('custom');
+  await page.locator('#pptxCustomFont').fill('Trebuchet MS');
   await page.locator('#pptx-accent').fill('#123456');
   await expect(page.locator('#pptxTheme')).toHaveValue('custom');
   const pending = page.waitForEvent('download');
@@ -56,7 +57,7 @@ test('PowerPoint produces editable vector slides with preset and customised them
   expect(detail).toContain('Beta pipelines');
   expect(detail).toContain('Editable cell');
   expect(theme).toContain('123456');
-  expect(theme).toContain('Georgia');
+  expect(theme).toContain('Trebuchet MS');
   expect(archive.includes(Buffer.from('ppt/media/'))).toBe(false);
   const parsed = await page.evaluate(xmls => xmls.map(xml => {
     const root = new DOMParser().parseFromString(xml, 'application/xml');
