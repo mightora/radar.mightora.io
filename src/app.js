@@ -368,7 +368,7 @@ document.fonts.ready.then(() => { if (state.config) renderPreview(); });
 $('csvInput').addEventListener('input', event => { state.source = event.target.value; state.dirty = true; updateLineNumbers(); clearTimeout(state.timer); state.timer = setTimeout(parseSource, 300); }); $('csvInput').addEventListener('scroll', () => { $('lineNumbers').scrollTop = $('csvInput').scrollTop; });
 $('formatCsv').addEventListener('click', () => { try { const rows = parseCsv(state.source); setSource(csvString(rows)); } catch (error) { showToast(error.message); } }); $('downloadCsv').addEventListener('click', () => download('technology-radar.csv', state.source, 'text/csv')); $('toggleLabels').addEventListener('click', () => { state.labels = !state.labels; renderPreview(); }); $('resetView').addEventListener('click', () => selectRadar('')); $('uploadButton').addEventListener('click', () => $('projectFile').click()); $('projectFile').addEventListener('change', async event => { const file = event.target.files[0]; if (file) setSource(await file.text()); event.target.value = ''; });
 $('examples').addEventListener('change', async event => { const select = event.currentTarget, name = select.value; select.value = ''; if (!name || !EXAMPLE_FILES[name]) return; if (state.dirty && !confirm('Replace the current source?')) return; try { const response = await fetch(EXAMPLE_FILES[name]); if (!response.ok) throw new Error('Not found'); setSource(await response.text()); } catch { showToast(`Could not load the “${name}” example.`); } }); $('newButton').addEventListener('click', () => { if (!state.dirty || confirm('Replace the current source with a blank radar?')) setSource(REQUIRED.join(',') + '\n'); });
-$('undoButton').addEventListener('click', () => { finishVisualEdit(); if (state.history.length) { state.future.push(state.source); setSource(state.history.pop(), false); if (state.editorMode === 'visual') renderVisualEditor(); } }); $('redoButton').addEventListener('click', () => { finishVisualEdit(); if (state.future.length) { state.history.push(state.source); setSource(state.future.pop(), false); if (state.editorMode === 'visual') renderVisualEditor(); } }); $('shareButton').addEventListener('click', () => $('shareDialog').showModal()); $('shareTopButton').addEventListener('click', () => $('shareDialog').showModal()); $('cancelShare').addEventListener('click', () => $('shareDialog').close()); $('closeShare').addEventListener('click', () => $('shareDialog').close()); $('shareDialog').addEventListener('change', updateShareOptions);
+$('undoButton').addEventListener('click', () => { finishVisualEdit(); if (state.history.length) { state.future.push(state.source); setSource(state.history.pop(), false); if (state.editorMode === 'visual') renderVisualEditor(); } }); $('redoButton').addEventListener('click', () => { finishVisualEdit(); if (state.future.length) { state.history.push(state.source); setSource(state.future.pop(), false); if (state.editorMode === 'visual') renderVisualEditor(); } }); $('shareButton').addEventListener('click', () => $('shareDialog').showModal()); $('publishButton').addEventListener('click', () => { document.querySelector('[name=shareMode][value=publish]').checked = true; updateShareOptions(); $('shareDialog').showModal(); }); $('shareTopButton').addEventListener('click', () => $('shareDialog').showModal()); $('cancelShare').addEventListener('click', () => $('shareDialog').close()); $('closeShare').addEventListener('click', () => $('shareDialog').close()); $('shareDialog').addEventListener('change', updateShareOptions);
 $('generateShare').addEventListener('click', async () => {
   const mode = document.querySelector('[name=shareMode]:checked').value, title = escapeHtml(`${$('previewTitle').textContent} radar`);
   try {
@@ -378,9 +378,9 @@ $('generateShare').addEventListener('click', async () => {
       url = await radarImageUrl(format); embed = `<img src="${url}" alt="${title}">`;
       meta = `${url.length} characters; self-contained ${format.toUpperCase()} image of the displayed radar. Use it as an image source; it is a snapshot and does not update.`;
     } else {
-      url = await encodeShare(mode);
+      url = mode === 'publish' ? (await encodeShare('view')).replace('#/view/', '#/publish/') : await encodeShare(mode);
       if (mode === 'embed') embed = `<iframe src="${url}" title="${title}" width="100%" height="${$('shareIncludeTable').checked ? 1400 : 800}" style="border:0" loading="lazy"></iframe>`;
-      meta = `${url.length} characters; ${state.validRows.length} technologies; encoded, not encrypted.`;
+      meta = `${url.length} characters; ${state.validRows.length} technologies; ${mode === 'publish' ? 'public read-only snapshot; ' : ''}encoded, not encrypted.`;
     }
     $('shareUrl').value = url; $('shareEmbed').value = embed; $('shareMeta').textContent = meta;
     $('shareEmbedField').classList.toggle('hidden', !embed); $('copyEmbed').classList.toggle('hidden', !embed);
@@ -392,6 +392,7 @@ $('copyEmbed').addEventListener('click', async () => { try { await navigator.cli
 document.querySelectorAll('[data-export]').forEach(button => button.addEventListener('click', async () => {
   const svg = $('radarCanvas').querySelector('svg');
   if (button.dataset.export === 'csv') download('technology-radar.csv', state.source, 'text/csv');
+  if (button.dataset.export === 'pptx') { $('pptxDialog').showModal(); return; }
   if (button.dataset.export === 'word') {
     try { download('technology-radar.docx', await wordDocument(radarRows(), svg.outerHTML), 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'); }
     catch { showToast('Could not create the Word document.'); }
@@ -402,5 +403,30 @@ document.querySelectorAll('[data-export]').forEach(button => button.addEventList
   if (button.dataset.export === 'project') download('technology-radar.radar.json', JSON.stringify({ format: 'mightora-technology-radar', version: 1, createdAt: new Date().toISOString(), radarData: { csv: state.source }, configuration: { strategy: 'embedded', labelMode: state.labelMode } }, null, 2), 'application/json');
 }));
 window.addEventListener('keydown', event => { if (!(event.ctrlKey || event.metaKey) || event.target.closest('.technology-cell-input')) return; if (event.key.toLowerCase() === 'z') { event.preventDefault(); (event.shiftKey ? $('redoButton') : $('undoButton')).click(); } if (event.key.toLowerCase() === 'y') { event.preventDefault(); $('redoButton').click(); } }); window.addEventListener('beforeunload', event => { if (state.dirty) { event.preventDefault(); event.returnValue = ''; } });
-async function loadShared() { const match = location.hash.match(/^#\/(view|edit|embed)\/(.+)$/); if (!match) return false; try { const payload = await decodeShare(match[2]); if (payload.version !== 1 || typeof payload.csv !== 'string') throw new Error('Unsupported share payload.'); state.selectedRadar = payload.selectedRadarName || ''; setSource(payload.csv, false); state.dirty = false; if (match[1] === 'edit') openTab('data'); else { $('dataPanel').classList.remove('active-panel'); $('dataPanel').classList.add('hidden'); openTab('preview'); if (match[1] === 'embed') { document.body.classList.add('embed-mode'); document.body.classList.toggle('embed-no-table', payload.table === false); } else showToast('View-only radar loaded.'); } return true; } catch (error) { showToast(`Could not open shared radar: ${error.message}`); return false; } }
+async function loadShared() {
+  const match = location.hash.match(/^#\/(view|edit|embed|publish)\/(.+)$/);
+  if (!match) return false;
+  try {
+    const payload = await decodeShare(match[2]);
+    if (payload.version !== 1 || typeof payload.csv !== 'string') throw new Error('Unsupported share payload.');
+    state.selectedRadar = payload.selectedRadarName || '';
+    state.published = match[1] === 'publish';
+    setSource(payload.csv, false);
+    state.dirty = false;
+    if (match[1] === 'edit') openTab('data');
+    else {
+      $('dataPanel').classList.remove('active-panel');
+      $('dataPanel').classList.add('hidden');
+      openTab('preview');
+      if (match[1] === 'embed') {
+        document.body.classList.add('embed-mode');
+        document.body.classList.toggle('embed-no-table', payload.table === false);
+      } else if (state.published) {
+        document.body.classList.add('published-mode');
+        $('publishedLanding').classList.remove('hidden');
+      } else showToast('View-only radar loaded.');
+    }
+    return true;
+  } catch (error) { state.published = false; showToast(`Could not open shared radar: ${error.message}`); return false; }
+}
 loadConfig().then(async () => { if (await loadShared()) return; state.source = localStorage.getItem('radar-builder-source') || EXAMPLE; $('csvInput').value = state.source; parseSource(); }); $('csvInput').addEventListener('input', () => localStorage.setItem('radar-builder-source', state.source));
