@@ -1,8 +1,8 @@
 # Feature build plan and delivery tracker
 
-Last updated: 2026-10-12.
+Last updated: 2026-10-13.
 Overall state: F00, X01, V01, V02, M01, D01, P01, W01 and P04 verified; product features unreleased.
-Current task: **P04 complete - numbers inside dots, consistent typography and editable Word objects.**
+Current task: **XP01 in progress - editable PowerPoint and published roadmap page.**
 Next planned task: **Z01 - Radar preview zoom controls.**
 
 Use this as the execution and progress record for the Technology Radar Live Editor improvements. Use the [implementation prompt](build-prompt.md) to start or resume work. Architecture profile: **static-web-delivery** (browser-only, GitHub Pages; no backend, sign-in or database).
@@ -34,6 +34,8 @@ Task states: `Not started`, `In progress`, `Blocked`, `Verified`. Feature releas
 | 9 | Edit values beneath the radar on click, save on blur, and curve category/subcategory names around nested radar sections | P02 |
 | 10 | Adjustable radar text size and fewer overlapping points | P03 |
 | 11 | Toggle radar labels between names and numbers, retaining the choice in exports | P04 |
+| 12 | Native editable PowerPoint export, presets and custom fonts/colours | XP01 |
+| 13 | Published interactive roadmap landing page with shareable link | XP01 |
 
 ## Scope and dependencies
 
@@ -74,6 +76,7 @@ Default work order is the table order. X01 and V01 are independent once F00 is v
 
 | ID | Task | Depends on | State | Evidence / blocker |
 | --- | --- | --- | --- | --- |
+| XP01 | Editable PPTX and published page | P04, H01 | In progress | Feature branch implementation and focused browser test added; unverified in desktop PowerPoint and Chromium. |
 | P04 | Names/numbers radar labels and export consistency | P01 | Verified | Centered numbered dots, names beside dots, consistent 8-20 px text and native editable Word objects. Syntax, smoke/geometry, build, 9/9 focused Chromium checks and Word 16 open/edit/ungroup/save passed; see archive. |
 | F00 | Baseline, method bootstrap and decisions | None | Verified | Added method docs and Playwright smoke test. `npm install` passed (0 vulnerabilities); `npm run check`, `npm test`, `npm run build` passed; `npm run test:e2e` passed (1/1); local browser confirmed listed findings. See [baseline](baseline.md). |
 | X01 | Example picker drop-down | F00 | Verified | Accessible picker and D-05 shared-link loading verified. `npm run check`, `npm test`, `npm run build` passed; `npm run test:e2e` passed (4/4), including seven examples and v1 view/edit links overriding stored source. Integrated browser loaded a generated view link, showed Preview, and hid Editor. |
@@ -153,6 +156,8 @@ Only unfinished tasks are listed. Details for Verified tasks are in the [deliver
 
 ## Delivery log
 
+- **2026-10-13** - XP01 implemented on a feature branch: native OOXML PPTX with native editable shapes/text, preset and custom themes, plus `#/publish/` interactive snapshot page. Added focused Playwright tests and documentation. Local Node/Chromium and desktop PowerPoint checks could not be run; no production deployment.
+
 Newest first; one or two lines per session. Entries up to D01 are in the [delivery archive](delivery-archive.md).
 
 - **2026-10-12** - P04 completed with centered numbered dots, sizing fixes and native editable Word export. Syntax, smoke/geometry, build, diff check and 9/9 focused Chromium checks passed; Word 16 edited shape/text, ungrouped 22 objects and saved. No push or deployment.
@@ -169,6 +174,8 @@ Newest first; one or two lines per session. Entries up to D01 are in the [delive
 - **2026-10-08** — Efficiency maintenance: moved Verified task details and the delivery log to [delivery-archive.md](delivery-archive.md); slimmed the build prompt to one task per session with focused verification. Docs-only; no application checks run.
 
 ## Current handoff
+
+- **XP01 next step:** run `npm run check`, `npm test`, `npm run build`, `npx playwright test tests/e2e/powerpoint-publish.spec.js --reporter=dot` and manually open/edit/save a generated PPTX with desktop PowerPoint. Verify published page responsive and privacy behaviour before merging to main. Status remains In progress.
 
 - **Next task Z01 first step:** update `src/app.js` (`renderPreview` and export integration), `index.html` (`.preview-head`) and `src/styles.css` (radar wrapper); add `tests/e2e/zoom.spec.js`. P04 and W01 are complete; retain fitted export dimensions and native Word editability.
 
