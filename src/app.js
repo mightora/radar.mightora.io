@@ -402,6 +402,7 @@ function applyPowerPointTheme() {
   if (values) Object.entries(values).forEach(([key, value]) => { $(`pptx-${key}`).value = value; });
 }
 $('pptxTheme').addEventListener('change', applyPowerPointTheme);
+$('pptxFont').addEventListener('change', event => { $('pptxCustomFont').classList.toggle('hidden', event.target.value !== 'custom'); });
 document.querySelectorAll('#pptxDialog input[type=color]').forEach(input => input.addEventListener('input', () => { $('pptxTheme').value = 'custom'; }));
 $('closePptx').addEventListener('click', () => $('pptxDialog').close());
 $('cancelPptx').addEventListener('click', () => $('pptxDialog').close());
@@ -411,7 +412,7 @@ $('exportPptx').addEventListener('click', () => {
     if (!svg) throw new Error('No radar preview is available.');
     const values = {};
     ['background', 'accent', 'secondary', 'text'].forEach(key => { values[key] = $(`pptx-${key}`).value; });
-    const options = { ...values, theme: $('pptxTheme').value, font: $('pptxFont').value,
+    const options = { ...values, theme: $('pptxTheme').value, font: $('pptxFont').value === 'custom' ? ($('pptxCustomFont').value.trim() || 'Aptos') : $('pptxFont').value,
       title: $('previewTitle').textContent, statuses: state.config?.statuses || [], dotStatuses: state.config?.dotStatuses || [] };
     const presentation = powerpointRadar(svg.outerHTML, radarRows(), options, zipStore);
     download('technology-radar.pptx', presentation, 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
