@@ -44,3 +44,37 @@
 @media print{.technology-cell-button{min-height:0;padding:0;border:0}.technology-cell-error{display:none}}
 .share-options{flex-wrap:wrap}.share-result textarea{border:1px solid var(--line);padding:10px;border-radius:2px;background:#fff;font:12px/1.4 monospace;resize:vertical}.share-result label+label{margin-top:10px}.share-result .button+.button{margin-left:8px}
 body.embed-mode>:not(main):not(#toast),body.embed-mode main>:not(#previewPanel),body.embed-mode .preview-head p,body.embed-no-table .preview-technologies{display:none!important}
+
+/* PowerPoint export: compact native-form controls and colour swatches. */
+.pptx-help{margin:16px 24px 8px;line-height:1.55;color:var(--muted)}
+.pptx-settings{padding:14px 24px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pptx-settings>label{display:flex;flex-direction:column;gap:7px;font-weight:700}
+.pptx-settings select{width:100%;min-width:0;padding:10px;background:var(--panel);border:1px solid var(--line);color:var(--ink)}
+.pptx-colours{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.pptx-colours label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700}
+.pptx-colours input{width:100%;min-height:44px;cursor:pointer;border:1px solid var(--line);border-radius:4px;padding:3px;background:var(--panel)}
+/* Published links are view-only static snapshots. Keep author/editor controls off this landing page. */
+body.published-mode main>.intro,body.published-mode main>.toolbar,body.published-mode main>.page-tabs,body.published-mode main>#dataPanel,body.published-mode main>#validationPanel,body.published-mode main>#exportsPanel,body.published-mode mightora-author{display:none!important}
+body.published-mode main{padding:0 clamp(14px,3vw,44px) 48px;max-width:1440px}
+.published-landing{margin:26px 0 0}
+.published-hero{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:clamp(24px,4vw,46px);background:linear-gradient(135deg,#102a43,#193f5a 64%,#1769aa);color:#fff;border-radius:12px 12px 0 0}
+.published-hero h1{max-width:940px;margin:12px 0 16px;line-height:1.1;font-size:clamp(26px,3.7vw,47px)}
+.published-hero .eyebrow{color:#ffc19b}
+.published-chip{display:inline-flex;align-items:center;border:1px solid #ffffff66;border-radius:100px;padding:5px 10px;letter-spacing:.05em;font-size:12px;background:#ffffff19}
+.published-intro{max-width:700px;font-size:clamp(14px,1.7vw,17px);line-height:1.55;color:#e4edf5}
+.published-metrics{display:flex;flex-wrap:wrap;gap:12px}
+.published-metrics span{padding:8px 14px;background:#ffffff19;border-radius:5px;font-weight:700}
+.published-create{white-space:nowrap;text-decoration:none;color:var(--ink);flex:none}
+.published-filters{display:grid;grid-template-columns:2fr 1fr 1fr auto;align-items:end;gap:12px;padding:22px 26px;background:#edf3f7;border:1px solid var(--line);border-bottom:0}
+.published-filters label{display:flex;flex-direction:column;gap:7px;font-weight:700;font-size:12px}
+.published-filters :is(input,select){min-width:0;width:100%;height:42px;border:1px solid #afc2d1;background:#fff;padding:8px 12px;border-radius:4px;color:var(--ink)}
+.published-filters .button{height:42px}
+.published-privacy{margin:0;padding:10px 26px;background:#edf3f7;border:1px solid var(--line);border-top:0;color:var(--muted);font-size:12px}
+body.published-mode #previewPanel{margin:0;border-radius:0 0 12px 12px;overflow:hidden}
+body.published-mode .preview-head{padding:20px 24px}
+body.published-mode .preview-head .radar-label-mode,body.published-mode .preview-head .radar-text-size{display:none}
+body.published-mode .technology-cell-button[disabled]{color:inherit;opacity:1;cursor:default}
+body.published-mode .radar-svg .radar-point-dimmed{opacity:.12}
+body.published-mode .radar-svg .radar-point-dimmed:focus{opacity:1}
+@media(max-width:900px){.published-filters{grid-template-columns:1fr 1fr}.published-filters label:first-child{grid-column:1/-1}.published-hero{align-items:flex-start;flex-direction:column}}
+@media(max-width:600px){.pptx-settings{grid-template-columns:1fr}.pptx-colours{grid-template-columns:1fr 1fr}.published-filters{grid-template-columns:1fr;padding:18px}.published-filters label:first-child{grid-column:auto}.published-hero{padding:24px}.published-privacy{padding:12px 18px}body.published-mode #previewPanel{margin:0}}
