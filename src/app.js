@@ -1,5 +1,6 @@
 import { createPreviewTable } from './preview-table.js';
 import { wordRadar } from './word-radar.js';
+import { powerpointRadar } from './powerpoint-radar.js';
 import { radarSections, radarPoints, wrapRadarLabel, radarNumberKey } from './radar-sections.js';
 
 const REQUIRED = ['Radar Name', 'Category', 'Sub Category', 'Technology', 'Status', 'Dot Status'];
@@ -27,6 +28,10 @@ const state = { source: EXAMPLE, validRows: [], errors: [], config: null, histor
 const $ = id => document.getElementById(id);
 state.textSize = 11;
 state.labelMode = 'names';
+state.published = false;
+state.publishSearch = '';
+state.publishStatus = '';
+state.publishCategory = '';
 const radarTextContext = document.createElement('canvas').getContext('2d');
 const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
 const escapeXml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' }[char]));
@@ -60,11 +65,32 @@ function validate(rows) {
 
 function parseYaml(text) { const config = { statuses: [], dotStatuses: [] }; let section = ''; let item = null; text.split(/\r?\n/).forEach(line => { const sectionMatch = line.match(/^(statuses|dotStatuses):/); if (sectionMatch) { section = sectionMatch[1]; return; } const itemMatch = line.match(/^\s+- id:\s*(.+)$/); if (itemMatch) { item = { id: itemMatch[1].trim() }; config[section].push(item); return; } const value = line.match(/^\s+(label|order|description|backgroundColor|borderColor|color|shape):\s*(.*)$/); if (value && item) item[value[1]] = value[2].replace(/^['"]|['"]$/g, ''); }); return config; }
 async function loadConfig() { try { const response = await fetch('public/config/radar-definition.yaml'); state.config = parseYaml(await response.text()); } catch { state.config = parseYaml(`statuses:\n  - id: assess\n    label: Assess\n    order: 1\n    backgroundColor: #A9C9E8\n    borderColor: #6E9BC7\n  - id: trial\n    label: Trial\n    order: 2\n    backgroundColor: #DCEAF6\n    borderColor: #A9C9E8\n  - id: deploy\n    label: Deploy\n    order: 3\n    backgroundColor: #C7C68B\n    borderColor: #ADA96A\n  - id: sunset\n    label: Sunset\n    order: 4\n    backgroundColor: #EFD469\n    borderColor: #D9B93F\n  - id: decommission\n    label: Decommission\n    order: 5\n    backgroundColor: #D9705B\n    borderColor: #C24E37\ndotStatuses:\n  - id: standard\n    label: Standard\n    color: #111827\n    shape: circle\n  - id: caveated\n    label: Caveated\n    color: #2563EB\n    shape: circle\n  - id: rejected\n    label: Rejected\n    color: #DC2626\n    shape: ring`); } }
-function setSource(source, addHistory = true) { if (addHistory && state.source !== source) { state.history.push(state.source); if (state.history.length > 50) state.history.shift(); state.future = []; } state.source = source; state.dirty = true; $('csvInput').value = source; localStorage.setItem('radar-builder-source', source); updateLineNumbers(); clearTimeout(state.timer); state.timer = setTimeout(parseSource, 300); }
+function setSource(source, addHistory = true) { if (addHistory && state.source !== source) { state.history.push(state.source); if (state.history.length > 50) state.history.shift(); state.future = []; } state.source = source; state.dirty = true; $('csvInput').value = source; if (!state.published) localStorage.setItem('radar-builder-source', source); updateLineNumbers(); clearTimeout(state.timer); state.timer = setTimeout(parseSource, 300); }
 function parseSource() { try { const rows = parseCsv(state.source); state.errors = validate(rows); if (!state.errors.length) state.validRows = rows; render(); } catch (error) { state.errors = [{ line: 1, message: error.message }]; render(); } }
 function updateLineNumbers() { $('lineNumbers').textContent = state.source.split('\n').map((_, index) => index + 1).join('\n'); }
 function renderErrors() { $('errorCount').textContent = state.errors.length; $('validationList').innerHTML = state.errors.length ? state.errors.map(error => `<div class="validation-item error"><strong>Line ${error.line}${error.column ? ` / ${escapeHtml(error.column)}` : ''}</strong> ${escapeHtml(error.message)}</div>`).join('') : '<div class="validation-item">No validation errors. Preview is current.</div>'; $('sourceStatus').textContent = state.errors.length ? 'Preview is showing the last valid version. Source was not discarded.' : `${state.validRows.length} valid technologies`; }
 function radarRows() { return state.validRows.filter(row => !state.selectedRadar || row[0] === state.selectedRadar); }
+function publishedMatch(row) {
+  return (!state.publishStatus || row[4] === state.publishStatus)
+    && (!state.publishCategory || row[1] === state.publishCategory)
+    && (!state.publishSearch || row.some(value => value.toLocaleLowerCase().includes(state.publishSearch)));
+}
+function refreshPublishedFilters() {
+  if (!state.published) return;
+  const choices = [
+    [$('publishStatus'), [...new Set(state.validRows.map(row => row[4]))], 'All status rings', 'publishStatus'],
+    [$('publishCategory'), [...new Set(state.validRows.map(row => row[1]))], 'All categories', 'publishCategory']
+  ];
+  choices.forEach(([select, values, allLabel, key]) => {
+    select.replaceChildren();
+    for (const value of ['', ...values.sort((a, b) => a.localeCompare(b))]) {
+      const option = document.createElement('option');
+      option.value = value; option.textContent = value || allLabel; select.append(option);
+    }
+    if (!values.includes(state[key])) state[key] = '';
+    select.value = state[key];
+  });
+}
 function commitTechnologyEdit(rowIndex, columnIndex, value, original) {
   let rows;
   try { rows = parseCsv(state.source); } catch { return 'Fix the CSV source errors in Editor before editing the preview.'; }
@@ -116,7 +142,7 @@ function renderPreview() {
     const color = dot.color || '#111827';
     const shape = dot.shape === 'ring' ? `<circle cx="${x}" cy="${y}" r="${dotRadius}" fill="#fff" stroke="${color}" stroke-width="3"/>` : `<circle cx="${x}" cy="${y}" r="${dotRadius}" fill="${color}"/>`;
     const label = numbered ? `<text x="${x}" y="${y}" class="dot-label dot-number" text-anchor="middle" dominant-baseline="central" font-family="Manrope,sans-serif" font-size="${state.textSize}" font-weight="600" fill="${dot.shape === 'ring' ? color : '#fff'}">${index + 1}</text>` : state.labels ? `<text x="${labelX}" y="${labelY}" class="dot-label" font-family="Manrope,sans-serif" font-size="${state.textSize}" font-weight="600" fill="#102a43" filter="url(#radar-label-background)">${labels[index].lines.map((line, lineIndex) => `<tspan x="${labelX}" dy="${lineIndex ? state.textSize * 1.3 : 0}">${escapeHtml(line)}</tspan>`).join('')}</text>` : '';
-    return `<g tabindex="0"><title>${escapeHtml(row.join(' / '))}</title>${shape}${label}</g>`;
+    return `<g class="${state.published && !publishedMatch(row) ? 'radar-point-dimmed' : ''}" tabindex="0"><title>${escapeHtml(row.join(' / '))}</title>${shape}${label}</g>`;
   }).join('');
   const ringLegend = rings.map(ring => `<span><i style="background:${ring.backgroundColor || '#fff'}"></i>${escapeHtml(ring.label)}</span>`).join('');
   const dotLegend = config.dotStatuses.map(item => `<span><i class="dot" style="${item.shape === 'ring' ? `background:#fff;border:3px solid ${item.color}` : `background:${item.color}`}"></i>${escapeHtml(item.label)}</span>`).join('');
@@ -126,7 +152,13 @@ function renderPreview() {
   const labelBackground = '<defs><filter id="radar-label-background" x="-3%" y="-12%" width="106%" height="124%" color-interpolation-filters="sRGB"><feFlood flood-color="#eeeeee" flood-opacity="0.85"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
   const key = state.labels && state.labelMode === 'numbers' ? radarNumberKey(rows, width, height, state.textSize, text => radarTextContext.measureText(text).width, escapeHtml, !state.selectedRadar) : { svg: '', height: 0 };
   $('radarCanvas').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="radar-svg" viewBox="0 0 ${width} ${height + key.height}" role="img" aria-label="${escapeHtml(title)} radar"><title>${escapeHtml(title)}</title>${labelBackground}${ringSvg}${boundary}${sections.svg}${dots}${key.svg}</svg><div class="legend"><h3>Status</h3>${ringLegend}<h3>Dot status</h3>${dotLegend}</div>`;
-  renderTechnologyTable(rows);
+  const visible = state.published ? rows.filter(publishedMatch) : rows;
+  renderTechnologyTable(visible);
+  if (state.published) {
+    $('publishedTitle').textContent = title;
+    $('publishedCount').textContent = `${visible.length} of ${rows.length} technologies`;
+    $('publishedCategories').textContent = `${new Set(rows.map(row => row[1])).size} categories`;
+  }
 }
 function renderRadarSelector() {
   let sourceRows = []; try { sourceRows = parseCsv(state.source); } catch { /* Keep the last valid preview's choices. */ }
@@ -141,7 +173,7 @@ function renderRadarSelector() {
   });
 }
 function selectRadar(name) { state.selectedRadar = name; renderRadarSelector(); renderPreview(); applyVisualFilters(); }
-function render() { renderErrors(); renderRadarSelector(); renderPreview(); updateLineNumbers(); if (state.editorMode === 'visual') { if (state.visualTableSource !== state.source) renderVisualEditor(); else { updateVisualErrors(); applyVisualFilters(); } } }
+function render() { renderErrors(); renderRadarSelector(); refreshPublishedFilters(); renderPreview(); updateLineNumbers(); if (state.editorMode === 'visual') { if (state.visualTableSource !== state.source) renderVisualEditor(); else { updateVisualErrors(); applyVisualFilters(); } } }
 function setEditorMode(mode, refresh = true) { state.editorMode = mode; localStorage.setItem('radar-builder-editor-mode', mode); $('visualMode').classList.toggle('active', mode === 'visual'); $('csvMode').classList.toggle('active', mode === 'csv'); $('visualMode').setAttribute('aria-pressed', String(mode === 'visual')); $('csvMode').setAttribute('aria-pressed', String(mode === 'csv')); $('visualEditor').classList.toggle('hidden', mode !== 'visual'); $('codeEditor').classList.toggle('hidden', mode !== 'csv'); $('sourceActions').classList.toggle('hidden', mode !== 'csv'); $('formatCsv').classList.toggle('hidden', mode !== 'csv'); if (mode === 'visual' && refresh) renderVisualEditor(); }
 function makeElement(tag, className, text) { const element = document.createElement(tag); if (className) element.className = className; if (text !== undefined) element.textContent = text; return element; }
 function renderVisualEditor() {
