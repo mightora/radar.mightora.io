@@ -26,7 +26,9 @@ There are no accounts, authentication, roles, server-side sessions, or server au
 | In-memory editor and `localStorage` | The user's source CSV; persistent source key is `radar-builder-source`. The Visual/CSV editor preference uses `radar-builder-editor-mode` (`visual` or `csv`). |
 | Share URL fragment | Version 1 payload containing `version`, `csv`, `mode`, and optional `selectedRadarName`; compressed and Base64URL-encoded. Anyone receiving a link can decode its CSV. |
 | Static host requests | Static application files, configuration, and selected example CSV; user CSV is not included in ordinary requests. |
-| Downloads | User-requested CSV, SVG, PNG, Word DOCX, print output, or portable project JSON. |
+| Downloads | User-requested CSV, SVG, PNG, Word DOCX, editable PowerPoint PPTX, print output, or portable project JSON. |
+
+Published `#/publish/<payload>` links use the existing compressed v1 view payload, with read-only search/category/ring filters as transient view state. Published links do not overwrite the recipient's local editor CSV. Anyone with the link can read the data. PPTX export packages native Open XML editable shapes and text boxes plus editable cell objects, preserving the semantic ring colours. No raster slide image or new runtime dependency is used.
 
 The required CSV columns, in exact order, are `Radar Name`, `Category`, `Sub Category`, `Technology`, `Status`, and `Dot Status`. Status and dot-status accepted labels and radar display vocabulary come from `public/config/radar-definition.yaml`; IDs and labels must remain aligned with that source. Share payload v1 is documented in [docs/sharing.md](../../docs/sharing.md). URL encoding is not encryption; the existing privacy warning must remain visible.
 
