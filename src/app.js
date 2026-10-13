@@ -371,6 +371,7 @@ $('examples').addEventListener('change', async event => { const select = event.c
 $('undoButton').addEventListener('click', () => { finishVisualEdit(); if (state.history.length) { state.future.push(state.source); setSource(state.history.pop(), false); if (state.editorMode === 'visual') renderVisualEditor(); } }); $('redoButton').addEventListener('click', () => { finishVisualEdit(); if (state.future.length) { state.history.push(state.source); setSource(state.future.pop(), false); if (state.editorMode === 'visual') renderVisualEditor(); } }); $('shareButton').addEventListener('click', () => $('shareDialog').showModal()); $('publishButton').addEventListener('click', () => { document.querySelector('[name=shareMode][value=publish]').checked = true; updateShareOptions(); $('shareDialog').showModal(); }); $('shareTopButton').addEventListener('click', () => $('shareDialog').showModal()); $('cancelShare').addEventListener('click', () => $('shareDialog').close()); $('closeShare').addEventListener('click', () => $('shareDialog').close()); $('shareDialog').addEventListener('change', updateShareOptions);
 $('generateShare').addEventListener('click', async () => {
   const mode = document.querySelector('[name=shareMode]:checked').value, title = escapeHtml(`${$('previewTitle').textContent} radar`);
+  if (mode === 'publish' && state.errors.length) { showToast('Fix radar validation errors before publishing.'); return; }
   try {
     let url, embed = '', meta;
     if (mode === 'image') {
