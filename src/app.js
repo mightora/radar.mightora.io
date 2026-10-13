@@ -389,6 +389,43 @@ $('generateShare').addEventListener('click', async () => {
 });
 $('copyShare').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('shareUrl').value); showToast('Share link copied'); } catch { $('shareUrl').select(); showToast('Select the link and copy it'); } });
 $('copyEmbed').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('shareEmbed').value); showToast('Embed code copied'); } catch { $('shareEmbed').select(); showToast('Select the embed code and copy it'); } });
+const powerPointThemes = {
+  plain: { background: '#FFFFFF', accent: '#25364A', secondary: '#6B7280', text: '#17212E' },
+  mightora: { background: '#F7F9FB', accent: '#E76F51', secondary: '#1769AA', text: '#102A43' },
+  ocean: { background: '#F0F8FD', accent: '#087E9B', secondary: '#2355B5', text: '#16324F' },
+  forest: { background: '#F3F9F2', accent: '#287D57', secondary: '#91AD46', text: '#1D382D' },
+  sunset: { background: '#FFF8F1', accent: '#CB593E', secondary: '#A9478C', text: '#432A35' }
+};
+function applyPowerPointTheme() {
+  const values = powerPointThemes[$('pptxTheme').value];
+  if (values) Object.entries(values).forEach(([key, value]) => { $(`pptx-${key}`).value = value; });
+}
+$('pptxTheme').addEventListener('change', applyPowerPointTheme);
+document.querySelectorAll('#pptxDialog input[type=color]').forEach(input => input.addEventListener('input', () => { $('pptxTheme').value = 'custom'; }));
+$('closePptx').addEventListener('click', () => $('pptxDialog').close());
+$('cancelPptx').addEventListener('click', () => $('pptxDialog').close());
+$('exportPptx').addEventListener('click', () => {
+  try {
+    const svg = $('radarCanvas').querySelector('svg');
+    if (!svg) throw new Error('No radar preview is available.');
+    const values = {};
+    ['background', 'accent', 'secondary', 'text'].forEach(key => { values[key] = $(`pptx-${key}`).value; });
+    const options = { ...values, theme: $('pptxTheme').value, font: $('pptxFont').value,
+      title: $('previewTitle').textContent, statuses: state.config?.statuses || [], dotStatuses: state.config?.dotStatuses || [] };
+    const presentation = powerpointRadar(svg.outerHTML, radarRows(), options, zipStore);
+    download('technology-radar.pptx', presentation, 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
+    $('pptxDialog').close();
+    showToast('Editable PowerPoint exported.');
+  } catch (error) { console.error('PowerPoint export failed', error); showToast('Could not create the PowerPoint.'); }
+});
+$('publishSearch').addEventListener('input', event => { state.publishSearch = event.target.value.trim().toLocaleLowerCase(); renderPreview(); });
+$('publishStatus').addEventListener('change', event => { state.publishStatus = event.target.value; renderPreview(); });
+$('publishCategory').addEventListener('change', event => { state.publishCategory = event.target.value; renderPreview(); });
+$('publishReset').addEventListener('click', () => {
+  state.publishSearch = ''; state.publishStatus = ''; state.publishCategory = '';
+  $('publishSearch').value = ''; $('publishStatus').value = ''; $('publishCategory').value = ''; renderPreview();
+});
+applyPowerPointTheme();
 document.querySelectorAll('[data-export]').forEach(button => button.addEventListener('click', async () => {
   const svg = $('radarCanvas').querySelector('svg');
   if (button.dataset.export === 'csv') download('technology-radar.csv', state.source, 'text/csv');
