@@ -2,9 +2,11 @@
 
 The editor stores share data in the URL fragment so the CSV is not sent to the static host. A link has this shape:
 
-`#/view/<base64url-deflate-payload>`, `#/edit/<base64url-deflate-payload>` or `#/embed/<base64url-deflate-payload>`
+`#/view/<base64url-deflate-payload>`, `#/edit/<base64url-deflate-payload>` or `#/embed/<base64url-deflate-payload>` or `#/publish/<base64url-deflate-payload>`
 
 Version 1 contains `version`, `csv`, `mode`, an optional `selectedRadarName`, and for `embed` an optional boolean `table` (default `true`). The JSON is UTF-8 encoded, compressed with browser `deflate-raw`, and encoded as unpadded Base64URL.
+
+`publish` uses the unchanged v1 view payload with a different route. It opens an interactive read-only landing with technology search, category and status filters. This is a static snapshot; source updates require a fresh published URL. A recipient's existing local editor source is not overwritten by opening a published link. There is no server storage, expiry, revocation, access control or permanent short URL. Publishing requires valid CSV.
 
 `embed` opens a read-only page containing only the radar, its legend and, unless `table` is `false`, the technology table. The dialog offers matching `<iframe>` embed code.
 

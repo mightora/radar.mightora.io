@@ -1,10 +1,10 @@
 # Technology Radar Live Editor
 
-A static, local-first CSV technology radar editor for GitHub Pages. Edit the source, validate it after a short debounce, and inspect the deterministic SVG preview. CSV, SVG, PNG, print, and portable `.radar.json` downloads are generated in the browser.
+A static, local-first CSV technology radar editor for GitHub Pages. Edit the source, validate it after a short debounce, and inspect the deterministic SVG preview. CSV, editable PowerPoint `.pptx`, Word `.docx`, SVG, PNG, print, and portable `.radar.json` downloads are generated in the browser.
 
 ## Usage
 
-Choose **Load example** or **Upload CSV**, then open **Editor** and select **Visual** or **CSV**. Fix any **Errors**, inspect **Preview**, and use **Download CSV**, **Exports** or **Share** to save or share your radar. Share links are encoded, not encrypted.
+Choose **Load example** or **Upload CSV**, then open **Editor** and select **Visual** or **CSV**. Fix any **Errors**, inspect **Preview**, and use **Download CSV**, **Exports** or **Share** to save or share your radar. Use **PowerPoint (.pptx)** in Exports for native editable shapes, labels, legends and technology-detail slides. Select Plain, Mightora, Ocean, Forest, Sunset or custom colours and fonts. **Publish roadmap** creates a branded, interactive, view-only snapshot with search, category and status filtering. Publish a new link whenever the source changes. Share links are encoded, not encrypted.
 
 Read the [user guide](guide/index.html) for a walkthrough, the required CSV columns, validation help, export formats and privacy details. The built guide is available at `/guide/`; both in-app **Documentation** links point there. [docs/sharing.md](docs/sharing.md) remains the technical share-format reference.
 
@@ -20,7 +20,7 @@ npm run test:e2e
 python -m http.server 8080 -d dist
 ```
 
-Open `http://localhost:8080/` or the guide at `http://localhost:8080/guide/`. The build copies `index.html`, `src/`, `public/` and `guide/` into `dist`; edit those sources rather than generated files. `npm run test:e2e` rebuilds `dist`, starts the same Python static server, and runs the Chromium browser tests. The separate Python command is available for manual browser checks. Hash routes such as `#/view/<payload>` and `#/edit/<payload>` work beneath a repository subpath on GitHub Pages.
+Open `http://localhost:8080/` or the guide at `http://localhost:8080/guide/`. The build copies `index.html`, `src/`, `public/` and `guide/` into `dist`; edit those sources rather than generated files. `npm run test:e2e` rebuilds `dist`, starts the same Python static server, and runs the Chromium browser tests. The separate Python command is available for manual browser checks. Hash routes such as `#/view/<payload>`, `#/edit/<payload>` and `#/publish/<payload>` work beneath a repository subpath on GitHub Pages.
 
 To run the full local check suite and save its logs and Playwright report, run `scripts/run-all-tests.ps1` in PowerShell or `bash scripts/run-all-tests.sh` in Bash. Each run writes a summary, per-check logs, and the HTML report under a new `test-results/local-*` directory.
 

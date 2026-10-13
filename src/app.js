@@ -1,5 +1,6 @@
 import { createPreviewTable } from './preview-table.js';
 import { wordRadar } from './word-radar.js';
+import { powerpointRadar } from './powerpoint-radar.js';
 import { radarSections, radarPoints, wrapRadarLabel, radarNumberKey } from './radar-sections.js';
 
 const REQUIRED = ['Radar Name', 'Category', 'Sub Category', 'Technology', 'Status', 'Dot Status'];
@@ -27,6 +28,10 @@ const state = { source: EXAMPLE, validRows: [], errors: [], config: null, histor
 const $ = id => document.getElementById(id);
 state.textSize = 11;
 state.labelMode = 'names';
+state.published = false;
+state.publishSearch = '';
+state.publishStatus = '';
+state.publishCategory = '';
 const radarTextContext = document.createElement('canvas').getContext('2d');
 const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
 const escapeXml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' }[char]));
@@ -60,11 +65,32 @@ function validate(rows) {
 
 function parseYaml(text) { const config = { statuses: [], dotStatuses: [] }; let section = ''; let item = null; text.split(/\r?\n/).forEach(line => { const sectionMatch = line.match(/^(statuses|dotStatuses):/); if (sectionMatch) { section = sectionMatch[1]; return; } const itemMatch = line.match(/^\s+- id:\s*(.+)$/); if (itemMatch) { item = { id: itemMatch[1].trim() }; config[section].push(item); return; } const value = line.match(/^\s+(label|order|description|backgroundColor|borderColor|color|shape):\s*(.*)$/); if (value && item) item[value[1]] = value[2].replace(/^['"]|['"]$/g, ''); }); return config; }
 async function loadConfig() { try { const response = await fetch('public/config/radar-definition.yaml'); state.config = parseYaml(await response.text()); } catch { state.config = parseYaml(`statuses:\n  - id: assess\n    label: Assess\n    order: 1\n    backgroundColor: #A9C9E8\n    borderColor: #6E9BC7\n  - id: trial\n    label: Trial\n    order: 2\n    backgroundColor: #DCEAF6\n    borderColor: #A9C9E8\n  - id: deploy\n    label: Deploy\n    order: 3\n    backgroundColor: #C7C68B\n    borderColor: #ADA96A\n  - id: sunset\n    label: Sunset\n    order: 4\n    backgroundColor: #EFD469\n    borderColor: #D9B93F\n  - id: decommission\n    label: Decommission\n    order: 5\n    backgroundColor: #D9705B\n    borderColor: #C24E37\ndotStatuses:\n  - id: standard\n    label: Standard\n    color: #111827\n    shape: circle\n  - id: caveated\n    label: Caveated\n    color: #2563EB\n    shape: circle\n  - id: rejected\n    label: Rejected\n    color: #DC2626\n    shape: ring`); } }
-function setSource(source, addHistory = true) { if (addHistory && state.source !== source) { state.history.push(state.source); if (state.history.length > 50) state.history.shift(); state.future = []; } state.source = source; state.dirty = true; $('csvInput').value = source; localStorage.setItem('radar-builder-source', source); updateLineNumbers(); clearTimeout(state.timer); state.timer = setTimeout(parseSource, 300); }
+function setSource(source, addHistory = true) { if (addHistory && state.source !== source) { state.history.push(state.source); if (state.history.length > 50) state.history.shift(); state.future = []; } state.source = source; state.dirty = true; $('csvInput').value = source; if (!state.published) localStorage.setItem('radar-builder-source', source); updateLineNumbers(); clearTimeout(state.timer); state.timer = setTimeout(parseSource, 300); }
 function parseSource() { try { const rows = parseCsv(state.source); state.errors = validate(rows); if (!state.errors.length) state.validRows = rows; render(); } catch (error) { state.errors = [{ line: 1, message: error.message }]; render(); } }
 function updateLineNumbers() { $('lineNumbers').textContent = state.source.split('\n').map((_, index) => index + 1).join('\n'); }
 function renderErrors() { $('errorCount').textContent = state.errors.length; $('validationList').innerHTML = state.errors.length ? state.errors.map(error => `<div class="validation-item error"><strong>Line ${error.line}${error.column ? ` / ${escapeHtml(error.column)}` : ''}</strong> ${escapeHtml(error.message)}</div>`).join('') : '<div class="validation-item">No validation errors. Preview is current.</div>'; $('sourceStatus').textContent = state.errors.length ? 'Preview is showing the last valid version. Source was not discarded.' : `${state.validRows.length} valid technologies`; }
 function radarRows() { return state.validRows.filter(row => !state.selectedRadar || row[0] === state.selectedRadar); }
+function publishedMatch(row) {
+  return (!state.publishStatus || row[4] === state.publishStatus)
+    && (!state.publishCategory || row[1] === state.publishCategory)
+    && (!state.publishSearch || row.some(value => value.toLocaleLowerCase().includes(state.publishSearch)));
+}
+function refreshPublishedFilters() {
+  if (!state.published) return;
+  const choices = [
+    [$('publishStatus'), [...new Set(state.validRows.map(row => row[4]))], 'All status rings', 'publishStatus'],
+    [$('publishCategory'), [...new Set(state.validRows.map(row => row[1]))], 'All categories', 'publishCategory']
+  ];
+  choices.forEach(([select, values, allLabel, key]) => {
+    select.replaceChildren();
+    for (const value of ['', ...values.sort((a, b) => a.localeCompare(b))]) {
+      const option = document.createElement('option');
+      option.value = value; option.textContent = value || allLabel; select.append(option);
+    }
+    if (!values.includes(state[key])) state[key] = '';
+    select.value = state[key];
+  });
+}
 function commitTechnologyEdit(rowIndex, columnIndex, value, original) {
   let rows;
   try { rows = parseCsv(state.source); } catch { return 'Fix the CSV source errors in Editor before editing the preview.'; }
@@ -116,7 +142,7 @@ function renderPreview() {
     const color = dot.color || '#111827';
     const shape = dot.shape === 'ring' ? `<circle cx="${x}" cy="${y}" r="${dotRadius}" fill="#fff" stroke="${color}" stroke-width="3"/>` : `<circle cx="${x}" cy="${y}" r="${dotRadius}" fill="${color}"/>`;
     const label = numbered ? `<text x="${x}" y="${y}" class="dot-label dot-number" text-anchor="middle" dominant-baseline="central" font-family="Manrope,sans-serif" font-size="${state.textSize}" font-weight="600" fill="${dot.shape === 'ring' ? color : '#fff'}">${index + 1}</text>` : state.labels ? `<text x="${labelX}" y="${labelY}" class="dot-label" font-family="Manrope,sans-serif" font-size="${state.textSize}" font-weight="600" fill="#102a43" filter="url(#radar-label-background)">${labels[index].lines.map((line, lineIndex) => `<tspan x="${labelX}" dy="${lineIndex ? state.textSize * 1.3 : 0}">${escapeHtml(line)}</tspan>`).join('')}</text>` : '';
-    return `<g tabindex="0"><title>${escapeHtml(row.join(' / '))}</title>${shape}${label}</g>`;
+    return `<g class="${state.published && !publishedMatch(row) ? 'radar-point-dimmed' : ''}" tabindex="0"><title>${escapeHtml(row.join(' / '))}</title>${shape}${label}</g>`;
   }).join('');
   const ringLegend = rings.map(ring => `<span><i style="background:${ring.backgroundColor || '#fff'}"></i>${escapeHtml(ring.label)}</span>`).join('');
   const dotLegend = config.dotStatuses.map(item => `<span><i class="dot" style="${item.shape === 'ring' ? `background:#fff;border:3px solid ${item.color}` : `background:${item.color}`}"></i>${escapeHtml(item.label)}</span>`).join('');
@@ -126,7 +152,13 @@ function renderPreview() {
   const labelBackground = '<defs><filter id="radar-label-background" x="-3%" y="-12%" width="106%" height="124%" color-interpolation-filters="sRGB"><feFlood flood-color="#eeeeee" flood-opacity="0.85"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
   const key = state.labels && state.labelMode === 'numbers' ? radarNumberKey(rows, width, height, state.textSize, text => radarTextContext.measureText(text).width, escapeHtml, !state.selectedRadar) : { svg: '', height: 0 };
   $('radarCanvas').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="radar-svg" viewBox="0 0 ${width} ${height + key.height}" role="img" aria-label="${escapeHtml(title)} radar"><title>${escapeHtml(title)}</title>${labelBackground}${ringSvg}${boundary}${sections.svg}${dots}${key.svg}</svg><div class="legend"><h3>Status</h3>${ringLegend}<h3>Dot status</h3>${dotLegend}</div>`;
-  renderTechnologyTable(rows);
+  const visible = state.published ? rows.filter(publishedMatch) : rows;
+  renderTechnologyTable(visible);
+  if (state.published) {
+    $('publishedTitle').textContent = title;
+    $('publishedCount').textContent = `${visible.length} of ${rows.length} technologies`;
+    $('publishedCategories').textContent = `${new Set(rows.map(row => row[1])).size} categories`;
+  }
 }
 function renderRadarSelector() {
   let sourceRows = []; try { sourceRows = parseCsv(state.source); } catch { /* Keep the last valid preview's choices. */ }
@@ -141,7 +173,7 @@ function renderRadarSelector() {
   });
 }
 function selectRadar(name) { state.selectedRadar = name; renderRadarSelector(); renderPreview(); applyVisualFilters(); }
-function render() { renderErrors(); renderRadarSelector(); renderPreview(); updateLineNumbers(); if (state.editorMode === 'visual') { if (state.visualTableSource !== state.source) renderVisualEditor(); else { updateVisualErrors(); applyVisualFilters(); } } }
+function render() { renderErrors(); renderRadarSelector(); refreshPublishedFilters(); renderPreview(); updateLineNumbers(); if (state.editorMode === 'visual') { if (state.visualTableSource !== state.source) renderVisualEditor(); else { updateVisualErrors(); applyVisualFilters(); } } }
 function setEditorMode(mode, refresh = true) { state.editorMode = mode; localStorage.setItem('radar-builder-editor-mode', mode); $('visualMode').classList.toggle('active', mode === 'visual'); $('csvMode').classList.toggle('active', mode === 'csv'); $('visualMode').setAttribute('aria-pressed', String(mode === 'visual')); $('csvMode').setAttribute('aria-pressed', String(mode === 'csv')); $('visualEditor').classList.toggle('hidden', mode !== 'visual'); $('codeEditor').classList.toggle('hidden', mode !== 'csv'); $('sourceActions').classList.toggle('hidden', mode !== 'csv'); $('formatCsv').classList.toggle('hidden', mode !== 'csv'); if (mode === 'visual' && refresh) renderVisualEditor(); }
 function makeElement(tag, className, text) { const element = document.createElement(tag); if (className) element.className = className; if (text !== undefined) element.textContent = text; return element; }
 function renderVisualEditor() {
@@ -336,9 +368,10 @@ document.fonts.ready.then(() => { if (state.config) renderPreview(); });
 $('csvInput').addEventListener('input', event => { state.source = event.target.value; state.dirty = true; updateLineNumbers(); clearTimeout(state.timer); state.timer = setTimeout(parseSource, 300); }); $('csvInput').addEventListener('scroll', () => { $('lineNumbers').scrollTop = $('csvInput').scrollTop; });
 $('formatCsv').addEventListener('click', () => { try { const rows = parseCsv(state.source); setSource(csvString(rows)); } catch (error) { showToast(error.message); } }); $('downloadCsv').addEventListener('click', () => download('technology-radar.csv', state.source, 'text/csv')); $('toggleLabels').addEventListener('click', () => { state.labels = !state.labels; renderPreview(); }); $('resetView').addEventListener('click', () => selectRadar('')); $('uploadButton').addEventListener('click', () => $('projectFile').click()); $('projectFile').addEventListener('change', async event => { const file = event.target.files[0]; if (file) setSource(await file.text()); event.target.value = ''; });
 $('examples').addEventListener('change', async event => { const select = event.currentTarget, name = select.value; select.value = ''; if (!name || !EXAMPLE_FILES[name]) return; if (state.dirty && !confirm('Replace the current source?')) return; try { const response = await fetch(EXAMPLE_FILES[name]); if (!response.ok) throw new Error('Not found'); setSource(await response.text()); } catch { showToast(`Could not load the “${name}” example.`); } }); $('newButton').addEventListener('click', () => { if (!state.dirty || confirm('Replace the current source with a blank radar?')) setSource(REQUIRED.join(',') + '\n'); });
-$('undoButton').addEventListener('click', () => { finishVisualEdit(); if (state.history.length) { state.future.push(state.source); setSource(state.history.pop(), false); if (state.editorMode === 'visual') renderVisualEditor(); } }); $('redoButton').addEventListener('click', () => { finishVisualEdit(); if (state.future.length) { state.history.push(state.source); setSource(state.future.pop(), false); if (state.editorMode === 'visual') renderVisualEditor(); } }); $('shareButton').addEventListener('click', () => $('shareDialog').showModal()); $('shareTopButton').addEventListener('click', () => $('shareDialog').showModal()); $('cancelShare').addEventListener('click', () => $('shareDialog').close()); $('closeShare').addEventListener('click', () => $('shareDialog').close()); $('shareDialog').addEventListener('change', updateShareOptions);
+$('undoButton').addEventListener('click', () => { finishVisualEdit(); if (state.history.length) { state.future.push(state.source); setSource(state.history.pop(), false); if (state.editorMode === 'visual') renderVisualEditor(); } }); $('redoButton').addEventListener('click', () => { finishVisualEdit(); if (state.future.length) { state.history.push(state.source); setSource(state.future.pop(), false); if (state.editorMode === 'visual') renderVisualEditor(); } }); $('shareButton').addEventListener('click', () => $('shareDialog').showModal()); $('publishButton').addEventListener('click', () => { document.querySelector('[name=shareMode][value=publish]').checked = true; updateShareOptions(); $('shareDialog').showModal(); }); $('shareTopButton').addEventListener('click', () => $('shareDialog').showModal()); $('cancelShare').addEventListener('click', () => $('shareDialog').close()); $('closeShare').addEventListener('click', () => $('shareDialog').close()); $('shareDialog').addEventListener('change', updateShareOptions);
 $('generateShare').addEventListener('click', async () => {
   const mode = document.querySelector('[name=shareMode]:checked').value, title = escapeHtml(`${$('previewTitle').textContent} radar`);
+  if (mode === 'publish' && state.errors.length) { showToast('Fix radar validation errors before publishing.'); return; }
   try {
     let url, embed = '', meta;
     if (mode === 'image') {
@@ -346,9 +379,9 @@ $('generateShare').addEventListener('click', async () => {
       url = await radarImageUrl(format); embed = `<img src="${url}" alt="${title}">`;
       meta = `${url.length} characters; self-contained ${format.toUpperCase()} image of the displayed radar. Use it as an image source; it is a snapshot and does not update.`;
     } else {
-      url = await encodeShare(mode);
+      url = mode === 'publish' ? (await encodeShare('view')).replace('#/view/', '#/publish/') : await encodeShare(mode);
       if (mode === 'embed') embed = `<iframe src="${url}" title="${title}" width="100%" height="${$('shareIncludeTable').checked ? 1400 : 800}" style="border:0" loading="lazy"></iframe>`;
-      meta = `${url.length} characters; ${state.validRows.length} technologies; encoded, not encrypted.`;
+      meta = `${url.length} characters; ${state.validRows.length} technologies; ${mode === 'publish' ? 'public read-only snapshot; ' : ''}encoded, not encrypted.`;
     }
     $('shareUrl').value = url; $('shareEmbed').value = embed; $('shareMeta').textContent = meta;
     $('shareEmbedField').classList.toggle('hidden', !embed); $('copyEmbed').classList.toggle('hidden', !embed);
@@ -357,9 +390,48 @@ $('generateShare').addEventListener('click', async () => {
 });
 $('copyShare').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('shareUrl').value); showToast('Share link copied'); } catch { $('shareUrl').select(); showToast('Select the link and copy it'); } });
 $('copyEmbed').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('shareEmbed').value); showToast('Embed code copied'); } catch { $('shareEmbed').select(); showToast('Select the embed code and copy it'); } });
+const powerPointThemes = {
+  plain: { background: '#FFFFFF', accent: '#25364A', secondary: '#6B7280', text: '#17212E' },
+  mightora: { background: '#F7F9FB', accent: '#E76F51', secondary: '#1769AA', text: '#102A43' },
+  ocean: { background: '#F0F8FD', accent: '#087E9B', secondary: '#2355B5', text: '#16324F' },
+  forest: { background: '#F3F9F2', accent: '#287D57', secondary: '#91AD46', text: '#1D382D' },
+  sunset: { background: '#FFF8F1', accent: '#CB593E', secondary: '#A9478C', text: '#432A35' }
+};
+function applyPowerPointTheme() {
+  const values = powerPointThemes[$('pptxTheme').value];
+  if (values) Object.entries(values).forEach(([key, value]) => { $(`pptx-${key}`).value = value; });
+}
+$('pptxTheme').addEventListener('change', applyPowerPointTheme);
+$('pptxFont').addEventListener('change', event => { $('pptxCustomFont').classList.toggle('hidden', event.target.value !== 'custom'); });
+document.querySelectorAll('#pptxDialog input[type=color]').forEach(input => input.addEventListener('input', () => { $('pptxTheme').value = 'custom'; }));
+$('closePptx').addEventListener('click', () => $('pptxDialog').close());
+$('cancelPptx').addEventListener('click', () => $('pptxDialog').close());
+$('exportPptx').addEventListener('click', () => {
+  try {
+    const svg = $('radarCanvas').querySelector('svg');
+    if (!svg) throw new Error('No radar preview is available.');
+    const values = {};
+    ['background', 'accent', 'secondary', 'text'].forEach(key => { values[key] = $(`pptx-${key}`).value; });
+    const options = { ...values, theme: $('pptxTheme').value, font: $('pptxFont').value === 'custom' ? ($('pptxCustomFont').value.trim() || 'Aptos') : $('pptxFont').value,
+      title: $('previewTitle').textContent, statuses: state.config?.statuses || [], dotStatuses: state.config?.dotStatuses || [] };
+    const presentation = powerpointRadar(svg.outerHTML, radarRows(), options, zipStore);
+    download('technology-radar.pptx', presentation, 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
+    $('pptxDialog').close();
+    showToast('Editable PowerPoint exported.');
+  } catch (error) { console.error('PowerPoint export failed', error); showToast('Could not create the PowerPoint.'); }
+});
+$('publishSearch').addEventListener('input', event => { state.publishSearch = event.target.value.trim().toLocaleLowerCase(); renderPreview(); });
+$('publishStatus').addEventListener('change', event => { state.publishStatus = event.target.value; renderPreview(); });
+$('publishCategory').addEventListener('change', event => { state.publishCategory = event.target.value; renderPreview(); });
+$('publishReset').addEventListener('click', () => {
+  state.publishSearch = ''; state.publishStatus = ''; state.publishCategory = '';
+  $('publishSearch').value = ''; $('publishStatus').value = ''; $('publishCategory').value = ''; renderPreview();
+});
+applyPowerPointTheme();
 document.querySelectorAll('[data-export]').forEach(button => button.addEventListener('click', async () => {
   const svg = $('radarCanvas').querySelector('svg');
   if (button.dataset.export === 'csv') download('technology-radar.csv', state.source, 'text/csv');
+  if (button.dataset.export === 'pptx') { $('pptxDialog').showModal(); return; }
   if (button.dataset.export === 'word') {
     try { download('technology-radar.docx', await wordDocument(radarRows(), svg.outerHTML), 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'); }
     catch { showToast('Could not create the Word document.'); }
@@ -370,5 +442,30 @@ document.querySelectorAll('[data-export]').forEach(button => button.addEventList
   if (button.dataset.export === 'project') download('technology-radar.radar.json', JSON.stringify({ format: 'mightora-technology-radar', version: 1, createdAt: new Date().toISOString(), radarData: { csv: state.source }, configuration: { strategy: 'embedded', labelMode: state.labelMode } }, null, 2), 'application/json');
 }));
 window.addEventListener('keydown', event => { if (!(event.ctrlKey || event.metaKey) || event.target.closest('.technology-cell-input')) return; if (event.key.toLowerCase() === 'z') { event.preventDefault(); (event.shiftKey ? $('redoButton') : $('undoButton')).click(); } if (event.key.toLowerCase() === 'y') { event.preventDefault(); $('redoButton').click(); } }); window.addEventListener('beforeunload', event => { if (state.dirty) { event.preventDefault(); event.returnValue = ''; } });
-async function loadShared() { const match = location.hash.match(/^#\/(view|edit|embed)\/(.+)$/); if (!match) return false; try { const payload = await decodeShare(match[2]); if (payload.version !== 1 || typeof payload.csv !== 'string') throw new Error('Unsupported share payload.'); state.selectedRadar = payload.selectedRadarName || ''; setSource(payload.csv, false); state.dirty = false; if (match[1] === 'edit') openTab('data'); else { $('dataPanel').classList.remove('active-panel'); $('dataPanel').classList.add('hidden'); openTab('preview'); if (match[1] === 'embed') { document.body.classList.add('embed-mode'); document.body.classList.toggle('embed-no-table', payload.table === false); } else showToast('View-only radar loaded.'); } return true; } catch (error) { showToast(`Could not open shared radar: ${error.message}`); return false; } }
+async function loadShared() {
+  const match = location.hash.match(/^#\/(view|edit|embed|publish)\/(.+)$/);
+  if (!match) return false;
+  try {
+    const payload = await decodeShare(match[2]);
+    if (payload.version !== 1 || typeof payload.csv !== 'string') throw new Error('Unsupported share payload.');
+    state.selectedRadar = payload.selectedRadarName || '';
+    state.published = match[1] === 'publish';
+    setSource(payload.csv, false);
+    state.dirty = false;
+    if (match[1] === 'edit') openTab('data');
+    else {
+      $('dataPanel').classList.remove('active-panel');
+      $('dataPanel').classList.add('hidden');
+      openTab('preview');
+      if (match[1] === 'embed') {
+        document.body.classList.add('embed-mode');
+        document.body.classList.toggle('embed-no-table', payload.table === false);
+      } else if (state.published) {
+        document.body.classList.add('published-mode');
+        $('publishedLanding').classList.remove('hidden');
+      } else showToast('View-only radar loaded.');
+    }
+    return true;
+  } catch (error) { state.published = false; showToast(`Could not open shared radar: ${error.message}`); return false; }
+}
 loadConfig().then(async () => { if (await loadShared()) return; state.source = localStorage.getItem('radar-builder-source') || EXAMPLE; $('csvInput').value = state.source; parseSource(); }); $('csvInput').addEventListener('input', () => localStorage.setItem('radar-builder-source', state.source));
