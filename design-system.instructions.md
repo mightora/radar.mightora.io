@@ -44,10 +44,15 @@ The header is built dynamically as a Web Component to keep consistency across va
   </mightora-header>
   ```
 
-### AA. Quick Navigation Bar (`<nav class="quick-jump-nav">`)
-To optimize the scanning experience and reduce long scroll times, we feature a sticky quick-jump bar directly beneath the dynamic header on the home view screen, plus an automated dynamic Table of Contents (`<nav class="connector-toc">`) injected at the top of detail document pages.
-- The sticky navigation bar links must use structural hash values with corresponding sections.
-- Ensure `scroll-margin-top` holds height accommodations so headers do not collide behind the sticky navigation bar in views.
+### AA. Persistent Header and Quick Navigation (mandatory on scrolling tools)
+**Keep the main navigation visible at the top of the viewport while users scroll.** This is a standing Mightora requirement for long-page static tools, not an optional visual enhancement.
+- Use a sticky `<mightora-header>` as the primary navigation. Where a page has multiple sections, keep `<nav class="quick-jump-nav">` visible directly **beneath** the header. Detail documentation pages may also inject a dynamic `<nav class="connector-toc">` at the appropriate level.
+- Apply `position: sticky`, with the primary header at `top: 0` and secondary navigation at the **actual rendered header height**, including changes at responsive breakpoints. Measure the height when a shared component or dynamic layout makes a fixed CSS offset unreliable.
+- Maintain deliberate stacking (`z-index`) so the mobile hamburger menu, popovers, focus rings and dialogs are not hidden beneath the quick-navigation bar.
+- Quick-navigation links must use structural hash targets that actually exist. Use `scroll-padding-top` and/or `scroll-margin-top` to keep targeted section headings and focused controls visible beneath *all* sticky navigation layers.
+- On mobile, preserve the working Mightora hamburger menu and allow section shortcuts to scroll horizontally or move into an accessible, clearly labelled collapsible menu. Avoid horizontal overflow of the entire page; all links must remain keyboard accessible.
+- Embedded/model-driven editions may use one compact sticky header rather than the public two-tier header. Offline editions retain equivalent navigation behaviour without network dependencies.
+- Verify by scrolling long pages, following hash links, opening the mobile menu, resizing the browser, and navigating by keyboard; include automated regression checks for the sticky styles and correct navigation offsets.
 
 ### B. Title/Footer Element (`<mightora-footer>`)
 We must use the `<mightora-footer>` web component instead of a raw static HTML footer. This ensures column lists and brand card buttons render dynamically.
