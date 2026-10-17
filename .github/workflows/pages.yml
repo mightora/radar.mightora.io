@@ -25,6 +25,10 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run build
+      - name: Bundle shared Mightora footer
+        uses: mightora/shared-ui/.github/actions/sync-footer@main
+        with:
+          output-directory: dist
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
